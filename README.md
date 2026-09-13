@@ -35,6 +35,26 @@ A single-page game (`index.html`, vanilla HTML/CSS/JS, no build tooling) —
   original's `.PCX` art and exact copy are not reused; only the game
   *mechanics and structure* are carried over.
 
+## Development
+
+The game itself has no build step or dependencies — `index.html` is
+self-contained on purpose (it's also published as a Claude Artifact, which
+requires a single inline file). The tooling below is dev-only, kept out of
+the runtime entirely.
+
+```
+make install     # one-time: installs prettier/eslint/stylelint/Playwright
+make dev          # serve the game at http://localhost:8000 (needs only Python)
+make format       # check formatting               make format-fix  # apply it
+make lint         # eslint (inline <script>) + stylelint (inline <style>)
+make test         # Playwright smoke tests, headless
+make check        # format + lint + test — what CI should run
+```
+
+Run `make help` for the full list. `make dev`/`make serve` only need Python
+(already on most systems) — everything else needs Node.js (`make install`
+pulls the rest, including a Chromium build for the tests).
+
 ## Status
 
 Actively evolving against reference material (screenshots and a playthrough
