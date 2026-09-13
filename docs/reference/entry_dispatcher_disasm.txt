@@ -1,0 +1,783 @@
+; CHEOPS.EXE entry point disassembly (linear sweep, x86-16 real mode)
+; header_size=0x1930 entry cs:ip = 0000:078a (file offset 0x20ba)
+
+00078a:  9a00000317               lcall	0x1703, 0
+00078f:  9a0b008c16               lcall	0x168c, 0xb
+000794:  9a00002a16               lcall	0x162a, 0
+000799:  9ad9187912               lcall	0x1279, 0x18d9
+00079e:  9a7106f311               lcall	0x11f3, 0x671
+0007a3:  9aa703b611               lcall	0x11b6, 0x3a7
+0007a8:  9a8d182410               lcall	0x1024, 0x188d
+0007ad:  9afc001310               lcall	0x1013, 0xfc
+0007b2:  9a4711fd0e               lcall	0xefd, 0x1147
+0007b7:  9a6b05a20e               lcall	0xea2, 0x56b
+0007bc:  9a00007509               lcall	0x975, 0
+0007c1:  9a00003707               lcall	0x737, 0
+0007c6:  9a00002304               lcall	0x423, 0
+0007cb:  55                       push	bp
+0007cc:  89e5                     mov	bp, sp
+0007ce:  9a3400c501               lcall	0x1c5, 0x34
+0007d3:  0e                       push	cs
+0007d4:  e849f8                   call	0x20
+0007d7:  0e                       push	cs
+0007d8:  e8a5fe                   call	0x680
+0007db:  803e29a001               cmp	byte ptr [0xa029], 1
+0007e0:  7d05                     jge	0x7e7
+0007e2:  c60629a001               mov	byte ptr [0xa029], 1
+0007e7:  a029a0                   mov	al, byte ptr [0xa029]
+0007ea:  3c01                     cmp	al, 1
+0007ec:  7512                     jne	0x800
+0007ee:  b81900                   mov	ax, 0x19
+0007f1:  50                       push	ax
+0007f2:  b001                     mov	al, 1
+0007f4:  50                       push	ax
+0007f5:  b000                     mov	al, 0
+0007f7:  50                       push	ax
+0007f8:  9a25007c01               lcall	0x17c, 0x25
+0007fd:  e98b06                   jmp	0xe8b
+000800:  3c02                     cmp	al, 2
+000802:  7512                     jne	0x816
+000804:  b82000                   mov	ax, 0x20
+000807:  50                       push	ax
+000808:  b001                     mov	al, 1
+00080a:  50                       push	ax
+00080b:  b000                     mov	al, 0
+00080d:  50                       push	ax
+00080e:  9a2a007c01               lcall	0x17c, 0x2a
+000813:  e97506                   jmp	0xe8b
+000816:  3c03                     cmp	al, 3
+000818:  750c                     jne	0x826
+00081a:  b80100                   mov	ax, 1
+00081d:  50                       push	ax
+00081e:  9a25000b01               lcall	0x10b, 0x25
+000823:  e96506                   jmp	0xe8b
+000826:  3c04                     cmp	al, 4
+000828:  7512                     jne	0x83c
+00082a:  b80900                   mov	ax, 9
+00082d:  50                       push	ax
+00082e:  b001                     mov	al, 1
+000830:  50                       push	ax
+000831:  b000                     mov	al, 0
+000833:  50                       push	ax
+000834:  9a2f007c01               lcall	0x17c, 0x2f
+000839:  e94f06                   jmp	0xe8b
+00083c:  3c05                     cmp	al, 5
+00083e:  7511                     jne	0x851
+000840:  9a2a005b01               lcall	0x15b, 0x2a
+000845:  bf1c07                   mov	di, 0x71c
+000848:  0e                       push	cs
+000849:  57                       push	di
+00084a:  0e                       push	cs
+00084b:  e806fa                   call	0x254
+00084e:  e93a06                   jmp	0xe8b
+000851:  3c06                     cmp	al, 6
+000853:  7512                     jne	0x867
+000855:  b86400                   mov	ax, 0x64
+000858:  50                       push	ax
+000859:  b001                     mov	al, 1
+00085b:  50                       push	ax
+00085c:  b000                     mov	al, 0
+00085e:  50                       push	ax
+00085f:  9a34007c01               lcall	0x17c, 0x34
+000864:  e92406                   jmp	0xe8b
+000867:  3c07                     cmp	al, 7
+000869:  7512                     jne	0x87d
+00086b:  b80100                   mov	ax, 1
+00086e:  50                       push	ax
+00086f:  b001                     mov	al, 1
+000871:  50                       push	ax
+000872:  b000                     mov	al, 0
+000874:  50                       push	ax
+000875:  9a3e007c01               lcall	0x17c, 0x3e
+00087a:  e90e06                   jmp	0xe8b
+00087d:  3c08                     cmp	al, 8
+00087f:  751b                     jne	0x89c
+000881:  b86400                   mov	ax, 0x64
+000884:  50                       push	ax
+000885:  b001                     mov	al, 1
+000887:  50                       push	ax
+000888:  b001                     mov	al, 1
+00088a:  50                       push	ax
+00088b:  9a39007c01               lcall	0x17c, 0x39
+000890:  bf2407                   mov	di, 0x724
+000893:  0e                       push	cs
+000894:  57                       push	di
+000895:  0e                       push	cs
+000896:  e8bbf9                   call	0x254
+000899:  e9ef05                   jmp	0xe8b
+00089c:  3c09                     cmp	al, 9
+00089e:  750c                     jne	0x8ac
+0008a0:  b80200                   mov	ax, 2
+0008a3:  50                       push	ax
+0008a4:  9a25005301               lcall	0x153, 0x25
+0008a9:  e9df05                   jmp	0xe8b
+0008ac:  3c0a                     cmp	al, 0xa
+0008ae:  750b                     jne	0x8bb
+0008b0:  b003                     mov	al, 3
+0008b2:  50                       push	ax
+0008b3:  9a2500eb00               lcall	0xeb, 0x25
+0008b8:  e9d005                   jmp	0xe8b
+0008bb:  3c0b                     cmp	al, 0xb
+0008bd:  7512                     jne	0x8d1
+0008bf:  b87800                   mov	ax, 0x78
+0008c2:  50                       push	ax
+0008c3:  b001                     mov	al, 1
+0008c5:  50                       push	ax
+0008c6:  b000                     mov	al, 0
+0008c8:  50                       push	ax
+0008c9:  9a48007c01               lcall	0x17c, 0x48
+0008ce:  e9ba05                   jmp	0xe8b
+0008d1:  3c0c                     cmp	al, 0xc
+0008d3:  7512                     jne	0x8e7
+0008d5:  b81e00                   mov	ax, 0x1e
+0008d8:  50                       push	ax
+0008d9:  b001                     mov	al, 1
+0008db:  50                       push	ax
+0008dc:  b000                     mov	al, 0
+0008de:  50                       push	ax
+0008df:  9a25007c01               lcall	0x17c, 0x25
+0008e4:  e9a405                   jmp	0xe8b
+0008e7:  3c0d                     cmp	al, 0xd
+0008e9:  7508                     jne	0x8f3
+0008eb:  9a25005b01               lcall	0x15b, 0x25
+0008f0:  e99805                   jmp	0xe8b
+0008f3:  3c0e                     cmp	al, 0xe
+0008f5:  751b                     jne	0x912
+0008f7:  b86400                   mov	ax, 0x64
+0008fa:  50                       push	ax
+0008fb:  b001                     mov	al, 1
+0008fd:  50                       push	ax
+0008fe:  b001                     mov	al, 1
+000900:  50                       push	ax
+000901:  9a2a007c01               lcall	0x17c, 0x2a
+000906:  bf2a07                   mov	di, 0x72a
+000909:  0e                       push	cs
+00090a:  57                       push	di
+00090b:  0e                       push	cs
+00090c:  e845f9                   call	0x254
+00090f:  e97905                   jmp	0xe8b
+000912:  3c0f                     cmp	al, 0xf
+000914:  7508                     jne	0x91e
+000916:  9a25004a01               lcall	0x14a, 0x25
+00091b:  e96d05                   jmp	0xe8b
+00091e:  3c10                     cmp	al, 0x10
+000920:  7512                     jne	0x934
+000922:  b86400                   mov	ax, 0x64
+000925:  50                       push	ax
+000926:  b001                     mov	al, 1
+000928:  50                       push	ax
+000929:  b000                     mov	al, 0
+00092b:  50                       push	ax
+00092c:  9a43007c01               lcall	0x17c, 0x43
+000931:  e95705                   jmp	0xe8b
+000934:  3c11                     cmp	al, 0x11
+000936:  7512                     jne	0x94a
+000938:  b80200                   mov	ax, 2
+00093b:  50                       push	ax
+00093c:  b000                     mov	al, 0
+00093e:  50                       push	ax
+00093f:  b000                     mov	al, 0
+000941:  50                       push	ax
+000942:  9a3e007c01               lcall	0x17c, 0x3e
+000947:  e94105                   jmp	0xe8b
+00094a:  3c12                     cmp	al, 0x12
+00094c:  750c                     jne	0x95a
+00094e:  b80300                   mov	ax, 3
+000951:  50                       push	ax
+000952:  9a25000601               lcall	0x106, 0x25
+000957:  e93105                   jmp	0xe8b
+00095a:  3c13                     cmp	al, 0x13
+00095c:  7512                     jne	0x970
+00095e:  b80c00                   mov	ax, 0xc
+000961:  50                       push	ax
+000962:  b001                     mov	al, 1
+000964:  50                       push	ax
+000965:  b000                     mov	al, 0
+000967:  50                       push	ax
+000968:  9a2f007c01               lcall	0x17c, 0x2f
+00096d:  e91b05                   jmp	0xe8b
+000970:  3c14                     cmp	al, 0x14
+000972:  751b                     jne	0x98f
+000974:  b86400                   mov	ax, 0x64
+000977:  50                       push	ax
+000978:  b000                     mov	al, 0
+00097a:  50                       push	ax
+00097b:  b000                     mov	al, 0
+00097d:  50                       push	ax
+00097e:  9a43007c01               lcall	0x17c, 0x43
+000983:  bf2f07                   mov	di, 0x72f
+000986:  0e                       push	cs
+000987:  57                       push	di
+000988:  0e                       push	cs
+000989:  e8c8f8                   call	0x254
+00098c:  e9fc04                   jmp	0xe8b
+00098f:  3c15                     cmp	al, 0x15
+000991:  7512                     jne	0x9a5
+000993:  b89001                   mov	ax, 0x190
+000996:  50                       push	ax
+000997:  b001                     mov	al, 1
+000999:  50                       push	ax
+00099a:  b001                     mov	al, 1
+00099c:  50                       push	ax
+00099d:  9a39007c01               lcall	0x17c, 0x39
+0009a2:  e9e604                   jmp	0xe8b
+0009a5:  3c16                     cmp	al, 0x16
+0009a7:  7508                     jne	0x9b1
+0009a9:  9a25001a01               lcall	0x11a, 0x25
+0009ae:  e9da04                   jmp	0xe8b
+0009b1:  3c17                     cmp	al, 0x17
+0009b3:  7512                     jne	0x9c7
+0009b5:  b8f401                   mov	ax, 0x1f4
+0009b8:  50                       push	ax
+0009b9:  b001                     mov	al, 1
+0009bb:  50                       push	ax
+0009bc:  b000                     mov	al, 0
+0009be:  50                       push	ax
+0009bf:  9a2a007c01               lcall	0x17c, 0x2a
+0009c4:  e9c404                   jmp	0xe8b
+0009c7:  3c18                     cmp	al, 0x18
+0009c9:  7512                     jne	0x9dd
+0009cb:  b8c800                   mov	ax, 0xc8
+0009ce:  50                       push	ax
+0009cf:  b001                     mov	al, 1
+0009d1:  50                       push	ax
+0009d2:  b001                     mov	al, 1
+0009d4:  50                       push	ax
+0009d5:  9a48007c01               lcall	0x17c, 0x48
+0009da:  e9ae04                   jmp	0xe8b
+0009dd:  3c19                     cmp	al, 0x19
+0009df:  7508                     jne	0x9e9
+0009e1:  9a2500ff00               lcall	0xff, 0x25
+0009e6:  e9a204                   jmp	0xe8b
+0009e9:  3c1a                     cmp	al, 0x1a
+0009eb:  751b                     jne	0xa08
+0009ed:  b86400                   mov	ax, 0x64
+0009f0:  50                       push	ax
+0009f1:  b001                     mov	al, 1
+0009f3:  50                       push	ax
+0009f4:  b000                     mov	al, 0
+0009f6:  50                       push	ax
+0009f7:  9a25007c01               lcall	0x17c, 0x25
+0009fc:  bf3607                   mov	di, 0x736
+0009ff:  0e                       push	cs
+000a00:  57                       push	di
+000a01:  0e                       push	cs
+000a02:  e84ff8                   call	0x254
+000a05:  e98304                   jmp	0xe8b
+000a08:  3c1b                     cmp	al, 0x1b
+000a0a:  750c                     jne	0xa18
+000a0c:  b80300                   mov	ax, 3
+000a0f:  50                       push	ax
+000a10:  9a25005301               lcall	0x153, 0x25
+000a15:  e97304                   jmp	0xe8b
+000a18:  3c1c                     cmp	al, 0x1c
+000a1a:  7512                     jne	0xa2e
+000a1c:  b8e803                   mov	ax, 0x3e8
+000a1f:  50                       push	ax
+000a20:  b001                     mov	al, 1
+000a22:  50                       push	ax
+000a23:  b000                     mov	al, 0
+000a25:  50                       push	ax
+000a26:  9a2a007c01               lcall	0x17c, 0x2a
+000a2b:  e95d04                   jmp	0xe8b
+000a2e:  3c1d                     cmp	al, 0x1d
+000a30:  7512                     jne	0xa44
+000a32:  b80300                   mov	ax, 3
+000a35:  50                       push	ax
+000a36:  b000                     mov	al, 0
+000a38:  50                       push	ax
+000a39:  b000                     mov	al, 0
+000a3b:  50                       push	ax
+000a3c:  9a3e007c01               lcall	0x17c, 0x3e
+000a41:  e94704                   jmp	0xe8b
+000a44:  3c1e                     cmp	al, 0x1e
+000a46:  7508                     jne	0xa50
+000a48:  9a25008601               lcall	0x186, 0x25
+000a4d:  e93b04                   jmp	0xe8b
+000a50:  3c1f                     cmp	al, 0x1f
+000a52:  750c                     jne	0xa60
+000a54:  b80200                   mov	ax, 2
+000a57:  50                       push	ax
+000a58:  9a25000b01               lcall	0x10b, 0x25
+000a5d:  e92b04                   jmp	0xe8b
+000a60:  3c20                     cmp	al, 0x20
+000a62:  751b                     jne	0xa7f
+000a64:  b81900                   mov	ax, 0x19
+000a67:  50                       push	ax
+000a68:  b001                     mov	al, 1
+000a6a:  50                       push	ax
+000a6b:  b000                     mov	al, 0
+000a6d:  50                       push	ax
+000a6e:  9a2f007c01               lcall	0x17c, 0x2f
+000a73:  bf3d07                   mov	di, 0x73d
+000a76:  0e                       push	cs
+000a77:  57                       push	di
+000a78:  0e                       push	cs
+000a79:  e8d8f7                   call	0x254
+000a7c:  e90c04                   jmp	0xe8b
+000a7f:  3c21                     cmp	al, 0x21
+000a81:  7512                     jne	0xa95
+000a83:  b82c01                   mov	ax, 0x12c
+000a86:  50                       push	ax
+000a87:  b001                     mov	al, 1
+000a89:  50                       push	ax
+000a8a:  b001                     mov	al, 1
+000a8c:  50                       push	ax
+000a8d:  9a34007c01               lcall	0x17c, 0x34
+000a92:  e9f603                   jmp	0xe8b
+000a95:  3c22                     cmp	al, 0x22
+000a97:  7512                     jne	0xaab
+000a99:  b84001                   mov	ax, 0x140
+000a9c:  50                       push	ax
+000a9d:  b000                     mov	al, 0
+000a9f:  50                       push	ax
+000aa0:  b000                     mov	al, 0
+000aa2:  50                       push	ax
+000aa3:  9a48007c01               lcall	0x17c, 0x48
+000aa8:  e9e003                   jmp	0xe8b
+000aab:  3c23                     cmp	al, 0x23
+000aad:  7508                     jne	0xab7
+000aaf:  9a25004101               lcall	0x141, 0x25
+000ab4:  e9d403                   jmp	0xe8b
+000ab7:  3c24                     cmp	al, 0x24
+000ab9:  7512                     jne	0xacd
+000abb:  b8e803                   mov	ax, 0x3e8
+000abe:  50                       push	ax
+000abf:  b001                     mov	al, 1
+000ac1:  50                       push	ax
+000ac2:  b001                     mov	al, 1
+000ac4:  50                       push	ax
+000ac5:  9a25007c01               lcall	0x17c, 0x25
+000aca:  e9be03                   jmp	0xe8b
+000acd:  3c25                     cmp	al, 0x25
+000acf:  7515                     jne	0xae6
+000ad1:  b8e803                   mov	ax, 0x3e8
+000ad4:  50                       push	ax
+000ad5:  9a25007701               lcall	0x177, 0x25
+000ada:  bf4607                   mov	di, 0x746
+000add:  0e                       push	cs
+000ade:  57                       push	di
+000adf:  0e                       push	cs
+000ae0:  e871f7                   call	0x254
+000ae3:  e9a503                   jmp	0xe8b
+000ae6:  3c26                     cmp	al, 0x26
+000ae8:  7512                     jne	0xafc
+000aea:  b8f401                   mov	ax, 0x1f4
+000aed:  50                       push	ax
+000aee:  b001                     mov	al, 1
+000af0:  50                       push	ax
+000af1:  b000                     mov	al, 0
+000af3:  50                       push	ax
+000af4:  9a43007c01               lcall	0x17c, 0x43
+000af9:  e98f03                   jmp	0xe8b
+000afc:  3c27                     cmp	al, 0x27
+000afe:  750c                     jne	0xb0c
+000b00:  b80100                   mov	ax, 1
+000b03:  50                       push	ax
+000b04:  9a2500f900               lcall	0xf9, 0x25
+000b09:  e97f03                   jmp	0xe8b
+000b0c:  3c28                     cmp	al, 0x28
+000b0e:  7512                     jne	0xb22
+000b10:  b80400                   mov	ax, 4
+000b13:  50                       push	ax
+000b14:  b001                     mov	al, 1
+000b16:  50                       push	ax
+000b17:  b000                     mov	al, 0
+000b19:  50                       push	ax
+000b1a:  9a3e007c01               lcall	0x17c, 0x3e
+000b1f:  e96903                   jmp	0xe8b
+000b22:  3c29                     cmp	al, 0x29
+000b24:  7508                     jne	0xb2e
+000b26:  9a2f005b01               lcall	0x15b, 0x2f
+000b2b:  e95d03                   jmp	0xe8b
+000b2e:  3c2a                     cmp	al, 0x2a
+000b30:  751b                     jne	0xb4d
+000b32:  b8e803                   mov	ax, 0x3e8
+000b35:  50                       push	ax
+000b36:  b001                     mov	al, 1
+000b38:  50                       push	ax
+000b39:  b001                     mov	al, 1
+000b3b:  50                       push	ax
+000b3c:  9a43007c01               lcall	0x17c, 0x43
+000b41:  bf4c07                   mov	di, 0x74c
+000b44:  0e                       push	cs
+000b45:  57                       push	di
+000b46:  0e                       push	cs
+000b47:  e80af7                   call	0x254
+000b4a:  e93e03                   jmp	0xe8b
+000b4d:  3c2b                     cmp	al, 0x2b
+000b4f:  750b                     jne	0xb5c
+000b51:  b005                     mov	al, 5
+000b53:  50                       push	ax
+000b54:  9a2500eb00               lcall	0xeb, 0x25
+000b59:  e92f03                   jmp	0xe8b
+000b5c:  3c2c                     cmp	al, 0x2c
+000b5e:  7512                     jne	0xb72
+000b60:  b8e803                   mov	ax, 0x3e8
+000b63:  50                       push	ax
+000b64:  b001                     mov	al, 1
+000b66:  50                       push	ax
+000b67:  b001                     mov	al, 1
+000b69:  50                       push	ax
+000b6a:  9a2a007c01               lcall	0x17c, 0x2a
+000b6f:  e91903                   jmp	0xe8b
+000b72:  3c2d                     cmp	al, 0x2d
+000b74:  751b                     jne	0xb91
+000b76:  b83200                   mov	ax, 0x32
+000b79:  50                       push	ax
+000b7a:  b000                     mov	al, 0
+000b7c:  50                       push	ax
+000b7d:  b001                     mov	al, 1
+000b7f:  50                       push	ax
+000b80:  9a2f007c01               lcall	0x17c, 0x2f
+000b85:  bf5307                   mov	di, 0x753
+000b88:  0e                       push	cs
+000b89:  57                       push	di
+000b8a:  0e                       push	cs
+000b8b:  e8c6f6                   call	0x254
+000b8e:  e9fa02                   jmp	0xe8b
+000b91:  3c2e                     cmp	al, 0x2e
+000b93:  750f                     jne	0xba4
+000b95:  b80400                   mov	ax, 4
+000b98:  50                       push	ax
+000b99:  b001                     mov	al, 1
+000b9b:  50                       push	ax
+000b9c:  9a25007001               lcall	0x170, 0x25
+000ba1:  e9e702                   jmp	0xe8b
+000ba4:  3c2f                     cmp	al, 0x2f
+000ba6:  7508                     jne	0xbb0
+000ba8:  9a2a004101               lcall	0x141, 0x2a
+000bad:  e9db02                   jmp	0xe8b
+000bb0:  3c30                     cmp	al, 0x30
+000bb2:  7512                     jne	0xbc6
+000bb4:  b80500                   mov	ax, 5
+000bb7:  50                       push	ax
+000bb8:  b001                     mov	al, 1
+000bba:  50                       push	ax
+000bbb:  b000                     mov	al, 0
+000bbd:  50                       push	ax
+000bbe:  9a3e007c01               lcall	0x17c, 0x3e
+000bc3:  e9c502                   jmp	0xe8b
+000bc6:  3c31                     cmp	al, 0x31
+000bc8:  7518                     jne	0xbe2
+000bca:  b80400                   mov	ax, 4
+000bcd:  50                       push	ax
+000bce:  b001                     mov	al, 1
+000bd0:  50                       push	ax
+000bd1:  9a2a007001               lcall	0x170, 0x2a
+000bd6:  bf5b07                   mov	di, 0x75b
+000bd9:  0e                       push	cs
+000bda:  57                       push	di
+000bdb:  0e                       push	cs
+000bdc:  e875f6                   call	0x254
+000bdf:  e9a902                   jmp	0xe8b
+000be2:  3c32                     cmp	al, 0x32
+000be4:  7508                     jne	0xbee
+000be6:  9a34004101               lcall	0x141, 0x34
+000beb:  e99d02                   jmp	0xe8b
+000bee:  3c33                     cmp	al, 0x33
+000bf0:  7512                     jne	0xc04
+000bf2:  b8e803                   mov	ax, 0x3e8
+000bf5:  50                       push	ax
+000bf6:  b001                     mov	al, 1
+000bf8:  50                       push	ax
+000bf9:  b001                     mov	al, 1
+000bfb:  50                       push	ax
+000bfc:  9a39007c01               lcall	0x17c, 0x39
+000c01:  e98702                   jmp	0xe8b
+000c04:  3c34                     cmp	al, 0x34
+000c06:  750c                     jne	0xc14
+000c08:  b80200                   mov	ax, 2
+000c0b:  50                       push	ax
+000c0c:  9a2500f900               lcall	0xf9, 0x25
+000c11:  e97702                   jmp	0xe8b
+000c14:  3c35                     cmp	al, 0x35
+000c16:  750c                     jne	0xc24
+000c18:  b80100                   mov	ax, 1
+000c1b:  50                       push	ax
+000c1c:  9a25003901               lcall	0x139, 0x25
+000c21:  e96702                   jmp	0xe8b
+000c24:  3c36                     cmp	al, 0x36
+000c26:  7508                     jne	0xc30
+000c28:  9a34005b01               lcall	0x15b, 0x34
+000c2d:  e95b02                   jmp	0xe8b
+000c30:  3c37                     cmp	al, 0x37
+000c32:  751b                     jne	0xc4f
+000c34:  b8c800                   mov	ax, 0xc8
+000c37:  50                       push	ax
+000c38:  b001                     mov	al, 1
+000c3a:  50                       push	ax
+000c3b:  b000                     mov	al, 0
+000c3d:  50                       push	ax
+000c3e:  9a2f007c01               lcall	0x17c, 0x2f
+000c43:  bf6507                   mov	di, 0x765
+000c46:  0e                       push	cs
+000c47:  57                       push	di
+000c48:  0e                       push	cs
+000c49:  e808f6                   call	0x254
+000c4c:  e93c02                   jmp	0xe8b
+000c4f:  3c38                     cmp	al, 0x38
+000c51:  750c                     jne	0xc5f
+000c53:  b8d007                   mov	ax, 0x7d0
+000c56:  50                       push	ax
+000c57:  9a25007701               lcall	0x177, 0x25
+000c5c:  e92c02                   jmp	0xe8b
+000c5f:  3c39                     cmp	al, 0x39
+000c61:  750c                     jne	0xc6f
+000c63:  b80100                   mov	ax, 1
+000c66:  50                       push	ax
+000c67:  9a25006701               lcall	0x167, 0x25
+000c6c:  e91c02                   jmp	0xe8b
+000c6f:  3c3a                     cmp	al, 0x3a
+000c71:  750f                     jne	0xc82
+000c73:  b80500                   mov	ax, 5
+000c76:  50                       push	ax
+000c77:  b001                     mov	al, 1
+000c79:  50                       push	ax
+000c7a:  9a25007001               lcall	0x170, 0x25
+000c7f:  e90902                   jmp	0xe8b
+000c82:  3c3b                     cmp	al, 0x3b
+000c84:  750c                     jne	0xc92
+000c86:  b80400                   mov	ax, 4
+000c89:  50                       push	ax
+000c8a:  9a25000601               lcall	0x106, 0x25
+000c8f:  e9f901                   jmp	0xe8b
+000c92:  3c3c                     cmp	al, 0x3c
+000c94:  751b                     jne	0xcb1
+000c96:  b80600                   mov	ax, 6
+000c99:  50                       push	ax
+000c9a:  b000                     mov	al, 0
+000c9c:  50                       push	ax
+000c9d:  b001                     mov	al, 1
+000c9f:  50                       push	ax
+000ca0:  9a3e007c01               lcall	0x17c, 0x3e
+000ca5:  bf6b07                   mov	di, 0x76b
+000ca8:  0e                       push	cs
+000ca9:  57                       push	di
+000caa:  0e                       push	cs
+000cab:  e8a6f5                   call	0x254
+000cae:  e9da01                   jmp	0xe8b
+000cb1:  3c3d                     cmp	al, 0x3d
+000cb3:  7512                     jne	0xcc7
+000cb5:  b88403                   mov	ax, 0x384
+000cb8:  50                       push	ax
+000cb9:  b001                     mov	al, 1
+000cbb:  50                       push	ax
+000cbc:  b000                     mov	al, 0
+000cbe:  50                       push	ax
+000cbf:  9a34007c01               lcall	0x17c, 0x34
+000cc4:  e9c401                   jmp	0xe8b
+000cc7:  3c3e                     cmp	al, 0x3e
+000cc9:  7508                     jne	0xcd3
+000ccb:  9a2a008601               lcall	0x186, 0x2a
+000cd0:  e9b801                   jmp	0xe8b
+000cd3:  3c3f                     cmp	al, 0x3f
+000cd5:  7512                     jne	0xce9
+000cd7:  b84001                   mov	ax, 0x140
+000cda:  50                       push	ax
+000cdb:  b001                     mov	al, 1
+000cdd:  50                       push	ax
+000cde:  b001                     mov	al, 1
+000ce0:  50                       push	ax
+000ce1:  9a48007c01               lcall	0x17c, 0x48
+000ce6:  e9a201                   jmp	0xe8b
+000ce9:  3c40                     cmp	al, 0x40
+000ceb:  7510                     jne	0xcfd
+000ced:  b80100                   mov	ax, 1
+000cf0:  50                       push	ax
+000cf1:  b80700                   mov	ax, 7
+000cf4:  50                       push	ax
+000cf5:  9a25002601               lcall	0x126, 0x25
+000cfa:  e98e01                   jmp	0xe8b
+000cfd:  3c41                     cmp	al, 0x41
+000cff:  7508                     jne	0xd09
+000d01:  9a2f004101               lcall	0x141, 0x2f
+000d06:  e98201                   jmp	0xe8b
+000d09:  3c42                     cmp	al, 0x42
+000d0b:  750f                     jne	0xd1c
+000d0d:  b80600                   mov	ax, 6
+000d10:  50                       push	ax
+000d11:  b000                     mov	al, 0
+000d13:  50                       push	ax
+000d14:  9a2a007001               lcall	0x170, 0x2a
+000d19:  e96f01                   jmp	0xe8b
+000d1c:  3c43                     cmp	al, 0x43
+000d1e:  7515                     jne	0xd35
+000d20:  b80200                   mov	ax, 2
+000d23:  50                       push	ax
+000d24:  9a25006701               lcall	0x167, 0x25
+000d29:  bf6f07                   mov	di, 0x76f
+000d2c:  0e                       push	cs
+000d2d:  57                       push	di
+000d2e:  0e                       push	cs
+000d2f:  e822f5                   call	0x254
+000d32:  e95601                   jmp	0xe8b
+000d35:  3c44                     cmp	al, 0x44
+000d37:  7510                     jne	0xd49
+000d39:  b80500                   mov	ax, 5
+000d3c:  50                       push	ax
+000d3d:  b80a00                   mov	ax, 0xa
+000d40:  50                       push	ax
+000d41:  9a25002601               lcall	0x126, 0x25
+000d46:  e94201                   jmp	0xe8b
+000d49:  3c45                     cmp	al, 0x45
+000d4b:  7512                     jne	0xd5f
+000d4d:  b80700                   mov	ax, 7
+000d50:  50                       push	ax
+000d51:  b001                     mov	al, 1
+000d53:  50                       push	ax
+000d54:  b000                     mov	al, 0
+000d56:  50                       push	ax
+000d57:  9a3e007c01               lcall	0x17c, 0x3e
+000d5c:  e92c01                   jmp	0xe8b
+000d5f:  3c46                     cmp	al, 0x46
+000d61:  7512                     jne	0xd75
+000d63:  b8d007                   mov	ax, 0x7d0
+000d66:  50                       push	ax
+000d67:  b001                     mov	al, 1
+000d69:  50                       push	ax
+000d6a:  b001                     mov	al, 1
+000d6c:  50                       push	ax
+000d6d:  9a39007c01               lcall	0x17c, 0x39
+000d72:  e91601                   jmp	0xe8b
+000d75:  3c47                     cmp	al, 0x47
+000d77:  7508                     jne	0xd81
+000d79:  9a2500f200               lcall	0xf2, 0x25
+000d7e:  e90a01                   jmp	0xe8b
+000d81:  3c48                     cmp	al, 0x48
+000d83:  7508                     jne	0xd8d
+000d85:  9a39005b01               lcall	0x15b, 0x39
+000d8a:  e9fe00                   jmp	0xe8b
+000d8d:  3c49                     cmp	al, 0x49
+000d8f:  7508                     jne	0xd99
+000d91:  9a2a004a01               lcall	0x14a, 0x2a
+000d96:  e9f200                   jmp	0xe8b
+000d99:  3c4a                     cmp	al, 0x4a
+000d9b:  7510                     jne	0xdad
+000d9d:  b80900                   mov	ax, 9
+000da0:  50                       push	ax
+000da1:  b81300                   mov	ax, 0x13
+000da4:  50                       push	ax
+000da5:  9a2a002601               lcall	0x126, 0x2a
+000daa:  e9de00                   jmp	0xe8b
+000dad:  3c4b                     cmp	al, 0x4b
+000daf:  7515                     jne	0xdc6
+000db1:  b80200                   mov	ax, 2
+000db4:  50                       push	ax
+000db5:  9a25003901               lcall	0x139, 0x25
+000dba:  bf7707                   mov	di, 0x777
+000dbd:  0e                       push	cs
+000dbe:  57                       push	di
+000dbf:  0e                       push	cs
+000dc0:  e891f4                   call	0x254
+000dc3:  e9c500                   jmp	0xe8b
+000dc6:  3c4c                     cmp	al, 0x4c
+000dc8:  7508                     jne	0xdd2
+000dca:  9a25001301               lcall	0x113, 0x25
+000dcf:  e9b900                   jmp	0xe8b
+000dd2:  3c4d                     cmp	al, 0x4d
+000dd4:  7508                     jne	0xdde
+000dd6:  9a39004101               lcall	0x141, 0x39
+000ddb:  e9ad00                   jmp	0xe8b
+000dde:  3c4e                     cmp	al, 0x4e
+000de0:  750c                     jne	0xdee
+000de2:  b80300                   mov	ax, 3
+000de5:  50                       push	ax
+000de6:  9a25006701               lcall	0x167, 0x25
+000deb:  e99d00                   jmp	0xe8b
+000dee:  3c4f                     cmp	al, 0x4f
+000df0:  7510                     jne	0xe02
+000df2:  b81400                   mov	ax, 0x14
+000df5:  50                       push	ax
+000df6:  b81b00                   mov	ax, 0x1b
+000df9:  50                       push	ax
+000dfa:  9a2a002601               lcall	0x126, 0x2a
+000dff:  e98900                   jmp	0xe8b
+000e02:  3c50                     cmp	al, 0x50
+000e04:  7507                     jne	0xe0d
+000e06:  9a2f004a01               lcall	0x14a, 0x2f
+000e0b:  eb7e                     jmp	0xe8b
+000e0d:  3c51                     cmp	al, 0x51
+000e0f:  7507                     jne	0xe18
+000e11:  9a2a001a01               lcall	0x11a, 0x2a
+000e16:  eb73                     jmp	0xe8b
+000e18:  3c52                     cmp	al, 0x52
+000e1a:  751a                     jne	0xe36
+000e1c:  b85802                   mov	ax, 0x258
+000e1f:  50                       push	ax
+000e20:  b001                     mov	al, 1
+000e22:  50                       push	ax
+000e23:  b001                     mov	al, 1
+000e25:  50                       push	ax
+000e26:  9a2f007c01               lcall	0x17c, 0x2f
+000e2b:  bf7d07                   mov	di, 0x77d
+000e2e:  0e                       push	cs
+000e2f:  57                       push	di
+000e30:  0e                       push	cs
+000e31:  e820f4                   call	0x254
+000e34:  eb55                     jmp	0xe8b
+000e36:  3c53                     cmp	al, 0x53
+000e38:  750b                     jne	0xe45
+000e3a:  b80600                   mov	ax, 6
+000e3d:  50                       push	ax
+000e3e:  9a25005301               lcall	0x153, 0x25
+000e43:  eb46                     jmp	0xe8b
+000e45:  3c54                     cmp	al, 0x54
+000e47:  7507                     jne	0xe50
+000e49:  9a2a006701               lcall	0x167, 0x2a
+000e4e:  eb3b                     jmp	0xe8b
+000e50:  3c55                     cmp	al, 0x55
+000e52:  750b                     jne	0xe5f
+000e54:  b80300                   mov	ax, 3
+000e57:  50                       push	ax
+000e58:  9a25003901               lcall	0x139, 0x25
+000e5d:  eb2c                     jmp	0xe8b
+000e5f:  3c56                     cmp	al, 0x56
+000e61:  7507                     jne	0xe6a
+000e63:  9a2f001a01               lcall	0x11a, 0x2f
+000e68:  eb21                     jmp	0xe8b
+000e6a:  3c57                     cmp	al, 0x57
+000e6c:  7514                     jne	0xe82
+000e6e:  b80300                   mov	ax, 3
+000e71:  50                       push	ax
+000e72:  9a25000b01               lcall	0x10b, 0x25
+000e77:  bf8407                   mov	di, 0x784
+000e7a:  0e                       push	cs
+000e7b:  57                       push	di
+000e7c:  0e                       push	cs
+000e7d:  e8d4f3                   call	0x254
+000e80:  eb09                     jmp	0xe8b
+000e82:  3c58                     cmp	al, 0x58
+000e84:  7505                     jne	0xe8b
+000e86:  9a8a19ed01               lcall	0x1ed, 0x198a
+000e8b:  c6063da001               mov	byte ptr [0xa03d], 1
+000e90:  803ec3a01b               cmp	byte ptr [0xa0c3], 0x1b
+000e95:  7403                     je	0xe9a
+000e97:  e941f9                   jmp	0x7db
+000e9a:  89ec                     mov	sp, bp
+000e9c:  5d                       pop	bp
+000e9d:  31c0                     xor	ax, ax
+000e9f:  9ad8000317               lcall	0x1703, 0xd8
+000ea4:  0000                     add	byte ptr [bx + si], al
+000ea6:  0000                     add	byte ptr [bx + si], al
+000ea8:  0000                     add	byte ptr [bx + si], al
+000eaa:  0000                     add	byte ptr [bx + si], al
+000eac:  0000                     add	byte ptr [bx + si], al
+000eae:  0000                     add	byte ptr [bx + si], al
+000eb0:  cd3f                     int	0x3f
+000eb2:  0000                     add	byte ptr [bx + si], al
+000eb4:  0400                     add	al, 0
+000eb6:  0000                     add	byte ptr [bx + si], al
+000eb8:  1c11                     sbb	al, 0x11
+000eba:  f6000f                   test	byte ptr [bx + si], 0xf
+000ebd:  0000                     add	byte ptr [bx + si], al
+000ebf:  0000                     add	byte ptr [bx + si], al
+000ec1:  0000                     add	byte ptr [bx + si], al
+000ec3:  0000                     add	byte ptr [bx + si], al
+000ec5:  0000                     add	byte ptr [bx + si], al
+000ec7:  0000                     add	byte ptr [bx + si], al
+000ec9:  0000                     add	byte ptr [bx + si], al
+000ecb:  0000                     add	byte ptr [bx + si], al
+000ecd:  0000                     add	byte ptr [bx + si], al
+000ecf:  00cd                     add	ch, cl
+000ed1:  3f                       aas	

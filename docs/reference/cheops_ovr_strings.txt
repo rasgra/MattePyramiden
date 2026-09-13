@@ -1,0 +1,1640 @@
+TPOVU
+LJA ANTAL RINGAR:  Du kan nu v
+lja hur m
+nga ringar
+som skall finnas p
+ tornen.$Du kan v
+lja mellan 1 och 64 ringar.
+Ange antal ringar: U
+             U
+     
+n vilket torn?
+Mersennes rum
+Till vilket torn?U
+Mersennes rum
+skatt
+ * = g
+ng till 
+Torn-rummet
+ Antal r
+tt:  0 U
+     
+Fel U
+verslags-rummetU
+ VARF
+R HETER DET MERSENNES RUM ?%Antalet drag som beh
+r att klara
+Tornproblemet 
+ledes:'1  3  7  15  31  63  127  255  511 ....0Det m
+rkliga med denna talf
+r att n
+sta tal/bildas genom att man dubblar och l
+gger till 1,
+ex: 2*31 + 1 = 63-Att denna talf
+ld dessutom svarar mot antalet.f
+rflyttningar av ringarna p
+ tornen 
+r kanske
+nnu m
+rkligare!.Talf
+ljden kallas f
+r Mersennes talf
+ljd efter
+en ber
+md italiensk matematiker(VARF
+R HETER DET MERSENNES RUM ? , forts.Vid 9 ringar p
+ tornen s
+vs det 511 drag.(Hur m
+nga drag beh
+vs det vid 11 ringar?
+BIGTUT Du n
+rmar Dig Pyramidens utg
+Mersennes rum
+Antal ringar  Antal drag   
+Antal ringar  Antal drag  
+* = g
+ng till Torn-rummet
+    U
+ Du har 
+ brickor, 
+datorn har 
+ brickor
+    Det 
+r lika !!
+    DU
+    DATORN	 VANN !!!U
+ Antal brickor: 
+                U
+$     1   2   3   4   5   6   7   8  $   
+nker!
+ Datorn passar.U
+, ange ditt drag: 
+ Passar du? 
+Nej1 Fel - f
+ltet omringar ej n
+gon av datorns rutor!$ Fel - f
+ltet m
+ste flankera en rad!, Fel - f
+ltet 
+r redan upptagen, pr
+va igen!U
+<1r=<8w9
+O<Ar=<Hw9
+OTHELLO - rummet
+righetsgrad: 
+	'	,	1	C	H	M	_	d	i	{	
+LComU
+<1r?<9w;
+ Magiska-rummet U
+6             hemliga talet    antal          antal    
+                  
+     helt r
+tt     siffror r
+              
+  J A A A A A !  
+tt tal var: U
+Gissning nr 
+Master Mind - rummetU
+        V
+nta!         
+Datorn tog: 
+ ur h
+Vilken h
+ljer du? :    
+Hur m
+nga stenar tar du? : U
+computer
+ Datorn vann! 
+human
+ Du vann !!! U
+Nim - rummet
+righetsgrad: 
+human
+computer
+	)	.	3	R	]	b	q	v	
+            1 
+          1   1
+        1   2   1
+      1   3   3   1
+    1               1
+         10   10        
+1   6  15   20   15  6  1U
+<1r3<9w/
+R HETER DET PASCALS RUM ?+Det triangul
+ra schemat som du just kn
+ckt,*kallas Pascals triangel, efter den franske
+matematikern Blaise Pascal.0Det m
+rkliga med schemat 
+r att det kan anv
+r en m
+ngd olika ber
+kningar.0Tex: sannolikhetsber
+kningar  och det s
+ kallade+binomialm
+nstret = bla kvadreringsreglerna.U
+ Pascals rum U
+	/	P	U	Z	v	
+             U
+Derivata-rummetU
+(Flytta rutan-tryck p
+1.Markera ett omr
+de med
+  positiv derivata!
+2.Markera ett omr
+de med
+  negativ derivata!
+3.Markera ett nollst
+r kurvan!
+4.Markera ett maximum!
+                           
+5.Markera ett minimum!
+6.Markera en terasspunkt!U
+	.Markera 
+Koordinat-rummet
+punkten(
+talet (
+Komplexa-rummet
+Komplexa-rummet
+(Flytta krysset-tryck p
+Koordinat-rummetU
+Derivata-rummetU
+Komplexa-rummetU
+	,	:	H	V	o	}	
+             U
+INGA R
+TT - .....
+Skalle
+%Cheops beklagar att Du aldrig kom ut,
+      ... men ordnar s
+ att ...
+Mumie
+... din kropp mumifieras!U
+fglas
+Fel !U
+y=0.5*x
+y=-2*x
+y=x+5
+y=2x-3
+y=2x+1
+y=2x+3
+y=-3x-3
+y=0.5x
+-3x+2
++2x+2
+y=sin(x)
+y=3*sin(x)
+y=sin(x+1)
+y=cos(x)
+y=tan(x)
+Ange r
+tt alternativ!U
+glasU
+BigGamU
+Linje-rummetU
+Funktions-rummetU
+	 	,	4	X	u	
+             U
+dynamit
+blind
+Fel !U
+  Tryck f
+r spr
+ngning!
+ Det lyckades - V
+ggen r
+mnade!! F
+r svag laddning - F
+k igen!U
+1  2  4  8  ?
+Vilket 
+sta tal?
+3  7  11  15  ?
+1  5  25  125  ?
+  90   ?   22.5
+Vilket tal saknas?
+88  ?  64  52
+2  10  40  ?  240
+108  ?  12  4
+1  3  5  7  9  ?
+Vilket 
+sta tal?
+1  4  9  16  ?
+1  2  3  5  ?
+12  18  ?  40,5
+Vilket tal saknas?
+18  24  29  ?  36
+1  8  27  ?  125
+5  6  ?  14  21
+10+5+2,5+ ... 
+kna seriens summa!
+100+60+36+ ...
+6+2+2/3+ ...
+1+0,9+0,81+ ...
+48+36+27+ ...
+6-3+3/2-3/4+ ...
+3+3/p+3/p
++ ...= 9	Best
+Svar:
+ljds-rummet
+Serie-rummetU
+             U
+kamel
+Fel !U
+Kairo
+ Skala 1:7 miljoner
+Hur l
+r Suezkanalen?
+ kartan.
+Svara i hela km.
+Hur l
+r det mellan
+Kairo och El-Alamein?
+Svara i hela mil.
+Hur l
+r det fr
+n Medel-
+havet till Assuandammen?
+ndet mellan Skara och
+Cheops Pyramid 
+r ca 350 mil.
+Hur m
+nga cm skulle
+ndet bli p
+ kartan?
+Vid vilken siffra p
+ kartan
+ligger Cheopspyramiden?U
+Daphnie
+Fig visar en daphnie sedd i
+ett mikroskop. Hur m
+nger f
+rstorar mikroskopet?
+Daphnierns l
+r 2,5 mm.
+Hur l
+r antennerna?
+Svara i hela antal mm.
+Hur l
+r stj
+rten?
+Svara i mikrometer.
+Hur l
+ng blir daphniern i
+mikroskopet, om vi 
+ndrar
+rstoringen till 40 ggr?
+Svara i cm.
+Vad kallas daphnie
+ svenska?
+HINNKR
+VATTENLOPPAU
+pythag
+ Alla m
+tt i meter
+Hur h
+r seglet?
+Svara i centimeter.
+Hur l
+r det 
+floden? Svara i decimeter.
+Hur l
+r det fr
+till h
+rn i huset?
+Svara i meter.
+Hur h
+g var
+flaggst
+ngen?
+Vilken nations flagga
+sitter p
+ flaggst
+ngen?
+EGYPTEN
+EGYPTENSU
+Vad heter denna
+grekiska bokstav?
+SIGMA
+OMEGA
+pyraGEN
+En fotbollsplan 
+r 60x110 m.
+Hur m
+nga fotbollsplaner
+cker Cheops-pyramiden?
+Hur l
+r diagonalen i
+pyramidens bottenplan?
+Svara i hela meter.
+Pyramidsidorna 
+r likbenta.
+Hur m
+nga liter f
+rg beh
+om man vill m
+la pyramiden?
+En liter f
+cker 4 m
+Hur h
+r pyramiden?
+Vad v
+ger pyramiden?
+En kubikmeter sten v
+ca 2,4 ton. Svara i hela
+antal millioner ton.U
+Svar:U
+KamDark
+biggamU
+Kart-rummet
+Mikroskop-rummet
+Pythagoras rum
+Grekiska rummet
+Pyramid-rummetU
+Kart-rummetU
+Mikroskop-rummetU
+Pythagoras rumU
+Grekiska rummetU
+Pyramid-rummetU
+	G	Z	m	
+             U
+GSkiva
+Skalle
+Fel !U
+Hur m
+nga grader 
+r vinkeln?U
+s sinus f
+r vinkeln!U
+s cosinus f
+r vinkeln!U
+Svar:U
+GSkiva
+SkalleU
+Vinkel-rummet
+Sinus-rummet
+Cosinus-rummetU
+Vinkel-rummetU
+Sinus-rummetU
+Cosinus-rummetU
+`	n	v	
+             U
+dynamit
+blind
+Fel !U
+  Tryck f
+r spr
+ngning!
+ Det lyckades - v
+ggen r
+mnade!! F
+r svag laddning - f
+k igen!
+      F
+r svag laddning!U
+   Vad kallas denna
+   geometriska figur?	REKTANGEL
+KVADRAT
+CIRKEL
+ELLIPS
+ELIPS
+   Vad kallas det
+   markerade omr
+CIRKELSEKTOR
+SEKTOR
+CIRKELSEGMENT
+SEGMENT
+Hur m
+nga dimensioner har
+dessa figurer?
+   Vad kallas denna
+   geometriska figur?
+TBLOCK
+PARALLELLEPIPED
+CYLINDER
+PYRAMID
+Hur m
+nga dimensioner har
+dessa figurer?
+De tv
+ linjerna 
+r parallella
+Vad kallas vinklarna a och b?
+SIDOVINKLAR
+Vad kallas vinklarna e och g?
+VERTIKALVINKLAR
+VERTIKAL
+Vad kallas vinklarna d och f?
+ALTERNATVINKLAR
+ALTERNAT
+Vad kallas vinklarna b och f?
+LIKBEL
+GNA VINKLAR
+LIKBEL
+Vinkel h 
+r 110 grader.
+Hur m
+nga grader 
+70	70 GRADER
+a=x grader    b=2x grader
+Hur m
+nga grader 
+r e ?
+60	60 GRADER
+Antag b=138 och g= 48 grader
+r linjerna d
+ parallella?
+Svar:U
+Geometri-rummet
+	<	O	b	u	
+             U
+Vad kallas figuren?	REKTANGEL
+tt i cm. Hur m
+nga cm
+r omkretsen?
+tt i cm. Hur m
+r arean?U
+Vad kallas figuren?
+TRIANGEL
+TREKANT
+tt i cm. Hur m
+nga cm
+r omkretsen?
+tt i cm.
+Hur m
+nga cm
+r arean?U
+Vad kallas figuren?
+CIRKEL
+tt i meter,  
+Ange omkretsen
+i hela meter!
+Ange arean i hela m
+Vad kallas figuren?
+tt i meter,  
+Ange begr
+nsningsarean
+i hela m
+Ange volymen i hela
+kubikmeter!U
+rsta simf
+andra simf
+SISTA simf
+Brunnen
+Vad kallas en geometrisk
+figur, formad som en
+brunn?
+CYLINDER
+Vattendjupet 
+r 9 m.
+Hur m
+nga liter vatten
+finns i brunnen? 
+Brunnen rymmer totalt
+165 000 liter vatten. Hur
+nga meter 
+r det kvar
+upp till brunnens mynning?U
+Brunnen
+Svar:U
+Brunnen
+Brunnen
+stege
+lucka
+Trekants-rummet
+Fyrkants-rummet
+Runda-rummet
+Bollen
+BrunnenU
+Trekants-rummetU
+Fyrkants-rummetU
+Runda-rummetU
+BollenU
+!Du klarar Dig fr
+n brunnshajarna,$men Du ramlar ned 6 rum i pyramiden!U
+Brunnen
+HajenU
+	A	l	u	
+sljusU
+Logaritmiska rummetU
+             U
+Logaritmiska rummetU
+tljus
+Fel !U
+  Ok! Forts
+tt ut i g
+ngen!
+rkt - F
+k igen!
+tljus
+           Kolsvart!
+sljusU
+Galler
+Ett galler blockerar 
+ppningen!
+med romerska siffror.
+med egyptiska siffror.
+1101101
+med bin
+ra siffror.
+med hexadecimala siffror.
+687"F
+r att 
+ppna d
+rren m
+ste du ange"r
+tt kod. Koden st
+rren men
+tutan
+       R
+tt kod!
+Forts
+tt upp
+t i g
+ngen!   Fel - g
+ tillbaks till rummet!U
+ = 0U
+rot1      rot2
+tljusU
+log(100) =
+log(10 000) =
+log(0,1) =
+log(1000 000) =
+log(0,000 01) =
+log(1) =
+2:a grads-rummetU
+Logaritmiska rummetU
+	+	0	N	S	X	d	
+ Antal r
+tt:  0 U
+ Fel U
+R<TuN
+      
+Talsystems-rummet2 bin
+rt   decimalt          bin
+rt   decimalt     
+Talsystems-rummet1decimalt   bin
+rt          decimalt   bin
+rt     
+      
+Y	c	m	u	z	
+kvadraten p
+kubiken p
+2 upph
+jt till 
+kvadratroten ur 
+r mindre 
+Gissa-rummet
+Jag t
+nker p
+ ett tal som:
+ Antal r
+tt:  0 U
+Fel U
+verslags-rummetU
+Additions-rummet
+Subtraktions-rummet
+Multiplikations-rummet
+Divisions-rummet
+verslags-rummet
+Ekvations-rummet
+*x = 
+/x = U
+Procent-rummet
+ Hur mycket 
+% av 
+Procent - rummet
+ Hur m
+nga procent utg
+ =        %U
+kamdark
+ - ett rum med utsikt!U
+ - ett rum med v
+xter!U
+FEL!U
+pyrtre
+Stopp i en g
+ng!$I vilket land ligger Cheops pyramid?
+Mumie
+Denna figur stoppar dig!
+Vad kallas figuren?
+pyramid
+      Stopp i en g
+  Cheopspyramiden byggdes ca:!  A)500  B)1000  C)2000   
+r f.Kr
+bigtut
+r detta som ocks
+ kommit fel och hamnat i Cheops pyramid?
+Hur m
+nga trianglar finns
+det i figuren?
+korrljus
+Snart blir det m
+Klokt nog har du sparat de
+ljusstumpar som blir 
+ man br
+nner ett ljus.
+Du har 125 ljusstumpar kvar. Av 5 ljusstumpar kan du g
+ra ett
+nytt ljus som r
+cker en timme.
+Hur m
+nga timmar r
+cker ljusen?
+durer
+Stopp i en g
+ng - D
+rers tavla!
+rtalsrutor:>Konstn
+ren D
+rer m
+lade en tavla med en magisk kvadrat inlagd.<I tv
+ av rutorna finns tavlans 
+rtal. Ovan ser du kvadraten.=Tyv
+rr har 
+rtalet och en del av de andra rutorna suddats ut.
+Vilket 
+rtal m
+lades tavlan?
+    En stunds avkoppling...
+    .. vad heter komposit
+kamdark
+33$Om du r
+knar en stj
+rna i sekunden..#..hur l
+ng tid tar det d
+ att r
+kna!till en miljard? Svara i hela 
+nefer
+En vacker kvinna
+ser f
+riskt
+in i dina 
+Hon s
+ker locka
+dig p
+Vad heter hon?
+matta
+Mattan d
+ljer en fallgrop!!Omkretsen 
+r 40 m,arean 
+r 96 m
+Hur m
+nga meter l
+r mattan?
+720"Kombinationen best
+r av 3 siffror!$Varje siffra anv
+nds endast en g
+ng!"Hur m
+nga kombinationer finns det?
+DIOFANTOS EKVATION - 
+       en klassisk ekvation2Diofantos barndom varade en sj
+ttedel av hans liv..Han fick sk
+gg efter ytterligare en tolftedel.3En sjundedel senare av sitt liv gifte sig Diofantos och 5 
+r senare fick han en son.1Sonen levde exakt h
+lften s
+nge som Diofantos.(Diofantos dog precis 4 
+r efter sin son.
+  Hur m
+r blev Diofantos?
+skatt1Problemen hopar sig! F
+rutom att du 
+r inst
+ngd i$pyramiden 
+r alla dina pengar borta..Du beh
+ver pengar till din EVENTUELLA hemresa!3Med en brevduva skickar du ett kortfattat telegram:
+           SEND
+         + MORE
+         -------
+          MONEY!Varje bokstav st
+r en siffra.'Olika bokst
+ver st
+r olika siffror.'MONEY 
+r antalet kronor som du beh
+Hur m
+nga kronor beh
+ver du?
+kartbild%Du har nu paserat relativt m
+nga rum.
+Antag att egyptierna hade byggt%rummen i en annan turordning. P
+ hur #m
+nga olika s
+tt hade de rum som du
+nu paserat kunnat turordnats?$Svara med en matematisk f
+rkortning!
+KHUF En stor sten blockerar utg
+ngen!
+Cheops 
+r det grekiska namnet.
+Vad hette Cheops p
+ egyptiska?U
+mozart
+Svar:U
+egypten
+mumie
+bigtut
+triang
+korrljus
+durer
+mozart
+miljard	nefertite
+matta
+diofant
+money
+turord
+khufuU
+.DATU
+.DATU
+      Ok - r
+tt kod .. 
+.. du kliver r
+tt in i
+      rum nr: 
+         Fel kod!   
+.. eller fel dataenhet
+.. eller namnet upptaget!
+ (Spara under annat namn!)
+.. eller fel dataenhet!U
+MTA RUMSNUMMER: &Har du tidigare varit inne i pyramiden(och l
+get finns sparat i datorn, kan du  starta d
+r du senast befann dig.$Vill du h
+mta sparat rumsnr (J/N)?  
+Ange ditt namn: 
+Ange en kod   : 
+Ange dataenhet(ex. a,b,c): (
+MTA RUMSNUMMER: &Har du tidigare varit inne i pyramiden&och l
+get finns sparat i datorn,kan du starta d
+r du senast befann dig.$Vill du h
+mta sparat rumsnr (J/N)?: 
+Ange ditt namn: 
+Ange din kod  : 
+Ange dataenhet (ex. a,b,c): (
+SPARA RUMSNUMMER: $Resultatet kan sparas i datorn.     $N
+sta g
+ng kan du d
+ forts
+tta i det$rum d
+r du nu befinner dig.         $Vill du spara ditt resultat (J/N)?  
+Ange ditt namn: 
+Ange en kod   : 
+Ange dataenhet(ex. a,b,c): (
+          Ok  .. 
+Ditt l
+ge i pyramiden
+r nu sparat!
+m ej din kod: 
+SPARA RUMSNUMMER: $Resultatet kan sparas i datorn.     $N
+sta g
+ng kan du d
+ forts
+tta i det$rum d
+r du nu befinner dig.         $Vill du spara ditt resultat (J/N)?  
+Ange ditt namn: 
+Ange en kod   : 
+Ange dataenhet (ex. a,b,c): (
+        Ok!    
+Ditt l
+ge i pyramiden
+r nu sparat.
+m ej din kod: U
+BYTA RUM: 
+Du kan 
+nda till n
+got av
+de rum d
+r du varit tidigare. Vill du g
+ tillbaks (J/N)?:     
+Ange numret p
+ det rum som du
+vill 
+nda till (1-
+          Ok  .. 
+.. du kliver r
+tt in i
+       rum nr: U
+BYTA RUM: 
+Du kan 
+nda till n
+got av
+de rum d
+r du varit tidgare.
+Vill du g
+ tillbaks (J/N)?: 
+Ange numret p
+ det rum som du
+nda till (1-
+     Ok  .. 
+.. du kliver r
+tt in i
+rum nr: U
+	Setup.DATU
+	:	b	|	
+ 3 8 @ H s 
+!*!/!4!9!A!O![!
+"-"2"7"C"R"q"
+#5#J#T#\#a#f#k#
+$a$k$p$~$
+ Addera f
+rst 100-tal, sedan 10-tal och
+  sist ental, ex:
+   26+72  =  92 + 6 = 98
+  283+45  = 323 + 5 = 328!  167+356 = 456+60+7= 516+7 = 523+
+ Blir det f
+rt-anv
+nd papper o penna!U
+ Ta f
+rst bort 100-tal, sedan 10- och sist
+  ental, ex:
+   76- 14 =  66 -  4 = 62$  593-146 = 493 - 46 = 453 - 6 = 447)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+va att dela upp talen, ex:!  7x13= 7x10 + 7x3 = 70 + 21 = 91
+ Multiplikation med 5:
+  svaret slutar p
+ 0 eller 5
+ Tal som sluta p
+ 9, ex:#  6x59 = 6x60 - 6x1 = 360 - 6 = 354)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+gra tips:'
+ vid divison med 2 s
+ blir kvoten j
+va att g
+ra en uppst
+llning i huvudet,+  ex 170/5:  5 i 17 g
+r 3 g
+nger, 3x5 = 15,#             rest 2 (+ sista 0:an),!             5 i 20 g
+r 4 g
+nger,
+             ger svaret 34)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+r att f
+renkla:)
+ avrunda till n
+rmaste 10- eller 100-tal)
+ vid addition och multiplikation b
+r det&  ena talet s
+nkas och det andra h
+ vid subtraktion och division b
+r talen
+  avrundas 
+t samma h
+r att spara tid:*
+ chansa - du kan ju g
+ tillbaks och r
+ Du vet v
+l att procent betyder hundradel?
+ Multiplicera!"
+ ex: 40% av 200 = 0,40 x 200 = 80
+  eller t
+  ex: 40% av 200 = 40 x 2 = 80
+ Ibland kan Du anv
+nda att:-  10% 
+r detsamma som en tiondel -dela med 10-  25% 
+r detsamma som en fj
+rdedel-dela med 4-  50% 
+r detsamma som h
+lften     -dela med 2)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+ Du vet v
+l att procent betyder hundradel?'
+r skall Du best
+mma antalet procent*
+ Dividera: antal procent = delen/det hela*
+va ocks
+ att g
+ra om till hundradelar)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+$Det g
+ller att lista ut v
+rdet p
+ Metod 1: Pr
+va - chansa!+
+ Metod 2: Anv
+nd dig av samma metod som du+  normalt anv
+nder f
+r att l
+sa ekvationer,+  men g
+r de olika operationerna i huvudet!)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+ att:(
+ andragradsekvationer alltid har 2 svar$
+ ex: x
+=9 har l
+sningen +3 eller -3
+  - x  - =  ++
+ ex: x
+ - 3x= x(x-3) har l
+sningen 0 och 3)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+Definition:
+===========
+10-logaritmen f
+r ett tal,%
+r det tal som 10 skall upph
+jas till+f
+r att bli lika med det f
+mnda talet.U
+gra tips:)
+ ringa in talet i allt sn
+vare intervall"
+ gissa alltid p
+ ett tal i mitten
+  av intervalletU
+ Antalet dimensioner betyder ungef
+r:$  antalet riktningar som figuren har
+  utstr
+ckning 
+ En ledning till svaret f
+r du ocks
+ om$  du vet hur man skriver enheten f
+  dessa geometriska figurerU
+rsta talet i parentesen = x-koordinaten+
+ Andra talet i parentesen  = y-koordinaten
+ x-axeln 
+ y-axeln 
+r lodr
+ OMKRETSEN = den str
+cka som en myra m
+ste+  krypa f
+r att komma ett varv runt figuren$
+ AREAN = basen x h
+jden delat med 2'
+ Blir det sv
+rt-anv
+nd papper o penna!U
+ OMKRETSEN = den str
+cka som en myra m
+ste+  krypa f
+r att komma ett varv runt figuren
+  (Addera 2 sidor och dubbla!)
+ AREAN = basen x h
+jden)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+ OMKRETSEN = 
+ x diametern +
+ AREAN = 
+ x radien
+ x radien x radien
+ 3,14 
+ Blir det sv
+rt - anv
+nd papper o penna!U
+   AREAN =  4  x 
+ x radien i kvadrat$
+ VOLYMEN = 4/3 x 
+ x radien i kubik
+ 3,14 
+ Blir det sv
+rt - anv
+nd papper o penna!U
+ VOLYMEN = Basarean x h
+ Basarean utg
+rs av en cirkel
+ En liter = en kubikdecimeter%
+ en kubikmeter g
+r det 1000 liter)
+ Blir det sv
+rt - anv
+nd papper o penna!U
+rmen med en linjal!'
+ Multiplicera en str
+cka p
+ kartan med*  SKALAN s
+r du det verkliga avst
+ndet!&
+ Du m
+ste f
+rvandla fr
+n cm till mil!&
+ Tips: Hur m
+nga mil motsvarar en cm?
+ Kanske beh
+ver du en atlas?U
+rmen med en linjal!
+RSTORNINGEN=+  l
+ngd i mikroskopet/l
+ngd i verkligheten;+  (Det m
+ste vara samma enhet p
+ngderna) 
+ Tips: Ber
+kna hur mycket en cm!        motsvarar i verkligheten!#
+ Namnet b
+r du hitta i en biologi-
+  eller uppslagsbok!U
+nd en uppslagsbok!U
+ PYTHAGORAS SATS:   I en r
+tvinklig triangel s
+  Kvadraten p
+ hypotenusan =   Summan av kateternas kvadrater#
+ Hypotenusan 
+r den l
+ngsta sidan!U
+ VOLYMEN = Basarean x h
+jden /3
+ Basarean 
+r en kvadrat
+nd Pythagoras sats!
+nd papper o penna!U
+ Vinkelns ena ben pekar 
+ger, det &  andra benet pekar i slumpad riktning
+nd en gradskiva!"
+ Vinkeln m
+tes mellan vinkelbenen
+ En r
+t linje = 180 graderU
+ I en r
+tvinklig triangel g
+ller:*  sin(vinkel)=motst
+ende katet/hypotenusan*
+ Cirkeln som visas 
+r en enhetscirkel dvs*  x- och y-axelns l
+r ett (och d
+rmed   ocks
+ hypotenusan i triangeln)*
+ Sin(vinkeln) f
+r man d
+r om man l
+ser'  av avs
+ttningen mot y-axeln f
+ det vinkelben som roterarU
+ I en r
+tvinklig triangel g
+ller:+  cos(vinkel)=n
+rliggande katet/hypotenusan*
+ Cirkeln som visas 
+r en enhetscirkel dvs*  x- och y-axelns l
+r ett (och d
+rmed,  ocks
+ hypotenusan i  motsvarande triangel)*
+ Cos(vinkeln) f
+r man d
+r om man l
+ser'  av avs
+ttningen mot x-axeln f
+ det vinkelben som roterarU
+(Det talsystem som vi oftast anv
+nder har$basen 10. Vi anv
+nder siffrorna 0-9.*Det bin
+ra talsystemet har basen 2. Bin
+ra*tal inneh
+ller d
+r bara 1:or och 0:or, 
+ex det bin
+ra talet: 110)Vad 
+r det d
+rt? L
+s bakifr
+r: 110 bin
+rt = 0x1 + 1x2 + 1x4 = 6*Dvs plaserna i talet 
+rda: 1,2,4,8 osv,Ex: 1101 bin
+rt = 1x1 + 0x2 + 1x4 + 1x8 = 13U
+)Talf
+ljderna kan byggas upp p
+ olika s
+tt(tex genom multiplikation eller addition.*F
+r att avsl
+ja hur talf
+ljden 
+r uppbyggd g
+ller det att vara lite klurig!+Ex: 2 6 18 ... byggs upp genom mult. med 3.)Ex: 2 6 10 ... byggs upp genom add. av 4.+En del talf
+ljder 
+ra att avsl
+ja! Tex+kan kvoten 
+ndras stegvis,potenser ing
+ mm.U
+ En serie 
+r summan av en talf
+ljd.(
+ En geometrisk talf
+ljd byggs upp genom   multiplikation med en sk kvot.+
+r att summan ej skall bli o
+ndlig m
+  kvoten ligga mellan -1 och 1.
+ Summan = a /(1-k)
+       a = seriens f
+rsta term
+       k = kvotenU
+ta linjens funktion: y=kx + m
+  k=riktningskoefficienten
+ Om k>0 s
+ lutar linjen upp
+ Om k<0 s
+ lutar linjen ned
+ m=linjens sk
+rning med y-axelnU
++Varje "kurvfamilj" har sitt karakteristiska*utseende. Ex en andragradskurva ser ut som)ett U. Minus framf
+-termen och kurvan
+blir upp och nedv
+nd.+Bl
+ddra i en mattebok med funktioner och du*kan snart avsl
+ja hur olika kurvor ser ut.)F
+r noggrannare f
+else m
+ste du sj
+ra dig att rita och f
+ funktionernas	utseende.U
+Derivatan 
+r positiv d
+ kurvan lutar upp
+Derivatan 
+r negativ d
+ kurvan lutar ned
+En maxpunkt ser ut som en bergstopp
+En minpunkt ser ut som en dal!
+Terassspunkt - terassodlingar !?"
+Kurvan har nollst
+llen d
+r kurvan
+r x-axelnU
+ Ett komplext tal best
+r av en sk realdel(   (ex 3) och en sk imagin
+r del (ex 4i)
+   Skrivs
+tt: (3,4i)*
+ Talet kan representeras i ett koordinat-'  system med det reela talet p
+ x-axeln$  och det imagin
+ra talet p
+ y-axeln
+ Speciellt g
+ller:  i
+ = -1U
+ Vet du ej vad du skall g
+  ta en sten i st
+rsta h
+gen!'
+ Vid 2 h
+gar - plocka s
+ att det finns$  endast en sten kvar i vardera h
+ Om datorn g
+r sitt b
+sta f
+r du det sv
+rt!'  K
+r du fast - s
+k hitta n
+gon bok som"  beskriver spelstrategin f
+r NIM!U
+ Talet i mitten m
+ste vara X !
+r udda !
+r ett bra betyg !U
+"CHEOPS HAR SUDDAT UT HJ
+LPTEXTEN !U
+rnen !U
+k att hitta en strategi!&
+ Hur g
+r man om det bara vore 1 ring?'  Om det vore 2, 3, 4 osv antal ringar?$
+ Strategin blir lite olika vid udda   respektive j
+mna antal ringar.U
+ tillbaks till Tornrummet och pr
+va med
+  olika antal ringar! (Tryck *),
+ Det minimala antalet drag som kr
+vs bildar)  en talserie med en speciell uppbyggnad.(
+ Det 
+r ocks
+jligt att st
+lla upp en#  formel f
+r minimala antalet drag.
+ Rummet heter "Mersennes rum".U
+Additions-rummet
+Subtraktions-rummet
+Multiplikations-rummet
+Divisions-rummet
+verslags-rummet
+Procent-rummet
+Procent - rummet
+Ekvations-rummet
+2:a grads-rummet
+Logaritmiska rummet
+Gissa-rummet
+Geometri-rummet
+Koordinat-rummet
+Trekants-rummet
+Fyrkants-rummet
+Runda-rummet
+Bollen
+Brunnen
+Kart-rummet
+Mikroskop-rummet
+Grekiska rummet
+Pythagoras rum
+Pyramid-rummet
+Vinkel-rummet
+Sinus-rummet
+Cosinus-rummet
+Talsystems-rummet
+ljds-rummet
+Serie-rummet
+ Pascals rum 
+Linje-rummet
+Funktions-rummet
+Derivata-rummet
+Komplexa-rummet
+Nim - rummet
+ Magiska-rummet 
+Master Mind - rummet
+OTHELLO - rummet
+Torn-rummet
+Mersennes rumU
+LP: U
+LP: U
+ 6 P j 
+" ";"V"p"
+$2$M$h$
+$[&{&
+'5'O'
+)7)Q)k)
++ +:+T+n+
+,:,T,n,
+.:.U.p.
+0-0H0b0|0
+2.2H2b2|2
+434M4
+4)5I5n5
+5S6s6
+868Q8k8
+86;E;];u;
+<5<M<e<}<
+=%===U=m=
+>->E>]>u>
+?&?\?
+@P@U@]@
+A#A.A?APAXA
+karta'Kartan 
+r sliten - alla v
+ggar syns ej!U
+<%| <3
+<4| <@
+<A| <K
+<L| <T
+slaskU
+                 ?U
+%OBS ! Du kan EJ g
+ tillbaks och r
+          om du g
+r fel!U
+Men du m
+ste skynda dig!
+Luften i rummet tar slut d
+  timglaset till h
+ger visar noll!U
+r att kl
+ttra upp
+vs alla r
+tt!+Mindre 
+n 7 r
+tt och du ramlar ned ett rum!U
+r att kl
+ttra upp
+vs alla r
+tt!'Du f
+tt om svaret avviker med h
+15 % fr
+n det r
+tta svaret.
+10 % fr
+n det r
+tta svaret.U
+Ange r
+rde p
+ x.,F
+r att kl
+ttra upp
+ste du ha alla r
+tt!,Mindre 
+n 7 r
+tt och du ramlar ned ett rum! U
+*Rummet 
+rkt-du har sv
+rt att hitta ut!*F
+r varje svar som 
+nds ett ljus.%F
+r att du ej skall ramla ned ett rum$m
+ste du t
+nda minst 6 utav 10 ljus.&F
+r att hitta g
+ngen som leder ut fr
+n!rummet m
+ste alla 10 ljus t
+ndas.U
+*Rummet 
+rkt-du har sv
+rt att hitta ut!*F
+r varje svar som 
+nds ett ljus.(Svarar du fel, blir allt m
+rkt, och ....
+    ... du seglar ned 5 rum!U
+#Gissa det tal som datorn t
+nker p
+(Ok, datorer kan inte t
+nka!&R
+tt uttryck 
+r det som datorn slumpat!fram med sin slumptalsgenerator.)
+Du har 10 gissningar p
+ dig.U
+ller det att vara f
+rsiktig!
+r du fel s
+r du verkligen i knipa!
+Du har ramlat ned i en brunn!%F
+r att komma upp ur brunnen m
+ste du#l
+sa de 3 uppgifterna helt korrekt.)Klarar du det inte p
+k sjunker du'ned genom brunnen till en l
+gre V
+NING!U
+Rummet saknar d
+ste spr
+nga dig ut!#F
+r varje r
+tt svar s
+r du en ny
+ngladdning.U
+  Detta 
+r ett klassiskt rum
+     - Pythagoras rum !#Du har v
+rt om Pythagoras sats?$F
+r att kl
+ttra upp
+ste du svara'helt r
+tt! Svaren skall ges som heltal.U
+'Inom matematiken anv
+nder man bokst
+ver(som beteckning p
+ framf
+rallt variabler.'Det 
+r vanligt att man d
+ utnyttjar det
+grekiska alfabetet.)Du f
+r en kamel f
+r varje grekisk bokstav
+som du anger r
+tt."Du beh
+ver 5 kameler av 5 m
+jliga!U
++Skulle du mot f
+rmodan ta dig ur pyramiden,)beh
+ver du samla kameler f
+r din hemf
+rd.'F
+r varje r
+tt svar f
+r du en ny kamel.%F
+r att du ej skall ramla ned ett rum&m
+ste du f
+ ihop minst 4 av 5 kameler.&F
+r att komma vidare i pyramiden m
+du ha alla r
+$Pyramiden 
+r byggd med en fantastisk$precision! Hur gjorde man f
+r att f
+alla vinklar korrekta?#P
+rmen visas ett antal vinklar.'Du skall bed
+ma vinklarnas storlek, dvs&ange vinklarnas gradtal. Du m
+ste vara%noggrann - ditt svar f
+gst avvika'med 10 grader fr
+n det korrekta v
+rdet.U
+'Vid ber
+kningar av str
+ckor och vinklar
+nds trigonometri.(I sinus-rummet skall du bed
+ma sinus f
+r den vinkel som visas p
+rmen.*Du m
+ste vara noggrann-ditt svar f
+gst)avvika med 0.05 fr
+n det korrekta v
+rdet.U
+'Vid ber
+kningar av str
+ckor och vinklar
+nds trigonometri.(I cosinus-rummet skall du bed
+ma cosinus$f
+r den vinkel som visas p
+rmen.*Du m
+ste vara noggrann-ditt svar f
+gst)avvika med 0.05 fr
+n det korrekta v
+rdet.U
+rmen visas en talf
+ljd.$Analysera hur talf
+ljden 
+r uppbyggd
+och ange det tal som saknas.%Du m
+ste klara de 7 talf
+ljderna som *visas f
+r att 
+ka upp ett rum i pyramiden!*Klarar du 6 stycken blir du kvar i rummet.U
+rmen visas en o
+ndlig talserie.$Analysera hur serien 
+r uppbyggd och
+kna sedan seriens summa.$Du m
+ste klara de 7 talserierna som *visas f
+r att 
+ka upp ett rum i pyramiden!*Klarar du 6 stycken blir du kvar i rummet.U
+&Uppgiften 
+r att omvandla tal fr
+n ett
+talsystem till ett annat.'Samtliga uppgifter m
+ste l
+sas innan du$kan kl
+ttra upp ett rum i pyramiden!U
+%Du h
+ller p
+ att t
+rsta ihj
+l! Kan du*identifiera den kurva som visas f
+r du ett%glas vatten f
+r att sl
+cka din t
+rst.)6 glas vatten  -  du kl
+ttrar upp ett rum'5 glas vatten  -  du blir kvar i rummet'1-4 glas  "    -  du ramlar ned ett rum* 0  GLAS OCH DITT LIV I PYRAMIDEN 
+R SLUT!U
+ller det att samla meloner f
+r att
+ ny n
+ring i knoppen!$F
+r varje r
+tt svar f
+r du en melon.%F
+r att du ej skall ramla ned ett rum(beh
+ver du f
+ ihop minst 5 av 6 meloner.%Du flyttar siktet med piltangenterna.&F
+r att komma vidare i pyramiden m
+du ha alla r
+)Spelet Nim g
+r ut p
+ att ta sista stenen!$P
+ golvet ligger 3 h
+gar med stenar.+D
+ det 
+r ditt drag v
+ljer du f
+rst h
+g och+sedan antalet stenar som du vill ta bort ur$h
+gen. Minst en sten m
+ste tas bort.,Tar du sista stenen kl
+ttrar du upp ett rum.,Vinner datorn ramlar du ner igen. Spelet kan)verka enkelt men 
+r klurigare 
+n du tror!U
+&Placera in talen s
+ att summan blir 15$b
+tt, lodr
+tt och diagonalt!U
+Lista ut de hemliga siffrorna.(Deras v
+rden kan variera mellan 0 och 9.&F
+r att f
+ helt r
+ste r
+tt siffra
+anges p
+tt plats!
+r gissa h
+gst 15 g
+nger.U
+*Spelplanen i Othello best
+r av 64 f
+lt. P
+lten placerar du och datorn ut egyptiska"mumier som finns i Othello-rummet.,D
+ det 
+r din tur placerar du ut en ny mumie,s
+ att 2 av dina mumier omringar datorns. De+omringade mumierna byts d
+ mot dina mumier.U
+,                                            ,Du placerar ut en mumie genom att ange en   -bokstav f
+r rad och en siffra f
+r kolumn.    ,Mumien m
+ste placeras s
+ att den tangerar   ,minst en av datorns mumier. G
+r det ej s
+   ,m
+ste du passa genom att trycka p
+ <Enter>. ,F
+r att kl
+ttra ett rum upp
+ste du d
+   ,planen 
+r full, ha fler mumier 
+n datorn!   U
+ golvet i rummet finns 3 sm
+ guldtorn. (P
+ torn nr 1 finns det n
+gra guldringar.*Cheops kr
+ver att Du flyttar ringarna till
+det tredje tornet.(Om du vill s
+ kan du tillf
+lligt placera ringar p
+ mellantornet (torn 2).*En st
+rre ring f
+r ej l
+ggas p
+ en mindre.)(Spelet kallas eg. "Tornet i Hanoi" eller
+"Brahminernas torn".)U
++Uppgiften bygger p
+ det du l
+rt dig i Torn-+rummet. D
+r flyttades ringar mellan 3 torn.*Om det 
+r bara en ring kr
+vs det ett drag.&Vid 2 ringar kr
+vs det minst tre drag.*Hur m
+nga drag kr
+vs det vid 3, 4, 5, ... 
+antal ringar?)Om Du vill kan du via en g
+ng tillf
+lligt%
+nda till tornrummet f
+r analys.
+ngen dit 
+ppnas med * U
+Additions-rummet
+Subtraktions-rummet
+Multiplikations-rummet
+Divisions-rummet
+Procent-rummet
+Procent - rummet
+verslags-rummet
+Ekvations-rummet
+2:a grads-rummet
+Logaritmiska rummet
+Gissa-rummet
+Geometri-rummet
+Linje-rummet
+Funktions-rummet
+Trekants-rummet
+Fyrkants-rummet
+Runda-rummet
+Bollen
+Brunnen
+Kart-rummet
+Mikroskop-rummet
+Pythagoras rum
+Pyramid-rummet
+Grekiska rummet
+Vinkel-rummet
+Sinus-rummet
+Cosinus-rummet
+ljds-rummet
+Serie-rummet
+ Pascals rum 
+Talsystems-rummet
+Koordinat-rummet
+Derivata-rummet
+Komplexa-rummet
+Nim - rummet
+ Magiska-rummet 
+Master Mind - rummet
+OTHELLO - rummet
+Torn-rummet
+Mersennes rumU
+RUMSREGLER: U
+RUMSREGLER: U
+OTHELLO - rummetU
+OTHELLO - rummetU
+ 1 K 
+"6"P"j"
+$ $:$T$c%
+(1(K(
+*-*G*a*{*
+,,,G,b,},
+,b/q/
+010I0a0y0
+0	1!191Q1i1
+2)2A2Y2q2
+3@3O3W3
+4(4A4
+425D5I5N5Y5d5u5
+6#6T6_6d6l6
+7)7.767;7U
+t300 L86o2p8Cp8dp8e-p8gp8  Cp8dp8e-p8gp8  Cp8dp8e-p8gp8L6cp8p46o3L8Cp8dp8e-p8gp8  Cp8dp8e-p8gp8  Cp8dp8e-p8gp8L6cp8p4@mb t200 o3p8L4ge-dc  ge-dcdo2bo3cP8  o2L4ge-dcge-dcL2d o1bo2cp64U
+FMNMF t245L16o4bL32o5do4bL16bf+df+df+o3L8bo4L16o3bL32o4do3bL16bf+df+L8bU
+-MNMF t300o4 L4g P8 L8d L4g P8 L8dgdgb o5L4dp4+L4cP8 o4L8a o5L4cp8 o4L8a o5c o4af+a L4d P4:L8gp8 l3gL8baggf+l3f+L8ao5co4f+agl3gl8baggf+l3f+l8ao5co4f+EL8ggl16gf+ef+l8ggl16baga l8bb o5l16dco4bo5cl4dp4 l2del8dcl4cl8co4bl4b-L8bal4al8gf+ef+gp8ap8bp8p4 o5l2del8dcccco4bbb1baaagf+ef+l2gl16f+gl8af+ l2bl16abo5l8co4al2dl4ef+4gabo5c+l3d o4l8a o5l6c+o4l16a o5l6c+o4l16ao5l3do4l8aAo5l6c+o4l16ao5l6c+o4l16aMSo5l8do4ao5c+o4ao5do4ao5c+o4ao5do4dddl4dU
+MNMFt220-o4l16a o5l12c+o4l32a o5l12c+o4l32ao5l6do4l16aDo5l12c+o4l32ao5l12c+o4l32aMSo5l16do4ao5c+o4ao5do4ao5c+o4ao5do4dddl8dU
+*MST255 L8o4dgP8dgP8dL4gP8 L8ggagf+P8L8gL4aU
+5MNT150 p1L4o2gaL2o3ccL4egL2aaP4 o2L4agL2gf o1L4feL2edU
+t120 L8 MB
+p4o2C6F4p4 o2CFGAGFCD2
+p2o3p8C6F4p4CFGAGFCD2U
+t255 l32 mB t230al16o2mnb4p8msbbmnb4p8msbbb8g#8e8g#8b8g#8b8o3e8o2b8g#8e8g#8b8g#8b8o3e8o2mnb4p8msbbmnb4p8msbbmnb4p8>msbbmnb4p8msbbb8bbb8b8b8bbb8b8b8bbb8b8b8bbb8b8mlb2b2b8p8p4p4p4U
+t230 l32 mb\mso1bbb8bbb8bbo2e8f#8g#8o1bbb8bbo2e8g#g#f#8d#8o1b8bbb8bbb8bbo2e8f#8g#8eg#mlb4bmsag#f#e8g#8e8U
+t230 l16 mb\mso2bbb8bbb8bbo3e8f#8g#8o2bbb8bbo3e8g#g#f#8d#8o2b8bbb8bbb8bbo3e8f#8g#8mleg#b4bag#f#mse8g#8e8U
+3MFT250 L16o5co4gbfadgco3gbfadg co2gbfadg co1gbfadgcU
+7MFT240 o1L16b-gf+gb-gf+gb-gf+gL8 f+ga-aL16b-gf+fb-gf+fdU
+<P4T250 o2L4eL2aL4o3eL2do2L4ao3cdo2bgL1a o3L4eL2gL4f+gaf+deP2U
+MBt140 L16 MN mb
+p8o1ggge2p4fffd2U
+	*	5	~	

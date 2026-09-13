@@ -1,0 +1,44 @@
+# Matte Pyramiden — Pyramid Reckoning
+
+A modern, browser-based homage to *Cheops Pyramid* (Alega Skolmateriel, 1993),
+a Swedish maths-adventure floppy game by Göran Hjalmarsson. Built from a
+reverse-engineering pass over the original `CHEOPS.EXE`/`CHEOPS.OVR` — see
+[`docs/CHEOPS_DESIGN_NOTES.md`](docs/CHEOPS_DESIGN_NOTES.md) for the technical
+analysis and the full room/mechanic inventory that inspired this build, and
+[`docs/reference/`](docs/reference/) for the raw string dumps, a disassembly
+excerpt of the entry dispatcher, and a few of the original `.PCX` screens
+converted to PNG.
+
+**Play it:** open [`index.html`](index.html) directly in a browser — no build
+step, no dependencies.
+
+## What's here
+
+A single-page game (`index.html`, vanilla HTML/CSS/JS, no build tooling) —
+*Pyramid Reckoning*:
+
+- 12 chambers: 9 random maths topics (arithmetic, percent, geometry, algebra,
+  sequences, number bases, Pythagoras, quadratics — 12 topic generators in
+  the pool, each producing fresh random problems every run) drawn as a
+  two-column worksheet of 10 problems, plus a Nim room, a full Mastermind
+  room, and a combinatorics riddle finale.
+- Two "sequential visual" chambers (Geometry Vault — name 3D wireframe
+  shapes to earn dynamite charges and blast through a wall; Coordinate Grid —
+  plot points to collect melons) sharing one canvas-driven engine.
+- Difficulty selectable by Swedish school year (Åk 1–9) or College, which
+  changes both number ranges and which topics can appear.
+- Swedish/English language toggle, a skippable narrated intro, a torch/life
+  system, save/load via `localStorage`, an in-game map, and separate
+  Hint (F2-style) and Rules (F1-style) panels per the original's own
+  control scheme.
+- Original art direction (a torch-lit stone-corridor aesthetic) — the
+  original's `.PCX` art and exact copy are not reused; only the game
+  *mechanics and structure* are carried over.
+
+## Status
+
+Actively evolving against reference material (screenshots and a playthrough
+video of the original) supplied during development. See
+`docs/CHEOPS_DESIGN_NOTES.md` for room types identified in the original but
+not yet built (Tower of Hanoi, Othello, Dürer's magic square, dependent
+multi-part word problems, per-room pass thresholds other than "all correct").

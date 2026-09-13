@@ -1,0 +1,1981 @@
+<title>Pyramid Reckoning</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Caveat:wght@600;700&display=swap');
+
+  :root{
+    --basalt:#15100c;
+    --wall:#241b13;
+    --wall-2:#2f2318;
+    --wall-3:#3a2b1c;
+    --papyrus:#ecdfc4;
+    --papyrus-dim:#b6a586;
+    --torch:#d99a3d;
+    --torch-bright:#f6c766;
+    --lapis:#4a92b6;
+    --lapis-dim:#3a6f8a;
+    --ochre:#c14f31;
+    --gilt:#8a6a34;
+    --shadow: rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 50% -10%, #2a1f14 0%, var(--basalt) 55%);
+    color:var(--papyrus);
+    font-family:'Manrope',ui-sans-serif,system-ui,sans-serif;
+    padding:32px 16px 56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+  }
+
+  h1,h2,h3{ font-family:'Cinzel',Georgia,serif; text-wrap:balance; margin:0; }
+
+  ::selection{ background:var(--torch); color:var(--basalt); }
+  a{ color:var(--lapis); }
+  button{ font:inherit; }
+
+  /* ---------- Header ---------- */
+  .masthead{
+    width:100%; max-width:760px; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:.72rem;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--torch); opacity:.85;
+  }
+  .masthead h1{
+    font-size:clamp(2rem, 5.5vw, 3.1rem); font-weight:700; letter-spacing:.02em;
+    color:var(--papyrus); text-shadow:0 0 26px rgba(217,154,61,.25);
+  }
+  .masthead p{ max-width:52ch; color:var(--papyrus-dim); line-height:1.6; font-size:.98rem; }
+
+  /* ---------- Game frame ---------- */
+  .frame{
+    width:100%; max-width:760px;
+    background: linear-gradient(180deg, var(--wall-3), var(--wall) 40%, var(--wall) 100%);
+    border:1px solid #4a3720; border-radius:14px; padding:16px;
+    box-shadow: 0 30px 60px -25px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.04);
+    position:relative;
+  }
+  .frame::before{
+    content:""; position:absolute; inset:6px;
+    border:1px solid rgba(138,106,52,.35); border-radius:9px; pointer-events:none;
+  }
+
+  .hud{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:2px 6px 12px; flex-wrap:wrap; }
+  .hud-block{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .room-label{ font-family:'IBM Plex Mono',monospace; font-size:.78rem; color:var(--papyrus-dim); letter-spacing:.06em; }
+  .level-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.05em;
+    color:var(--basalt); background:var(--gilt); border-radius:4px; padding:2px 6px;
+  }
+  .room-name{ font-family:'Cinzel',serif; font-size:1.05rem; color:var(--torch-bright); }
+  .torches{ display:flex; gap:6px; }
+  .torch-icon{ font-size:1.05rem; filter: drop-shadow(0 0 6px rgba(217,154,61,.5)); }
+  .torch-icon.out{ filter:grayscale(1) brightness(.5); opacity:.5; }
+
+  .timer{
+    font-family:'IBM Plex Mono',monospace; font-variant-numeric: tabular-nums; font-size:1rem;
+    padding:4px 10px; border-radius:7px; background:rgba(0,0,0,.35);
+    border:1px solid rgba(138,106,52,.4); min-width:64px; text-align:center;
+  }
+
+  canvas#scene{
+    width:100%; aspect-ratio: 16/9; display:block; border-radius:8px; background:#0c0906;
+    box-shadow: inset 0 0 0 1px rgba(138,106,52,.3), inset 0 30px 60px rgba(0,0,0,.6);
+  }
+
+  .stage{ position:relative; }
+
+  .parchment{
+    position:absolute; left:5%; right:5%; bottom:6%;
+    background: linear-gradient(180deg, #e9dcc0, #ddcda6);
+    color:#2b2013; border-radius:6px; padding:16px 18px;
+    box-shadow: 0 18px 34px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.15);
+    --room-accent: #4a92b6;
+  }
+  .parchment .prompt{ font-size:1.02rem; line-height:1.5; font-weight:600; margin:0 0 10px; }
+  .parchment .subprompt{ font-family:'IBM Plex Mono',monospace; font-size:.85rem; color:#5c4a2c; margin:-4px 0 12px; }
+  .ws-tip{
+    font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:#5c4a2c;
+    margin:0 0 10px; line-height:1.4;
+  }
+  .worksheet{
+    display:grid; grid-template-columns:1fr 1fr; gap:1px 22px; margin-bottom:6px;
+    border-top:3px solid var(--room-accent); padding-top:9px;
+  }
+  .ws-col{ display:flex; flex-direction:column; gap:1px; }
+  .ws-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:.92rem; padding:4px 6px; border-radius:4px;
+  }
+  .ws-row.current{ background:rgba(43,32,19,.08); box-shadow:inset 3px 0 0 var(--room-accent); }
+  .ws-num{ white-space:nowrap; }
+  .ws-slot{
+    font-weight:700; min-width:30px; text-align:right; font-variant-numeric:tabular-nums;
+    display:inline-flex; align-items:baseline; gap:6px; justify-content:flex-end;
+  }
+  .ws-slot.placeholder{ color:var(--lapis-dim); opacity:.7; }
+  .ws-slot.correct{ color:#2e6b3e; }
+  .ws-slot.wrong{ color:#8a2f1c; }
+  .ws-word{
+    font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.03em; text-transform:uppercase; opacity:.85;
+  }
+  .tally-row{ display:flex; justify-content:center; margin:2px 0 12px; }
+  .tally-plaque{
+    font-family:'IBM Plex Mono',monospace; font-size:.85rem; font-weight:700; padding:5px 14px;
+    border-radius:5px; background:rgba(177,71,46,.1); border:1px solid rgba(177,71,46,.4); color:#8a2f1c;
+  }
+  .mm-history{
+    display:none; margin-top:10px; padding-top:8px; border-top:1px solid rgba(43,32,19,.25);
+    font-family:'IBM Plex Mono',monospace; font-size:.82rem; max-height:200px; overflow-y:auto;
+  }
+  .mm-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:2px 0; }
+  .mm-row .mm-code{ font-weight:700; letter-spacing:.15em; }
+  .mm-row .mm-score{ color:#5c4a2c; white-space:nowrap; }
+  .mm-row.win .mm-score{ color:#2e6b3e; font-weight:700; }
+  .trial-charges{ display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .trial-charge{ font-size:1.3rem; opacity:.25; filter:grayscale(1); transition:opacity .2s, filter .2s; }
+  .trial-charge.lit{ opacity:1; filter:none; }
+  .trial-charge.spent{ opacity:.5; filter:grayscale(1) brightness(.6); }
+  .answer-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .answer-row input{
+    flex:1 1 160px; min-width:0; font-family:'IBM Plex Mono',monospace; font-size:1rem;
+    padding:9px 10px; border-radius:6px; border:1px solid #a68c5c; background:#f7efdc; color:#2b2013;
+  }
+  .answer-row input:focus{ outline:2px solid var(--lapis); outline-offset:1px; }
+  .btn{
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:.88rem; border:none; border-radius:6px;
+    padding:9px 16px; cursor:pointer; color:var(--basalt);
+    background: linear-gradient(180deg, var(--torch-bright), var(--torch));
+    box-shadow: 0 2px 0 #8a611c, 0 6px 14px -6px rgba(0,0,0,.5);
+  }
+  .btn:active{ transform:translateY(1px); box-shadow:0 1px 0 #8a611c; }
+  .btn.secondary{
+    background: linear-gradient(180deg, #3f5c6d, var(--lapis-dim)); color:#eaf4f9;
+    box-shadow: 0 2px 0 #274654, 0 6px 14px -6px rgba(0,0,0,.5);
+  }
+  .btn.ghost{
+    background:transparent; color:var(--papyrus-dim); border:1px solid rgba(138,106,52,.5);
+    box-shadow:none;
+  }
+  .feedback{ margin-top:10px; font-size:.88rem; font-weight:600; min-height:1.2em; }
+  .feedback.good{ color:#2e6b3e; }
+  .feedback.bad{ color:#8a2f1c; }
+
+  .hint{
+    display:none; margin-top:10px; padding:10px 12px; border-radius:6px;
+    background:rgba(74,146,182,.14); border:1px dashed var(--lapis-dim); color:#20323b;
+    font-size:.85rem; line-height:1.5;
+  }
+  .hint.show{ display:block; }
+
+  .controls{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding-top:14px; }
+  .frame:has(#setupOverlay.show) .controls,
+  .frame:has(#introOverlay.show) .controls{ visibility:hidden; }
+  .rail-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:.76rem; letter-spacing:.04em; color:var(--papyrus);
+    background:linear-gradient(180deg, var(--wall-2), var(--wall)); border:1px solid rgba(138,106,52,.45);
+    border-radius:6px; padding:8px 12px; cursor:pointer; display:flex; align-items:center; gap:6px;
+  }
+  .rail-btn:hover{ border-color:var(--torch); color:var(--torch-bright); }
+  .rail-btn kbd{
+    font-family:'IBM Plex Mono',monospace; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.12);
+    border-radius:3px; padding:0 4px; font-size:.68rem;
+  }
+
+  /* ---------- Generic full-stage overlays ---------- */
+  .overlay{
+    display:none; position:absolute; inset:16px; background:rgba(10,7,4,.96);
+    border-radius:10px; border:1px solid rgba(138,106,52,.5); padding:20px; z-index:8; overflow:auto;
+  }
+  .overlay.show{ display:flex; flex-direction:column; }
+  .overlay h3{ color:var(--torch-bright); margin-bottom:4px; font-size:1.15rem; }
+  .overlay .overlay-sub{ color:var(--papyrus-dim); font-size:.85rem; margin-bottom:16px; }
+
+  /* Map */
+  .map-track{ display:flex; flex-direction:column; gap:6px; }
+  .map-room{ display:flex; align-items:center; gap:10px; font-size:.82rem; padding:6px 8px; border-radius:6px; color:var(--papyrus-dim); }
+  .map-room.done{ color:var(--lapis); }
+  .map-room.current{ color:var(--torch-bright); background:rgba(217,154,61,.1); }
+  .map-room .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; flex:none; }
+  .overlay-close{ margin-top:16px; align-self:flex-start; }
+
+  /* Setup */
+  .field-label{ font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gilt); margin:14px 0 8px; }
+  .field-label:first-of-type{ margin-top:0; }
+  .lang-row{ display:flex; gap:8px; }
+  .pill{
+    font-family:'Manrope',sans-serif; font-weight:600; font-size:.85rem; padding:8px 14px;
+    border-radius:20px; border:1px solid rgba(138,106,52,.5); background:var(--wall-2); color:var(--papyrus);
+    cursor:pointer;
+  }
+  .pill.active{ background:linear-gradient(180deg, var(--torch-bright), var(--torch)); color:var(--basalt); border-color:transparent; }
+  .level-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(84px,1fr)); gap:8px; }
+  .level-pill{
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:9px 6px; text-align:center;
+    border-radius:7px; border:1px solid rgba(138,106,52,.5); background:var(--wall-2); color:var(--papyrus); cursor:pointer;
+  }
+  .level-pill.active{ background:linear-gradient(180deg, var(--torch-bright), var(--torch)); color:var(--basalt); border-color:transparent; }
+  .level-pill.college{ grid-column: 1 / -1; }
+  .setup-actions{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+
+  /* Intro */
+  .intro-body{ flex:1; display:flex; align-items:center; justify-content:center; min-height:160px; }
+  .intro-beat{ font-size:1.15rem; line-height:1.6; text-align:center; max-width:48ch; color:var(--papyrus); }
+  .intro-actions{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:18px; }
+  .intro-dots{ display:flex; gap:6px; justify-content:center; margin-top:14px; }
+  .intro-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(230,200,140,.25); }
+  .intro-dots span.on{ background:var(--torch); }
+
+  .intro-letter{
+    display:flex; align-items:center; gap:22px; max-width:520px;
+  }
+  .intro-letter-scrap{
+    position:relative; background:linear-gradient(155deg, #d9cba3, #c3b280);
+    color:#2b2013; padding:22px 26px; flex:1;
+    clip-path: polygon(3% 6%, 22% 0%, 45% 4%, 68% 0%, 92% 5%, 100% 18%, 97% 40%,
+      100% 63%, 95% 82%, 100% 96%, 78% 100%, 55% 97%, 30% 100%, 6% 95%, 0% 74%, 5% 48%, 0% 24%);
+    box-shadow: 0 16px 30px rgba(0,0,0,.5);
+  }
+  .intro-letter-sig{
+    font-family:'Cinzel',serif; font-size:.8rem; letter-spacing:.15em; text-transform:uppercase;
+    color:#6b5327; display:block; margin-top:10px; text-align:right;
+  }
+  .intro-letter-text{ font-family:'Caveat',cursive; font-size:1.45rem; line-height:1.35; }
+  .intro-candle{ flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .intro-candle .flame{
+    font-size:1.9rem; filter:drop-shadow(0 0 10px rgba(246,199,102,.8));
+    animation: flicker 1.6s ease-in-out infinite;
+  }
+  @keyframes flicker{ 0%,100%{ transform:scale(1) translateY(0); } 50%{ transform:scale(1.08) translateY(-1px); } }
+  @media (max-width:560px){ .intro-letter{ flex-direction:column; } }
+
+  /* End */
+  .end-body{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; }
+  .end-body h2{ font-size:1.7rem; color:var(--torch-bright); }
+  .end-body p{ color:var(--papyrus-dim); max-width:42ch; line-height:1.5; }
+  .overlay.mummy .end-body h2{ color:var(--ochre); }
+
+  footer{ max-width:760px; text-align:center; color:var(--papyrus-dim); font-size:.78rem; line-height:1.6; }
+  footer .glyphs{ color:var(--gilt); letter-spacing:.3em; font-size:.7rem; margin-bottom:6px; }
+
+  @media (max-width:480px){
+    .hud{ justify-content:flex-start; }
+    .parchment{ left:3%; right:3%; padding:12px 14px; }
+    .answer-row{ flex-direction:column; }
+    .answer-row .btn{ width:100%; }
+    .intro-actions{ flex-direction:column-reverse; }
+    .worksheet{ grid-template-columns:1fr; gap:1px; }
+    .ws-num{ font-size:.86rem; }
+  }
+  @media (prefers-reduced-motion: reduce){ * { animation-duration:.001ms !important; } }
+</style>
+
+<div class="masthead">
+  <div class="eyebrow" id="eyebrowText">A math expedition</div>
+  <h1>Pyramid Reckoning</h1>
+  <p id="subtitleText">Loading…</p>
+</div>
+
+<div class="frame">
+  <div class="hud">
+    <div class="hud-block">
+      <span class="level-badge" id="levelBadge">ÅK 5</span>
+      <span class="room-label" id="roomIndexLabel">CHAMBER 1 / 12</span>
+      <span class="room-name" id="roomNameLabel">The Threshold</span>
+    </div>
+    <div class="hud-block">
+      <span class="torches" id="torchRow" aria-label="Torches remaining"></span>
+      <span class="timer" id="timerLabel">01:00</span>
+    </div>
+  </div>
+
+  <div class="stage">
+    <canvas id="scene" width="960" height="540"></canvas>
+
+    <div class="parchment" id="parchment">
+      <p class="ws-tip" id="wsTip" style="display:none;"></p>
+      <div class="worksheet" id="worksheet" style="display:none;">
+        <div class="ws-col" id="wsColLeft"></div>
+        <div class="ws-col" id="wsColRight"></div>
+      </div>
+      <div class="tally-row" id="tallyRow" style="display:none;">
+        <span class="tally-plaque" id="setTallyLabel">Correct: 0</span>
+      </div>
+      <div class="trial-charges" id="trialCharges" style="display:none;"></div>
+
+      <p class="prompt" id="promptText">Loading the first chamber…</p>
+      <p class="subprompt" id="subPromptText"></p>
+      <div class="answer-row" id="answerRow">
+        <input id="answerInput" type="text" inputmode="text" autocomplete="off" placeholder="Your answer" aria-label="Your answer">
+        <button class="btn" id="submitBtn">Answer</button>
+        <button class="btn" id="setContinueBtn" style="display:none;">Continue</button>
+      </div>
+      <div class="feedback" id="feedbackText"></div>
+      <div class="mm-history" id="mmHistory"></div>
+      <div class="hint" id="hintText"></div>
+    </div>
+
+    <div class="overlay" id="rulesOverlay">
+      <h3 id="rulesTitle">Room rules</h3>
+      <p class="overlay-sub" id="rulesBody" style="margin-bottom:0;">Solve all 10 problems…</p>
+      <button class="btn secondary overlay-close" id="rulesCloseBtn">Close</button>
+    </div>
+
+    <div class="overlay" id="mapOverlay">
+      <h3 id="mapTitle">Passage map</h3>
+      <div class="map-track" id="mapTrack"></div>
+      <button class="btn secondary overlay-close" id="mapCloseBtn">Close</button>
+    </div>
+
+    <div class="overlay" id="setupOverlay">
+      <h3 id="setupTitle">Before you descend</h3>
+      <p class="overlay-sub" id="setupSub">Choose a language and a difficulty.</p>
+
+      <div class="field-label" id="langLabel">Language</div>
+      <div class="lang-row">
+        <button class="pill" id="langSv" type="button">Svenska</button>
+        <button class="pill" id="langEn" type="button">English</button>
+      </div>
+
+      <div class="field-label" id="levelLabel">Difficulty</div>
+      <div class="level-grid" id="levelGrid"></div>
+
+      <div class="setup-actions">
+        <button class="btn" id="setupPrimaryBtn">Begin the descent</button>
+        <button class="btn ghost" id="setupCancelBtn" style="display:none;">Cancel</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="introOverlay">
+      <div class="intro-body">
+        <p class="intro-beat" id="introBeatText"></p>
+        <div class="intro-letter" id="introLetter" style="display:none;">
+          <div class="intro-letter-scrap">
+            <p class="intro-letter-text" id="introLetterText"></p>
+            <span class="intro-letter-sig" id="introLetterSig">— Cheops</span>
+          </div>
+          <div class="intro-candle"><span class="flame">🕯️</span></div>
+        </div>
+      </div>
+      <div class="intro-dots" id="introDots"></div>
+      <div class="intro-actions">
+        <button class="btn ghost" id="introSkipBtn">Skip intro</button>
+        <button class="btn" id="introNextBtn">Continue</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="endOverlay">
+      <div class="end-body">
+        <h2 id="endTitle">You reach the treasure chamber</h2>
+        <p id="endBody">Gold, faience and a very smug cat statue.</p>
+        <button class="btn" id="restartBtn">Descend again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="rail-btn" id="rulesBtn">📖 <span id="lblRules">Rules</span> <kbd>R</kbd></button>
+    <button class="rail-btn" id="hintBtn">💡 <span id="lblHint">Hint</span> <kbd>H</kbd></button>
+    <button class="rail-btn" id="mapBtn">🗺 <span id="lblMap">Map</span> <kbd>M</kbd></button>
+    <button class="rail-btn" id="saveBtn">⛏ <span id="lblSave">Save</span> <kbd>S</kbd></button>
+    <button class="rail-btn" id="loadBtn">📜 <span id="lblLoad">Load</span> <kbd>L</kbd></button>
+    <button class="rail-btn" id="settingsBtn">⚙ <span id="lblSettings">Settings</span></button>
+    <button class="rail-btn" id="resetBtn">↺ <span id="lblRestart">Restart</span></button>
+  </div>
+</div>
+
+<footer>
+  <div class="glyphs">▲ ▲ ▲ ▲ ▲</div>
+  <span id="footerText">Numbers regenerate on every descent, so the pyramid never solves the same way twice.</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ================= Utilities =================
+  function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function pick(arr){ return arr[randInt(0, arr.length-1)]; }
+  function normAnswer(s){
+    return String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/,/g,'.').replace(/±/g,'+-');
+  }
+  function numEq(a,b,eps){ eps = eps===undefined?0.01:eps; return Math.abs(a-b) <= eps; }
+  function parseNumberSet(s){
+    return String(s).toLowerCase()
+      .replace(/och|and/g,',')
+      .split(/[,;\s]+/)
+      .filter(function(x){ return x!==''; })
+      .map(function(x){ return parseFloat(x); })
+      .filter(function(x){ return !isNaN(x); });
+  }
+  function sameMultiset(a,b,eps){
+    if(a.length!==b.length) return false;
+    var bb = b.slice();
+    for(var i=0;i<a.length;i++){
+      var idx = bb.findIndex(function(v){ return numEq(v,a[i],eps); });
+      if(idx===-1) return false;
+      bb.splice(idx,1);
+    }
+    return true;
+  }
+  // tier: 0 = grade 1-2, 1 = grade 3-4, 2 = grade 5-6, 3 = grade 7-9, 4 = college
+  function tierOf(level){
+    if(level<=2) return 0;
+    if(level<=4) return 1;
+    if(level<=6) return 2;
+    if(level<=9) return 3;
+    return 4;
+  }
+  function T(level, arr){ return arr[tierOf(level)]; }
+
+  // ================= Localized fixed strings =================
+  var STR = {
+    sv: {
+      eyebrow: 'Ett matteäventyr',
+      subtitle: 'Facklan försvinner runt hörnet. Tolv kamrar skiljer dig från Khufus skatt. Varje kammare ställer tio uppgifter av samma sort — klarar du alla tio öppnas vägen, annars slocknar en fackla.',
+      footer: 'Talen skapas på nytt varje gång, så pyramiden löses aldrig likadant två gånger.',
+      chamber: function(n,total){ return 'KAMMARE ' + n + ' / ' + total; },
+      hint:'Ledtråd', map:'Karta', save:'Spara', load:'Hämta', settings:'Inställningar', restart:'Börja om',
+      answerBtn:'Svara', answerPlaceholder:'Ditt svar', continueBtn:'Fortsätt',
+      mapTitle:'Karta över gångarna',
+      correct:'Rätt!',
+      wrongAnswer:'Fel.',
+      wordCorrect:'Rätt', wordWrong:'Fel',
+      rulesBtn:'Regler', rulesTitle:'Rumsregler',
+      rulesBodyDrill:'Lös alla 10 uppgifterna. För att klättra uppåt krävs alla rätt! Missar du någon ramlar du ned ett rum och förlorar en fackla. Skynda dig — facklan ovanför mäter tiden för hela arbetsbladet, inte varje uppgift.',
+      rulesBodyNim:'Ta 1–3 tegelstenar i din tur. Den som tvingas ta den sista stenen förlorar. Besegra din motståndare för att komma vidare; förlorar du slocknar en fackla.',
+      rulesBodyCombo:'En gåta, en chans. Svara rätt för att öppna valvet. Ett felaktigt svar kostar en fackla och skickar dig tillbaka ett rum.',
+      rulesBodyMastermind:'Tre hemliga siffror (0–9, kan upprepas) väntar på att knäckas. Efter varje gissning får du veta hur många siffror som satt helt rätt, och hur många som fanns med men på fel plats. Du har 15 gissningar — tar de slut utan att du knäcker koden slocknar en fackla.',
+      setQuestion: function(n,total){ return 'Uppgift ' + n + ' / ' + total; },
+      setTally: function(n){ return 'Antal rätt: ' + n; },
+      setPerfect:'Alla rätt — vägen öppnas!',
+      setPass:function(n,total){ return 'Bra jobbat — ' + n + '/' + total + ' rätt. Vägen öppnas.'; },
+      setFail:function(n,total){ return 'Bara ' + n + '/' + total + ' rätt — det räcker inte. En fackla slocknar.'; },
+      setPassSub:'Alla 10 rätt krävdes för att klara kammaren.',
+      setFailSub:'Det krävdes alla 10 rätt. Var rädd om dina facklor.',
+      setTimeUp:'Facklan slocknar mitt i räkningen.',
+      wrongGeneric:'Fel svar — en fackla slocknar.',
+      timeUp:'Facklan slocknar. Mörkret kostar dig ett ljus.',
+      saveOk:'Sparat i väggen.', saveFail:'Kunde inte spara i den här webbläsaren.',
+      loadOk:'Du fortsätter där du var.', loadFail:'Det sparade märket gick inte att läsa.', loadEmpty:'Inget sparat märke hittades.',
+      winTitle:'Du når skattkammaren', winBody:'Tolv kamrar, tolv fullständiga svar. Guld, fajans och en hemresa att planera.',
+      loseTitle:'Sista facklan slocknar', loseBody:'Cheops beklagar att du aldrig hittade ut — men ser till att du får sällskap där nere.',
+      settingsHeading:'Innan du kliver ner', settingsSub:'Välj språk och svårighetsgrad.',
+      settingsHeadingReopen:'Ändra inställningar', settingsSubReopen:'Spelet startas om från kammare 1 med de nya inställningarna.',
+      langLabel:'Språk', levelLabel:'Svårighetsgrad',
+      begin:'Kliv ner i pyramiden', apply:'Starta om med detta', cancel:'Avbryt',
+      levelNames:['Åk 1','Åk 2','Åk 3','Åk 4','Åk 5','Åk 6','Åk 7','Åk 8','Åk 9','Högskola'],
+      introSkip:'Hoppa över', introNext:'Fortsätt', introEnter:'Kliv in i pyramiden',
+      introBeats:[
+        'En stund för länge vid hieroglyferna på väggen — och turen har redan svängt runt hörnet utan dig.',
+        'Du trevar dig fram genom en gång som blivit kolsvart, gruppens röster redan uppslukade av stenen.',
+        null,
+        'Långt ovanför har sanden börjat rinna in i ett schakt. Tolv kamrar står mellan dig och utgången.'
+      ],
+      introLetterText:'Den som läser detta sitter fången i min pyramid, precis som du. Varje kammare gömmer ett matematiskt problem — lös det, och stenen lyfter dig uppåt. Missa, och du faller tillbaka ett steg.'
+    },
+    en: {
+      eyebrow: 'A math expedition',
+      subtitle: 'The torchbearer turned a corner without you. Twelve sealed chambers stand between you and Khufu’s hoard. Each chamber sets ten problems of the same kind — a perfect ten opens the way; fall short and a torch burns out.',
+      footer: 'Numbers regenerate on every descent, so the pyramid never solves the same way twice.',
+      chamber: function(n,total){ return 'CHAMBER ' + n + ' / ' + total; },
+      hint:'Hint', map:'Map', save:'Save', load:'Load', settings:'Settings', restart:'Restart',
+      answerBtn:'Answer', answerPlaceholder:'Your answer', continueBtn:'Continue',
+      mapTitle:'Passage map',
+      correct:'Correct!',
+      wrongAnswer:'Not quite.',
+      wordCorrect:'Correct', wordWrong:'Wrong',
+      rulesBtn:'Rules', rulesTitle:'Room rules',
+      rulesBodyDrill:'Solve all 10 problems. Climbing upward requires a perfect sheet! Miss even one and you fall back a chamber, losing a torch. Answer quickly — the torch above times the whole worksheet, not each question.',
+      rulesBodyNim:'Take 1–3 bricks on your turn. Whoever is forced to take the last brick loses. Beat your rival to move on; lose, and a torch burns out.',
+      rulesBodyCombo:'One riddle, one chance. Answer correctly to open the vault. A wrong answer costs a torch and sends you back a chamber.',
+      rulesBodyMastermind:'Three secret digits (0–9, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses — run out without cracking it and a torch burns out.',
+      setQuestion: function(n,total){ return 'Question ' + n + ' / ' + total; },
+      setTally: function(n){ return 'Correct: ' + n; },
+      setPerfect:'Flawless — the way opens!',
+      setPass:function(n,total){ return 'Well reckoned — ' + n + '/' + total + ' correct. The way opens.'; },
+      setFail:function(n,total){ return 'Only ' + n + '/' + total + ' correct — not enough. A torch burns out.'; },
+      setPassSub:'A perfect 10 out of 10 was needed to pass this chamber.',
+      setFailSub:'All 10 out of 10 were needed. Mind your torches.',
+      setTimeUp:'The torch gutters out mid-count.',
+      wrongGeneric:'Not quite — a torch burns out.',
+      timeUp:'The torch gutters out. Darkness costs you a light.',
+      saveOk:'Progress etched into the wall.', saveFail:'Could not save in this browser.',
+      loadOk:'Picked up where you left off.', loadFail:'That save mark was unreadable.', loadEmpty:'No saved mark found on the wall.',
+      winTitle:'You reach the treasury', winBody:'Twelve chambers, twelve perfect reckonings. Gold, faience beads, and a trip home to plan.',
+      loseTitle:'The last torch dies', loseBody:'Cheops regrets that you never found the way out — but sees to it that you’re given excellent company down here.',
+      settingsHeading:'Before you descend', settingsSub:'Choose a language and a difficulty.',
+      settingsHeadingReopen:'Change settings', settingsSubReopen:'The run restarts from chamber 1 with the new settings.',
+      langLabel:'Language', levelLabel:'Difficulty',
+      begin:'Descend into the pyramid', apply:'Restart with this', cancel:'Cancel',
+      levelNames:['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','College'],
+      introSkip:'Skip intro', introNext:'Continue', introEnter:'Enter the pyramid',
+      introBeats:[
+        'A moment too long over the hieroglyphs on the wall — and the tour has already turned the corner without you.',
+        'You feel your way forward down a corridor gone pitch-black, the group’s voices already swallowed by the stone.',
+        null,
+        'Far above, sand has begun hissing into a shaft. Twelve chambers stand between you and the way out.'
+      ],
+      introLetterText:'Whoever finds this is trapped here, same as you. Every chamber hides a problem of mathematics — solve it, and the stone lifts you higher. Miss it, and you fall back a step.'
+    }
+  };
+
+  // ================= Room definitions =================
+  // Each room: { key, name:{sv,en}, minLevel, build(level)->vars, text(lang,vars)->{prompt,sub,hint}, check(vars,answer)->bool }
+  var ROOMS = [
+    {
+      key:'threshold', minLevel:1,
+      name:{sv:'Tröskeln', en:'The Threshold'}, accent:'#4a92b6',
+      build:function(level){
+        var range = T(level, [[1,20],[10,99],[50,500],[100,9999],[500,99999]]);
+        var op = pick(['+','-']);
+        var x = randInt(range[0], range[1]), y = randInt(range[0], range[1]);
+        if(op==='-' && x<y){ var t=x; x=y; y=t; }
+        var ans = op==='+' ? x+y : x-y;
+        return {x:x,y:y,op:op,ans:ans};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'En sliten trappsten visar: ' + v.x + ' ' + v.op + ' ' + v.y + ' = ?',
+          sub:'Dela upp talen i hundratal, tiotal och ental innan du räknar.',
+          hint:'Dela upp varje tal i hundratal/tiotal/ental och räkna var för sig, t.ex. 283+45 → 323, sedan +5 → 328.'
+        } : {
+          prompt:'A worn step reads: ' + v.x + ' ' + v.op + ' ' + v.y + ' = ?',
+          sub:'Try splitting the numbers into hundreds, tens and ones first.',
+          hint:'Break each number into hundreds/tens/ones and combine separately, e.g. 283+45 → 323, then +5 → 328.'
+        };
+      },
+      short:function(lang,v){ return v.x + ' ' + v.op + ' ' + v.y + ' ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
+      key:'coins', minLevel:1,
+      name:{sv:'Skattkistan', en:'The Coin Chest'}, accent:'#c99a3d',
+      build:function(level){
+        var range = T(level, [[1,9],[5,40],[20,200],[100,5000],[1000,90000]]);
+        var a = randInt(range[0], range[1]);
+        var b = randInt(range[0], range[1]);
+        return {a:a,b:b,ans:a+b};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'I ena handen har du ' + v.a + ' guldmynt, i den andra ' + v.b + '. Hur många mynt har du sammanlagt?',
+          sub:'Lägg ihop de två högarna.',
+          hint:'Räkna ihop myntens antal: ' + v.a + ' + ' + v.b + '.'
+        } : {
+          prompt:'You hold ' + v.a + ' gold coins in one hand and ' + v.b + ' in the other. How many coins in total?',
+          sub:'Add the two piles together.',
+          hint:'Simply add the two amounts: ' + v.a + ' + ' + v.b + '.'
+        };
+      },
+      short:function(lang,v){ return v.a + ' + ' + v.b + ' ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
+      key:'multiplication', minLevel:2,
+      name:{sv:'Radernas Sal', en:'The Hall of Rows'}, accent:'#8a2f2f',
+      build:function(level){
+        var range = T(level, [[1,5],[2,10],[2,12],[6,20],[12,30]]);
+        var a = randInt(range[0], range[1]);
+        var b = randInt(range[0], range[1]);
+        return {a:a,b:b,ans:a*b};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'Stenblocken är lagda i ' + v.a + ' rader med ' + v.b + ' block i varje rad. Hur många block totalt?',
+          sub:'Multiplicera raderna med antalet block per rad.',
+          hint:'Antal rader × antal block per rad = ' + v.a + ' × ' + v.b + '.'
+        } : {
+          prompt:'The stone blocks are laid in ' + v.a + ' rows of ' + v.b + ' blocks each. How many blocks in total?',
+          sub:'Multiply the rows by the blocks per row.',
+          hint:'Rows × blocks per row = ' + v.a + ' × ' + v.b + '.'
+        };
+      },
+      short:function(lang,v){ return v.a + ' × ' + v.b + ' ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
+      key:'estimation', minLevel:3,
+      name:{sv:'Uppsyningsmannens Lista', en:'The Overseer’s Tally'}, accent:'#8a4fb1',
+      build:function(level){
+        var range = T(level, [[10,40],[40,150],[100,600],[180,890],[500,3000]]);
+        var a = randInt(range[0], range[1]);
+        var b = randInt(Math.max(2,Math.round(range[0]/8)), Math.max(9,Math.round(range[1]/8)));
+        var tol = tierOf(level) >= 3 ? 0.07 : 0.12;
+        return {a:a,b:b,ans:a*b,tol:tol};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'Uppsyningsmannen vill ha ett snabbt överslag: ungefär hur mycket är ' + v.a + ' × ' + v.b + '? (avrunda båda talen först)',
+          sub:'Godkänt svar ligger inom ' + Math.round(v.tol*100) + '% av det exakta värdet.',
+          hint:'Avrunda ' + v.a + ' och ' + v.b + ' till närmaste tiotal eller hundratal, multiplicera sedan.'
+        } : {
+          prompt:'The overseer wants a quick estimate: about how much is ' + v.a + ' × ' + v.b + '? (round each number first)',
+          sub:'Accepted within ' + Math.round(v.tol*100) + '% of the true product.',
+          hint:'Round ' + v.a + ' and ' + v.b + ' to the nearest ten or hundred, then multiply.'
+        };
+      },
+      short:function(lang,v){ return '≈ ' + v.a + ' × ' + v.b + ' ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return Math.abs(n-v.ans) <= v.ans*v.tol; }
+    },
+    {
+      key:'sequence', minLevel:2,
+      name:{sv:'Frisen av Tal', en:'The Frieze of Numbers'}, accent:'#3f8a7a',
+      build:function(level){
+        var geoAllowed = tierOf(level) >= 2;
+        var kind = geoAllowed ? pick(['arith','geo']) : 'arith';
+        if(kind==='arith'){
+          var stepRange = T(level, [[1,3],[2,6],[2,9],[3,12],[4,20]]);
+          var start = randInt(1, 9);
+          var step = randInt(stepRange[0], stepRange[1]);
+          var seq = [start, start+step, start+2*step, start+3*step];
+          return {seq:seq, ans:start+4*step, kind:kind};
+        } else {
+          var s0 = randInt(1,4), ratio = pick(tierOf(level)>=3 ? [2,3,4] : [2,3]);
+          var seq2 = [s0, s0*ratio, s0*ratio*ratio, s0*ratio*ratio*ratio];
+          return {seq:seq2, ans:s0*Math.pow(ratio,4), kind:kind};
+        }
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'Inhugget i frisen: ' + v.seq.join('  ') + '  ?',
+          sub:'Vad kommer härnäst i talföljden?',
+          hint: v.kind==='arith' ? 'Jämför varje tal med det föregående — här läggs samma tal till varje gång.' : 'Jämför varje tal med det föregående — här multipliceras med samma tal varje gång.'
+        } : {
+          prompt:'Carved into the frieze: ' + v.seq.join('  ') + '  ?',
+          sub:'What comes next in the sequence?',
+          hint: v.kind==='arith' ? 'Compare each term to the one before it — the same number is added each time.' : 'Compare each term to the one before it — each term is multiplied by the same number.'
+        };
+      },
+      short:function(lang,v){ return v.seq.join(' ') + ' ?'; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
+      key:'percent', minLevel:4,
+      name:{sv:'Vågkammaren', en:'The Scale Chamber'}, accent:'#3f8a52',
+      build:function(level){
+        var pctPool = T(level, [
+          [10,25,50], [10,25,50,20,75], [10,20,25,30,50,75], [5,15,30,40,60,70], [5,12.5,17.5,32.5,62.5]
+        ]);
+        var baseRange = T(level, [[20,60],[40,120],[60,250],[100,400],[200,900]]);
+        var base = randInt(baseRange[0], baseRange[1]);
+        var pct = pick(pctPool);
+        var part = Math.round(base*pct)/100;
+        // From tier 1 up, sometimes ask the reverse: "X of Y is what percent?"
+        var findPercent = tierOf(level) >= 1 && Math.random() < 0.5;
+        return {base:base, pct:pct, part:part, findPercent:findPercent};
+      },
+      text:function(lang,v){
+        if(v.findPercent){
+          return lang==='sv' ? {
+            prompt:'Handlaren undrar: hur många procent utgör ' + v.part + ' av ' + v.base + '?',
+            sub:'Dela delen med det hela, och gör om till procent.',
+            hint:'Procentandel = (delen / det hela) × 100 = (' + v.part + ' / ' + v.base + ') × 100.'
+          } : {
+            prompt:'The merchant wonders: what percent of ' + v.base + ' is ' + v.part + '?',
+            sub:'Divide the part by the whole, then convert to a percentage.',
+            hint:'Percentage = (part / whole) × 100 = (' + v.part + ' / ' + v.base + ') × 100.'
+          };
+        }
+        return lang==='sv' ? {
+          prompt:'En handlares våg kräver: hur mycket är ' + v.pct + '% av ' + v.base + '?',
+          sub:'Procent betyder "per hundra".',
+          hint:'10% är en tiondel (dela med 10), 25% är en fjärdedel (dela med 4), 50% är hälften (dela med 2). Kombinera för andra procenttal.'
+        } : {
+          prompt:'A merchant’s scale demands: what is ' + v.pct + '% of ' + v.base + '?',
+          sub:'Percent means "per hundred".',
+          hint:'10% is a tenth (÷10), 25% is a quarter (÷4), 50% is half (÷2). Combine those for other percentages.'
+        };
+      },
+      short:function(lang,v){
+        return v.findPercent
+          ? (v.part + ' ' + (lang==='sv'?'av':'of') + ' ' + v.base + ' = ?%')
+          : (v.pct + '% ' + (lang==='sv'?'av':'of') + ' ' + v.base + ' =');
+      },
+      check:function(v,s){
+        var n=parseFloat(normAnswer(s));
+        return v.findPercent ? numEq(n, v.pct, 0.5) : numEq(n, v.part, 0.05);
+      }
+    },
+    {
+      key:'area', minLevel:4,
+      name:{sv:'Det Sluttande Golvet', en:'The Sloped Floor'}, accent:'#b1652f',
+      build:function(level){
+        var range = T(level, [[4,10],[4,14],[6,20],[8,30],[10,60]]);
+        var base = randInt(range[0], range[1]);
+        var height = randInt(range[0], range[1]);
+        return {base:base, height:height, ans: base*height/2};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'En triangulär hällplatta har basen ' + v.base + ' m och höjden ' + v.height + ' m. Vad är arean, i m²?',
+          sub:'Arean av en triangel = bas × höjd / 2.',
+          hint:'Multiplicera bas med höjd, dela sedan resultatet med 2: ' + v.base + ' × ' + v.height + ' / 2.'
+        } : {
+          prompt:'A triangular slab has base ' + v.base + ' m and height ' + v.height + ' m. What is its area, in m²?',
+          sub:'Area of a triangle = base × height / 2.',
+          hint:'Multiply base by height, then halve the result: ' + v.base + ' × ' + v.height + ' / 2.'
+        };
+      },
+      short:function(lang,v){ return 'b=' + v.base + ' h=' + v.height + ' → A ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0.05); }
+    },
+    {
+      key:'angle', minLevel:5,
+      name:{sv:'Den Triangulära Stämpeln', en:'The Triangular Seal'}, accent:'#a89a2f',
+      build:function(level){
+        var a = randInt(30,85);
+        var bMax = Math.max(21, 150-a-10);
+        var b = randInt(20, bMax);
+        return {a:a, b:b, ans: 180-a-b};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'En triangulär stämpel har vinklarna ' + v.a + '° och ' + v.b + '°. Vad är den tredje vinkeln, i grader?',
+          sub:'De tre vinklarna i en triangel summerar alltid till samma tal.',
+          hint:'En triangels vinklar summerar alltid till 180°, så den saknade vinkeln är 180 − ' + v.a + ' − ' + v.b + '.'
+        } : {
+          prompt:'A triangular seal has angles ' + v.a + '° and ' + v.b + '°. What is the third angle, in degrees?',
+          sub:'A triangle’s three angles always add to the same total.',
+          hint:'A triangle’s angles always sum to 180°, so the missing one is 180 − ' + v.a + ' − ' + v.b + '.'
+        };
+      },
+      short:function(lang,v){ return v.a + '° + ' + v.b + '° + ? = 180°'; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
+      key:'equation', minLevel:5,
+      name:{sv:'Ekvationssalen', en:'The Equation Hall'}, accent:'#8a7a2f',
+      build:function(level){
+        var tier = tierOf(level);
+        var range = T(level, [[1,15],[1,30],[1,60],[1,99],[1,200]]);
+        var op = pick(['+','-']);
+        var n = randInt(range[0], range[1]);
+        var xMin = tier >= 3 ? -range[1] : 0;
+        var x = randInt(xMin, range[1]);
+        var m = op==='+' ? x+n : x-n;
+        return {op:op, n:n, m:m, x:x};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'Lös ekvationen: x ' + v.op + ' ' + v.n + ' = ' + v.m,
+          sub:'Gör samma sak på båda sidor för att ensam ställa x.',
+          hint: v.op==='+' ? 'x + ' + v.n + ' = ' + v.m + ' → dra bort ' + v.n + ' från båda sidor: x = ' + v.m + ' − ' + v.n + '.'
+                             : 'x − ' + v.n + ' = ' + v.m + ' → lägg till ' + v.n + ' på båda sidor: x = ' + v.m + ' + ' + v.n + '.'
+        } : {
+          prompt:'Solve the equation: x ' + v.op + ' ' + v.n + ' = ' + v.m,
+          sub:'Do the same thing to both sides to isolate x.',
+          hint: v.op==='+' ? 'x + ' + v.n + ' = ' + v.m + ' → subtract ' + v.n + ' from both sides: x = ' + v.m + ' − ' + v.n + '.'
+                             : 'x − ' + v.n + ' = ' + v.m + ' → add ' + v.n + ' to both sides: x = ' + v.m + ' + ' + v.n + '.'
+        };
+      },
+      short:function(lang,v){ return 'x ' + v.op + ' ' + v.n + ' = ' + v.m + ' → x ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.x,0); }
+    },
+    {
+      key:'base', minLevel:6,
+      name:{sv:'Det Binära Låset', en:'The Binary Lock'}, accent:'#2f6d8a',
+      build:function(level){
+        var useHex = tierOf(level) >= 3 && Math.random() < (tierOf(level)===4 ? 0.6 : 0.3);
+        var base = useHex ? 16 : 2;
+        var range = T(level, [[3,9],[5,15],[8,24],[9,60],[16,120]]);
+        var n = randInt(range[0], range[1]);
+        var dir = pick(['toBase','toDec']);
+        return {n:n, base:base, dir:dir, repr:n.toString(base)};
+      },
+      text:function(lang,v){
+        var baseName = v.base===16 ? {sv:'bas 16 (hexadecimalt)', en:'base 16 (hex)'} : {sv:'bas 2 (binärt)', en:'base 2 (binary)'};
+        if(v.dir==='toBase'){
+          return lang==='sv' ? {
+            prompt:'Ett lås accepterar bara ' + baseName.sv + '. Ange ' + v.n + ' i ' + baseName.sv + '.',
+            sub: v.base===16 ? 'Använd siffrorna 0-9 och a-f.' : 'Bara 0:or och 1:or öppnar den här dörren.',
+            hint:'Dela talet upprepade gånger med ' + v.base + ', notera resten varje gång, läs sedan resterna nerifrån och upp.'
+          } : {
+            prompt:'A lock accepts only ' + baseName.en + '. Enter ' + v.n + ' in ' + baseName.en + '.',
+            sub: v.base===16 ? 'Use digits 0-9 and letters a-f.' : 'Only 0s and 1s open this door.',
+            hint:'Repeatedly divide by ' + v.base + ', noting the remainder each time, then read the remainders bottom-to-top.'
+          };
+        } else {
+          return lang==='sv' ? {
+            prompt:'Ett lås visar talet ' + v.repr + ' i ' + baseName.sv + '. Ange värdet i bas 10.',
+            sub:'Varje position är värd ' + v.base + ' gånger mer än den till höger.',
+            hint:'Räkna platsvärdena från höger: 1, ' + v.base + ', ' + (v.base*v.base) + ', ' + (v.base*v.base*v.base) + '… och summera.'
+          } : {
+            prompt:'A lock displays the number ' + v.repr + ' in ' + baseName.en + '. Enter its value in base 10.',
+            sub:'Each position is worth ' + v.base + ' times the one to its right.',
+            hint:'Place values from the right are 1, ' + v.base + ', ' + (v.base*v.base) + ', ' + (v.base*v.base*v.base) + '… add up the ones that are used.'
+          };
+        }
+      },
+      short:function(lang,v){
+        return v.dir==='toBase' ? (v.n + ' → base' + v.base + ' =') : (v.repr + ' (base' + v.base + ') → dec =');
+      },
+      check:function(v,s){
+        var raw = normAnswer(s).replace(/^0+(?=[0-9a-f])/,'');
+        if(v.dir==='toBase') return raw === v.repr;
+        var val = parseInt(normAnswer(s), v.base);
+        return val === v.n;
+      }
+    },
+    {
+      key:'pythagoras', minLevel:7,
+      name:{sv:'Byggmästarens Gång', en:'The Mason’s Corridor'}, accent:'#9c3f2f',
+      build:function(level){
+        var triples = [[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25],[12,16,20],[20,21,29]];
+        var tri = pick(triples);
+        var askLeg = tierOf(level) >= 4 && Math.random() < 0.5;
+        if(askLeg){
+          var knownLeg = tri[0], unknownLeg = tri[1], hyp = tri[2];
+          return {mode:'leg', a:knownLeg, hyp:hyp, ans:unknownLeg};
+        }
+        return {mode:'hyp', a:tri[0], b:tri[1], ans:tri[2]};
+      },
+      text:function(lang,v){
+        if(v.mode==='hyp'){
+          return lang==='sv' ? {
+            prompt:'En ramp har basen ' + v.a + ' alnar och höjden ' + v.b + ' alnar. Hur lång är själva rampen (hypotenusan), i alnar?',
+            sub:'Pythagoras sats: kvadraten på den längsta sidan = summan av kvadraterna på de andra två.',
+            hint:'hypotenusa² = ' + v.a + '² + ' + v.b + '² = ' + (v.a*v.a+v.b*v.b) + ', ta sedan roten ur.'
+          } : {
+            prompt:'A ramp’s base runs ' + v.a + ' cubits and rises ' + v.b + ' cubits. How long is the ramp itself (the hypotenuse), in cubits?',
+            sub:'Pythagoras: the square of the longest side equals the sum of the squares of the other two.',
+            hint:'hypotenuse² = ' + v.a + '² + ' + v.b + '² = ' + (v.a*v.a+v.b*v.b) + ', then take the square root.'
+          };
+        }
+        return lang==='sv' ? {
+          prompt:'Rampen är ' + v.hyp + ' alnar lång och dess bas är ' + v.a + ' alnar. Hur hög är rampen, i alnar?',
+          sub:'Denna gång är hypotenusan känd — lös ut den andra kateten.',
+          hint:'höjd² = hypotenusa² − bas² = ' + v.hyp + '² − ' + v.a + '² = ' + (v.hyp*v.hyp-v.a*v.a) + ', ta sedan roten ur.'
+        } : {
+          prompt:'The ramp is ' + v.hyp + ' cubits long and its base runs ' + v.a + ' cubits. How tall is the ramp, in cubits?',
+          sub:'This time the hypotenuse is known — solve for the other leg.',
+          hint:'height² = hypotenuse² − base² = ' + v.hyp + '² − ' + v.a + '² = ' + (v.hyp*v.hyp-v.a*v.a) + ', then take the square root.'
+        };
+      },
+      short:function(lang,v){
+        return v.mode==='hyp' ? ('legs ' + v.a + ', ' + v.b + ' → hyp =') : ('hyp ' + v.hyp + ', leg ' + v.a + ' → leg =');
+      },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
+      key:'quadratic', minLevel:8,
+      name:{sv:'Salen med Två Dörrar', en:'The Hall of Two Doors'}, accent:'#b1902f',
+      build:function(level){
+        var college = level >= 10;
+        if(college){
+          var k = randInt(3,12);
+          return {college:true, k:k, roots:[0,k]};
+        }
+        var r = randInt(2, tierOf(level)>=3 ? 12 : 9);
+        return {college:false, r:r, n:r*r};
+      },
+      text:function(lang,v){
+        if(v.college){
+          return lang==='sv' ? {
+            prompt:'Två dörrar öppnas bara om båda lösningarna anges: x² − ' + v.k + 'x = 0. Ange båda värdena på x (skilj med komma).',
+            sub:'Bryt ut x ur uttrycket.',
+            hint:'Faktorisera: x(x − ' + v.k + ') = 0, så antingen är x = 0 eller x = ' + v.k + '.'
+          } : {
+            prompt:'Two doors open only if both solutions are given: x² − ' + v.k + 'x = 0. Give both values of x (comma-separated).',
+            sub:'Factor x out of the expression.',
+            hint:'Factor it as x(x − ' + v.k + ') = 0, so either x = 0 or x = ' + v.k + '.'
+          };
+        }
+        return lang==='sv' ? {
+          prompt:'Två identiska dörrar vaktar salen. Lös: x² = ' + v.n + ' (ange den positiva roten)',
+          sub:'Den här typen av ekvation har alltid två svar — ett positivt och ett negativt.',
+          hint:'Fråga dig "vilket tal gånger sig själv ger ' + v.n + '?" Det talets negativa motsvarighet fungerar också.'
+        } : {
+          prompt:'Two identical doors guard this hall. Solve: x² = ' + v.n + ' (give the positive root)',
+          sub:'This kind of equation always has two answers — a positive and a negative one.',
+          hint:'Ask "what number times itself gives ' + v.n + '?" The negative of that number also works.'
+        };
+      },
+      short:function(lang,v){
+        return v.college ? ('x² − ' + v.k + 'x = 0 → x =') : ('x² = ' + v.n + ' → x =');
+      },
+      check:function(v,s){
+        if(v.college){
+          var nums = parseNumberSet(s);
+          return sameMultiset(nums, v.roots, 0.01);
+        }
+        var n=parseFloat(normAnswer(s)); return numEq(Math.abs(n), v.r, 0);
+      }
+    },
+    {
+      key:'geometry3d', minLevel:4, isTrial:true, accent:'#2f6d9c', chargeIcon:'🧨',
+      name:{sv:'Geometri-rummet', en:'The Geometry Vault'},
+      buildSet:function(level, lang){
+        var shapeKeys = ['cuboid','cube','cylinder','sphere','cone','pyramid'];
+        var shuffled = shapeKeys.slice();
+        for(var i=shuffled.length-1;i>0;i--){ var j=randInt(0,i); var tmp=shuffled[i]; shuffled[i]=shuffled[j]; shuffled[j]=tmp; }
+        var synonyms = {
+          cuboid:['ratblock','cuboid','rectangularprism','box'],
+          cube:['kub','cube'],
+          cylinder:['cylinder'],
+          sphere:['klot','sphere','ball'],
+          cone:['kon','cone'],
+          pyramid:['pyramid']
+        };
+        function normShape(s){ return String(s).toLowerCase().trim().replace(/\s+/g,'').replace(/[åä]/g,'a').replace(/ö/g,'o'); }
+        var items = shuffled.map(function(key){
+          return {
+            prompt: lang==='sv' ? 'Vad kallas denna geometriska figur?' : 'What is this geometric shape called?',
+            sub: '',
+            hint: lang==='sv' ? 'Räkna hörn, kanter och sidoytor — jämför med ett föremål du känner igen.' : 'Count corners, edges and faces — compare it to an object you recognize.',
+            draw: function(ctx,w,h){ drawFramedShapes(ctx,w,h,[key]); },
+            check: function(s){ var n=normShape(s); return synonyms[key].some(function(alt){ return normShape(alt)===n; }); }
+          };
+        });
+        items.push({
+          prompt: lang==='sv' ? 'Hur många dimensioner har dessa figurer?' : 'How many dimensions do these shapes have?',
+          sub: '',
+          hint: lang==='sv' ? 'Dimensioner = antal riktningar figuren sträcker sig i (längd, bredd, höjd).' : 'Dimensions = the number of directions a shape extends in (length, width, height).',
+          draw: function(ctx,w,h){ drawFramedShapes(ctx,w,h,['cube','sphere','cylinder']); },
+          check: function(s){ return parseFloat(normAnswer(s)) === 3; }
+        });
+        return {
+          name: lang==='sv' ? 'Geometri-rummet' : 'The Geometry Vault',
+          sub: lang==='sv'
+            ? 'Rummet saknar dörr — du måste spränga dig ut. Varje rätt svar tänder en ny laddning.'
+            : 'The room has no door — you must blast your way out. Each correct answer lights a new charge.',
+          seconds: T(level, [200,190,170,150,130]),
+          items: items
+        };
+      }
+    },
+    {
+      key:'coordinates', minLevel:5, isTrial:true, accent:'#3f7a4a', chargeIcon:'🍈',
+      name:{sv:'Koordinat-rummet', en:'The Coordinate Grid'},
+      buildSet:function(level, lang){
+        var range = T(level, [3,4,5,6,7]);
+        var items = [];
+        for(var i=0;i<6;i++){
+          var tx = randInt(-range, range), ty = randInt(-range, range);
+          items.push((function(tx,ty){
+            return {
+              prompt: lang==='sv' ? 'Markera punkten (' + tx + ', ' + ty + ')' : 'Mark the point (' + tx + ', ' + ty + ')',
+              sub: lang==='sv' ? 'Ange koordinaterna som "x,y".' : 'Enter the coordinates as "x,y".',
+              hint: lang==='sv'
+                ? 'Första talet är x (vågrätt), andra är y (lodrätt). Positivt går åt höger/uppåt, negativt åt vänster/nedåt.'
+                : 'The first number is x (horizontal), the second is y (vertical). Positive goes right/up, negative goes left/down.',
+              draw: function(ctx,w,h){ drawCoordGrid(ctx,w,h,range,this.markedPoint); },
+              check: function(s){
+                var parts = String(s).replace(/[()]/g,'').split(/[,;\s]+/).filter(function(x){ return x!==''; }).map(Number);
+                var ok = parts.length===2 && parts[0]===tx && parts[1]===ty;
+                this.markedPoint = {x:parts[0], y:parts[1], ok:ok};
+                return ok;
+              }
+            };
+          })(tx,ty));
+        }
+        return {
+          name: lang==='sv' ? 'Koordinat-rummet' : 'The Coordinate Grid',
+          sub: lang==='sv'
+            ? 'Samla meloner genom att markera rätt punkt i koordinatsystemet.'
+            : 'Collect melons by marking the right point on the coordinate grid.',
+          seconds: T(level, [200,190,170,150,130]),
+          items: items
+        };
+      }
+    }
+  ];
+
+  var NIM_INDEX = 8;
+  var MASTERMIND_INDEX = 9;
+  var TOTAL_ROOMS = 12;
+  var MAX_TORCHES = 3;
+  var ROOM_SECONDS = 60;      // Nim single moves
+  var MASTERMIND_SECONDS = 240; // whole Mastermind puzzle
+  var SET_SIZE = 10;       // exercises per drill chamber
+  // The original's own room-rules screens (Subtraktions-rummet, Överslags-rummet)
+  // state "för att klättra uppåt krävs alla rätt" — all 10 correct, no partial credit.
+
+  function nimName(lang){ return lang==='sv' ? 'Räknemuren' : 'The Counting Wall'; }
+  function comboName(lang){ return lang==='sv' ? 'Skattkammardörren' : 'The Treasury Door'; }
+
+  // Build a themed worksheet of SET_SIZE independent problems from one topic.
+  function buildDrillSet(level, lang){
+    var pool = ROOMS.filter(function(r){ return r.minLevel <= level; });
+    if(pool.length===0) pool = ROOMS.filter(function(r){ return r.minLevel===1; });
+    var def = pick(pool);
+    var seconds = T(level, [220,200,180,150,130]);
+
+    if(def.isTrial){
+      // Sequential visual challenge: each item draws its own scene on the room canvas
+      // instead of appearing as a worksheet row. All items must be answered correctly
+      // to pass, same rule as the text worksheets.
+      var trial = def.buildSet(level, lang);
+      return {
+        topicName: trial.name, topicSub: trial.sub || '', accent: def.accent, isTrial:true,
+        chargeIcon: def.chargeIcon, items: trial.items,
+        idx:0, results:[], seconds: trial.seconds || seconds, finalized:false
+      };
+    }
+
+    var items = [];
+    for(var i=0;i<SET_SIZE;i++){
+      var vars = def.build(level);
+      var text = def.text(lang, vars);
+      items.push({
+        label: def.short(lang, vars), sub: text.sub, hint: text.hint,
+        check: (function(v){ return function(s){ return def.check(v, s); }; })(vars)
+      });
+    }
+    return {
+      topicName: def.name[lang], topicSub: items[0].sub, accent: def.accent, isTrial:false,
+      items: items, idx:0, results:[], seconds: seconds, finalized:false
+    };
+  }
+
+  function buildComboRoom(level, lang){
+    var tier = tierOf(level);
+    var pools = [3,4,6,9,9];
+    var picks = [3,3,4,4,4];
+    var n = pools[tier], r = picks[tier];
+    var isCollege = tier===4;
+    var perm = 1; for(var i=0;i<r;i++) perm *= (n-i);
+    if(isCollege){
+      // combination (order doesn't matter) — nCr
+      function fact(x){ var f=1; for(var j=2;j<=x;j++) f*=j; return f; }
+      var comb = fact(n) / (fact(r) * fact(n-r));
+      return {
+        name: comboName(lang),
+        prompt: lang==='sv'
+          ? 'Valvet väljs ut av ' + r + ' väktarstatyer bland ' + n + ' tillgängliga — ordningen spelar ingen roll. Hur många olika urval är möjliga?'
+          : 'The vault is guarded by choosing ' + r + ' statues out of ' + n + ' available — order doesn’t matter. How many different selections are possible?',
+        sub: lang==='sv' ? 'Det här är ett urval, inte en ordnad kod.' : 'This is a selection, not an ordered code.',
+        hint: lang==='sv'
+          ? 'Antal urval utan ordning = n! / (r! × (n−r)!). Här: ' + n + '! / (' + r + '! × ' + (n-r) + '!).'
+          : 'Number of unordered selections = n! / (r! × (n−r)!). Here: ' + n + '! / (' + r + '! × ' + (n-r) + '!).',
+        check: function(s){ var v=parseInt(normAnswer(s),10); return v===comb; }
+      };
+    }
+    return {
+      name: comboName(lang),
+      prompt: lang==='sv'
+        ? 'Slutvalvet har en kod med ' + r + ' siffror, valda bland siffrorna 1–' + n + ', ingen siffra upprepas. Hur många olika koder är möjliga?'
+        : 'The final vault uses a ' + r + '-digit code drawn from the digits 1–' + n + ', no digit repeated. How many different codes are possible?',
+      sub: lang==='sv' ? (n) + ' val för första siffran, en färre för varje efterföljande.' : n + ' choices for the first digit, one fewer for each after.',
+      hint: lang==='sv'
+        ? 'Multiplicera ' + Array.from({length:r},function(_,i){return n-i;}).join(' × ') + ' — en möjlighet färre för varje siffra som placeras.'
+        : 'Multiply ' + Array.from({length:r},function(_,i){return n-i;}).join(' × ') + ' — one fewer option for each digit placed.',
+      check: function(s){ var v=parseInt(normAnswer(s),10); return v===perm; }
+    };
+  }
+
+  function buildNimRoom(level, lang){
+    var range = T(level, [[6,9],[9,13],[12,17],[14,20],[20,30]]);
+    var heap = randInt(range[0], range[1]);
+    state.nimState = { heap: heap, over:false };
+    return {
+      name: nimName(lang),
+      prompt: lang==='sv'
+        ? 'En mur av ' + heap + ' lösa tegelstenar blockerar passagen. Turas om att ta 1–3 stenar. Den som tvingas ta den SISTA stenen måste hitta en annan väg runt — försök tvinga din motståndare att ta den.'
+        : 'A wall of ' + heap + ' loose bricks blocks the passage. Take turns removing 1–3 bricks. Whoever takes the LAST brick must find another way around — try to force your rival to take it.',
+      sub: lang==='sv' ? 'Klicka på ett tal nedan för att ta så många stenar.' : 'Click a number below to take that many bricks.',
+      hint: lang==='sv' ? 'Försök lämna din motståndare en multipel av 4 stenar. Om du alltid kan det vinner du.' : 'Try to leave your opponent a multiple of 4 bricks. If you always can, you win.',
+      check: function(){ return false; }
+    };
+  }
+
+  var MM_CODE_LEN = 3;
+  var MM_MAX_GUESSES = 15;
+  function scoreMastermind(secret, guess){
+    var exact = 0;
+    var secretRest = [], guessRest = [];
+    for(var i=0;i<secret.length;i++){
+      if(secret[i]===guess[i]) exact++;
+      else { secretRest.push(secret[i]); guessRest.push(guess[i]); }
+    }
+    var freq = {};
+    secretRest.forEach(function(d){ freq[d] = (freq[d]||0)+1; });
+    var partial = 0;
+    guessRest.forEach(function(d){ if(freq[d] > 0){ partial++; freq[d]--; } });
+    return {exact:exact, partial:partial};
+  }
+
+  function buildMastermindRoom(level, lang){
+    var secret = [];
+    for(var i=0;i<MM_CODE_LEN;i++) secret.push(randInt(0,9));
+    state.mmState = { secret:secret, guesses:[], over:false };
+    return {
+      name: lang==='sv' ? 'Master Mind-rummet' : 'The Master Mind Room',
+      prompt: lang==='sv'
+        ? 'Lista ut de ' + MM_CODE_LEN + ' hemliga siffrorna (0–9, kan upprepas). Du får gissa högst ' + MM_MAX_GUESSES + ' gånger.'
+        : 'Work out the ' + MM_CODE_LEN + ' secret digits (0–9, repeats allowed). You have at most ' + MM_MAX_GUESSES + ' guesses.',
+      sub: lang==='sv' ? 'Ange en gissning som ' + MM_CODE_LEN + ' siffror, t.ex. 482.' : 'Enter a guess as ' + MM_CODE_LEN + ' digits, e.g. 482.',
+      hint: lang==='sv'
+        ? '"Helt rätt" = rätt siffra på rätt plats. "Siffror rätt" = siffran finns med men på fel plats. Använd båda ledtrådarna för att snäva in svaret!'
+        : '"Exact" means the right digit in the right spot. "Present" means the digit is in the code but in the wrong spot. Use both clues together to narrow it down.',
+      check: function(){ return false; }
+    };
+  }
+
+  // ================= State =================
+  var state = {
+    lang: 'en',
+    level: 5,
+    room: 0,
+    torches: MAX_TORCHES,
+    visited: [],
+    current: null,
+    timeLeft: ROOM_SECONDS,
+    timerId: null,
+    nimState: null,
+    mmState: null,
+    set: null,
+    ended: false,
+    resolved: false,
+    booted: false,
+    timerTotal: ROOM_SECONDS,
+    settingsMode: 'initial' // 'initial' | 'reopen'
+  };
+
+  var els = {};
+  ['eyebrowText','subtitleText','footerText','levelBadge','roomIndexLabel','roomNameLabel','torchRow','timerLabel',
+   'promptText','subPromptText','answerInput','submitBtn','feedbackText','hintText','hintBtn','mapBtn',
+   'wsTip','worksheet','wsColLeft','wsColRight','tallyRow','setTallyLabel','setContinueBtn','mmHistory','trialCharges',
+   'mapOverlay','mapTrack','mapCloseBtn','mapTitle','saveBtn','loadBtn','settingsBtn','resetBtn',
+   'rulesBtn','rulesOverlay','rulesTitle','rulesBody','rulesCloseBtn','lblRules',
+   'setupOverlay','setupTitle','setupSub','langLabel','langSv','langEn','levelLabel','levelGrid',
+   'setupPrimaryBtn','setupCancelBtn','introOverlay','introBeatText','introLetter','introLetterText','introLetterSig','introDots','introSkipBtn','introNextBtn',
+   'endOverlay','endTitle','endBody','restartBtn','parchment','lblHint','lblMap','lblSave','lblLoad','lblSettings','lblRestart'
+  ].forEach(function(id){ els[id] = document.getElementById(id); });
+  els.answerRow = document.querySelector('.answer-row');
+  // short aliases used throughout the game logic below
+  els.prompt = els.promptText;
+  els.sub = els.subPromptText;
+  els.feedback = els.feedbackText;
+  els.hint = els.hintText;
+  els.input = els.answerInput;
+
+  function t(){ return STR[state.lang]; }
+
+  // ================= Room lifecycle =================
+  function isSpecialRoom(index){ return index === NIM_INDEX || index === MASTERMIND_INDEX || index === TOTAL_ROOMS-1; }
+
+  function renderTorches(){
+    els.torchRow.innerHTML = '';
+    for(var i=0;i<MAX_TORCHES;i++){
+      var span = document.createElement('span');
+      span.className = 'torch-icon' + (i < state.torches ? '' : ' out');
+      span.textContent = '🔥';
+      els.torchRow.appendChild(span);
+    }
+  }
+
+  function formatTime(ti){ var m=Math.floor(ti/60), s=ti%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+
+  function runTimerInterval(){
+    clearInterval(state.timerId);
+    updateTimerLabel();
+    state.timerId = setInterval(function(){
+      state.timeLeft--;
+      updateTimerLabel();
+      if(state.timeLeft <= 0){
+        clearInterval(state.timerId);
+        if(state.set && !state.set.finalized) finalizeSet(true);
+        else onFail(t().timeUp);
+      }
+    }, 1000);
+  }
+  function startTimer(seconds){ state.timeLeft = seconds; state.timerTotal = seconds; runTimerInterval(); }
+  function pauseTimer(){ clearInterval(state.timerId); }
+
+  function updateTimerLabel(){
+    els.timerLabel.textContent = formatTime(Math.max(0,state.timeLeft));
+    var frac = state.timeLeft / state.timerTotal;
+    els.timerLabel.style.color = frac < 0.25 ? 'var(--ochre)' : (frac < 0.5 ? 'var(--torch)' : 'var(--papyrus)');
+  }
+
+  var nimControlsEl = null;
+
+  function loadRoom(index, opts){
+    opts = opts || {};
+    state.booted = true;
+    if(nimControlsEl){ nimControlsEl.remove(); nimControlsEl = null; }
+    state.room = index;
+    state.resolved = false;
+    state.set = null;
+    els.hint.classList.remove('show');
+    els.feedback.textContent = '';
+    els.feedback.className = 'feedback';
+    els.input.style.display = '';
+    els.submitBtn.style.display = '';
+    els.setContinueBtn.style.display = 'none';
+    els.mmHistory.style.display = 'none';
+    els.mmHistory.innerHTML = '';
+    els.levelBadge.textContent = t().levelNames[state.level-1];
+    els.roomIndexLabel.textContent = t().chamber(index+1, TOTAL_ROOMS);
+    els.input.value = '';
+
+    if(isSpecialRoom(index)){
+      els.wsTip.style.display = 'none';
+      els.worksheet.style.display = 'none';
+      els.tallyRow.style.display = 'none';
+      els.trialCharges.style.display = 'none';
+      els.prompt.style.display = '';
+      els.sub.style.display = '';
+      els.parchment.style.setProperty('--room-accent', '#4a92b6');
+      if(index === NIM_INDEX) state.current = buildNimRoom(state.level, state.lang);
+      else if(index === MASTERMIND_INDEX) state.current = buildMastermindRoom(state.level, state.lang);
+      else state.current = buildComboRoom(state.level, state.lang);
+      els.hint.textContent = state.current.hint;
+      els.roomNameLabel.textContent = state.current.name;
+      els.prompt.textContent = state.current.prompt;
+      els.sub.textContent = state.current.sub || '';
+
+      if(index === NIM_INDEX){
+        els.answerRow.style.display = 'none';
+        nimControlsEl = renderNimControls();
+        els.parchment.appendChild(nimControlsEl);
+      } else {
+        els.answerRow.style.display = '';
+        setTimeout(function(){ els.input.focus(); }, 50);
+      }
+      if(index === MASTERMIND_INDEX) els.mmHistory.style.display = '';
+      if(!opts.skipTimer) startTimer(index === MASTERMIND_INDEX ? MASTERMIND_SECONDS : ROOM_SECONDS);
+    } else {
+      els.answerRow.style.display = '';
+      state.set = buildDrillSet(state.level, state.lang);
+      els.roomNameLabel.textContent = state.set.topicName;
+      els.parchment.style.setProperty('--room-accent', state.set.accent || '#4a92b6');
+
+      if(state.set.isTrial){
+        els.wsTip.style.display = 'none';
+        els.worksheet.style.display = 'none';
+        els.tallyRow.style.display = 'none';
+        els.trialCharges.style.display = '';
+        els.prompt.style.display = '';
+        els.sub.style.display = '';
+      } else {
+        els.wsTip.style.display = '';
+        els.worksheet.style.display = '';
+        els.tallyRow.style.display = '';
+        els.trialCharges.style.display = 'none';
+        els.prompt.style.display = 'none';
+        els.sub.style.display = 'none';
+        els.wsTip.textContent = state.set.topicSub || '';
+        renderWorksheet();
+      }
+      focusCurrentRow();
+      if(!opts.skipTimer) startTimer(state.set.seconds);
+    }
+
+    drawScene();
+    if(state.visited.indexOf(index) === -1) state.visited.push(index);
+  }
+
+  // ---------------- Drill-set (10-exercise worksheet) flow ----------------
+  function countCorrect(set){ return set.results.filter(function(r){ return r==='correct'; }).length; }
+
+  // Build the full two-column worksheet once; individual rows are patched in place afterward.
+  function renderWorksheet(){
+    var set = state.set;
+    els.wsColLeft.innerHTML = '';
+    els.wsColRight.innerHTML = '';
+    var n = set.items.length;
+    var half = Math.ceil(n/2);
+    for(var i=0;i<n;i++){
+      var row = document.createElement('div');
+      row.className = 'ws-row';
+      row.id = 'wsRow-' + i;
+      var num = document.createElement('span');
+      num.className = 'ws-num';
+      num.textContent = set.items[i].label;
+      var slot = document.createElement('span');
+      slot.className = 'ws-slot placeholder';
+      slot.id = 'wsSlot-' + i;
+      slot.textContent = '?';
+      row.appendChild(num);
+      row.appendChild(slot);
+      (i < half ? els.wsColLeft : els.wsColRight).appendChild(row);
+    }
+    updateRowHighlight();
+  }
+
+  function updateRowHighlight(){
+    var set = state.set;
+    for(var i=0;i<set.items.length;i++){
+      var row = document.getElementById('wsRow-' + i);
+      if(row) row.classList.toggle('current', i === set.idx && !set.finalized);
+    }
+  }
+
+  function renderTrialCharges(){
+    var set = state.set;
+    els.trialCharges.innerHTML = '';
+    for(var i=0;i<set.items.length;i++){
+      var span = document.createElement('span');
+      var cls = 'trial-charge';
+      if(set.results[i]==='correct') cls += ' lit';
+      else if(set.results[i]==='wrong') cls += ' spent';
+      span.className = cls;
+      span.textContent = set.chargeIcon || '🔥';
+      els.trialCharges.appendChild(span);
+    }
+  }
+
+  function focusCurrentRow(){
+    var set = state.set;
+    els.hint.textContent = set.items[set.idx].hint || '';
+    els.hint.classList.remove('show');
+    els.feedback.textContent = '';
+    els.feedback.className = 'feedback';
+    els.setTallyLabel.textContent = t().setTally(countCorrect(set));
+    els.input.value = '';
+    els.input.disabled = false;
+    els.submitBtn.disabled = false;
+    if(set.isTrial){
+      els.prompt.textContent = set.items[set.idx].prompt;
+      els.sub.textContent = set.items[set.idx].sub || '';
+      renderTrialCharges();
+    } else {
+      updateRowHighlight();
+    }
+    setTimeout(function(){ els.input.focus(); }, 30);
+  }
+
+  function checkAnswerForSet(val){
+    var set = state.set;
+    if(!set || set.finalized) return;
+    var idx = set.idx;
+    var item = set.items[idx];
+    var correct = item.check(val);
+    set.results[idx] = correct ? 'correct' : 'wrong';
+    item.answered = val.trim();
+    item.answeredCorrect = correct;
+
+    if(set.isTrial){
+      renderTrialCharges();
+    } else {
+      var slot = document.getElementById('wsSlot-' + idx);
+      if(slot){
+        slot.innerHTML = '';
+        var valSpan = document.createElement('span');
+        valSpan.textContent = val.trim();
+        var wordSpan = document.createElement('span');
+        wordSpan.className = 'ws-word';
+        wordSpan.textContent = correct ? t().wordCorrect : t().wordWrong;
+        slot.appendChild(valSpan);
+        slot.appendChild(wordSpan);
+        slot.className = 'ws-slot ' + (correct ? 'correct' : 'wrong');
+      }
+    }
+    els.feedback.className = 'feedback ' + (correct ? 'good' : 'bad');
+    els.feedback.textContent = correct ? t().correct : t().wrongAnswer;
+    els.setTallyLabel.textContent = t().setTally(countCorrect(set));
+    els.input.disabled = true;
+    els.submitBtn.disabled = true;
+    setTimeout(function(){
+      if(set.finalized) return;
+      if(idx+1 >= set.items.length) finalizeSet(false);
+      else { set.idx = idx+1; focusCurrentRow(); }
+    }, 700);
+  }
+
+  function finalizeSet(timedOut){
+    var set = state.set;
+    if(!set || set.finalized) return;
+    set.finalized = true;
+    clearInterval(state.timerId);
+    showSetResult(countCorrect(set), countCorrect(set) === set.items.length, timedOut);
+  }
+
+  function showSetResult(correctCount, pass, timedOut){
+    var s = t();
+    var set = state.set;
+    if(set && set.isTrial) renderTrialCharges(); else updateRowHighlight();
+    els.hint.classList.remove('show');
+    els.input.disabled = true;
+    els.input.style.display = 'none';
+    els.submitBtn.style.display = 'none';
+    els.setContinueBtn.style.display = '';
+    els.feedback.textContent = '';
+    els.prompt.style.display = '';
+    els.sub.style.display = '';
+
+    if(pass){
+      els.prompt.textContent = s.setPerfect;
+      els.sub.textContent = s.setPassSub;
+    } else {
+      els.prompt.textContent = s.setFail(correctCount, set ? set.items.length : SET_SIZE);
+      els.sub.textContent = timedOut ? s.setTimeUp : s.setFailSub;
+    }
+
+    els.setContinueBtn.textContent = s.continueBtn;
+    els.setContinueBtn.onclick = function(){
+      if(pass) advanceRoom(); else failRoom();
+    };
+  }
+
+  function advanceRoom(){
+    state.set = null;
+    if(state.room >= TOTAL_ROOMS-1) winGame();
+    else loadRoom(state.room+1);
+  }
+
+  function failRoom(){
+    state.set = null;
+    state.torches--;
+    renderTorches();
+    if(state.torches <= 0){ loseGame(); return; }
+    loadRoom(Math.max(0, state.room-1));
+  }
+
+  // ---------------- Single-shot rooms (Nim, Treasury Door) ----------------
+  function onSuccess(){
+    if(state.resolved) return;
+    state.resolved = true;
+    clearInterval(state.timerId);
+    els.feedback.className = 'feedback good';
+    els.feedback.textContent = t().correct;
+    setTimeout(function(){
+      if(state.room >= TOTAL_ROOMS-1) winGame();
+      else loadRoom(state.room+1);
+    }, 650);
+  }
+
+  function onFail(message){
+    if(state.resolved) return;
+    state.resolved = true;
+    clearInterval(state.timerId);
+    state.torches--;
+    renderTorches();
+    if(state.torches <= 0){ loseGame(); return; }
+    els.feedback.className = 'feedback bad';
+    els.feedback.textContent = message || t().wrongGeneric;
+    var back = Math.max(0, state.room - 1);
+    setTimeout(function(){ loadRoom(back); }, 900);
+  }
+
+  function checkAnswer(){
+    var val = els.input.value;
+    if(state.room === NIM_INDEX) return;
+    if(state.set){
+      if(val.trim() === '') return;
+      checkAnswerForSet(val);
+      return;
+    }
+    if(state.room === MASTERMIND_INDEX){
+      if(val.trim() === '') return;
+      submitMastermindGuess(val);
+      return;
+    }
+    if(!state.current) return;
+    if(val.trim() === '') return;
+    if(state.current.check(val)) onSuccess(); else onFail(t().wrongGeneric);
+  }
+
+  function submitMastermindGuess(val){
+    var mm = state.mmState;
+    if(!mm || mm.over) return;
+    var digits = normAnswer(val).replace(/[^0-9]/g,'');
+    if(digits.length !== MM_CODE_LEN){
+      els.feedback.className = 'feedback bad';
+      els.feedback.textContent = state.lang==='sv'
+        ? 'Ange en gissning med exakt ' + MM_CODE_LEN + ' siffror.'
+        : 'Enter a guess with exactly ' + MM_CODE_LEN + ' digits.';
+      return;
+    }
+    var guess = digits.split('').map(Number);
+    var score = scoreMastermind(mm.secret, guess);
+    mm.guesses.push({guess:guess, score:score});
+    els.input.value = '';
+    els.feedback.textContent = '';
+
+    var row = document.createElement('div');
+    row.className = 'mm-row' + (score.exact===MM_CODE_LEN ? ' win' : '');
+    var left = document.createElement('span');
+    left.textContent = (state.lang==='sv' ? 'Gissning ' : 'Guess ') + mm.guesses.length + ':  ' + digits;
+    left.className = 'mm-code';
+    var right = document.createElement('span');
+    right.className = 'mm-score';
+    right.textContent = state.lang==='sv'
+      ? score.exact + ' helt rätt, ' + score.partial + ' siffror rätt'
+      : score.exact + ' exact, ' + score.partial + ' present';
+    row.appendChild(left); row.appendChild(right);
+    els.mmHistory.appendChild(row);
+    els.mmHistory.scrollTop = els.mmHistory.scrollHeight;
+
+    if(score.exact === MM_CODE_LEN){
+      mm.over = true;
+      onSuccess();
+    } else if(mm.guesses.length >= MM_MAX_GUESSES){
+      mm.over = true;
+      onFail(state.lang==='sv' ? 'Du tog slut på gissningar.' : 'You ran out of guesses.');
+    }
+  }
+
+  // ---------------- Nim controls ----------------
+  function renderNimControls(){
+    var wrap = document.createElement('div');
+    wrap.style.display = 'flex'; wrap.style.gap = '8px'; wrap.style.marginTop = '4px';
+    [1,2,3].forEach(function(n){
+      var b = document.createElement('button');
+      b.className = 'btn secondary';
+      b.textContent = (state.lang==='sv' ? 'Ta ' : 'Take ') + n;
+      b.onclick = function(){ nimPlayerMove(n); };
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+  function nimPlayerMove(n){
+    var ns = state.nimState;
+    if(!ns || ns.over) return;
+    n = Math.min(n, ns.heap);
+    ns.heap -= n;
+    if(ns.heap <= 0){
+      ns.over = true;
+      if(nimControlsEl){ nimControlsEl.remove(); nimControlsEl = null; }
+      els.feedback.className='feedback bad';
+      els.feedback.textContent = state.lang==='sv'
+        ? 'Du tog den sista stenen — muren rasar på din sida! En fackla slocknar.'
+        : 'You took the last brick — the wall collapses on your side! A torch burns out.';
+      setTimeout(function(){ onFail(els.feedback.textContent); }, 1000);
+      return;
+    }
+    els.sub.textContent = ns.heap + (state.lang==='sv' ? ' stenar kvar.' : ' bricks remain.');
+    drawScene();
+    setTimeout(nimComputerMove, 500);
+  }
+  function nimComputerMove(){
+    var ns = state.nimState;
+    if(!ns || ns.over) return;
+    var take = ns.heap % 4;
+    if(take === 0) take = randInt(1,3);
+    take = Math.min(take, ns.heap);
+    ns.heap -= take;
+    if(ns.heap <= 0){
+      ns.over = true;
+      if(nimControlsEl){ nimControlsEl.remove(); nimControlsEl = null; }
+      els.feedback.className='feedback good';
+      els.feedback.textContent = state.lang==='sv' ? 'Din motståndare tar den sista stenen. Passagen är din!' : 'Your rival takes the last brick. The passage is yours!';
+      setTimeout(onSuccess, 900);
+      return;
+    }
+    els.sub.textContent = (state.lang==='sv' ? 'Motståndaren tar ' : 'Your rival takes ') + take + '. ' + ns.heap + (state.lang==='sv' ? ' stenar kvar.' : ' bricks remain.');
+    drawScene();
+  }
+
+  // ---------------- Map ----------------
+  function renderMap(){
+    els.mapTrack.innerHTML = '';
+    for(var i=0;i<TOTAL_ROOMS;i++){
+      var row = document.createElement('div');
+      var cls = 'map-room';
+      if(i === state.room) cls += ' current';
+      else if(state.visited.indexOf(i) !== -1) cls += ' done';
+      row.className = cls;
+      var label = t().chamber(i+1, TOTAL_ROOMS);
+      if(i === NIM_INDEX) label += ' — ' + nimName(state.lang);
+      if(i === MASTERMIND_INDEX) label += (state.lang==='sv' ? ' — Master Mind-rummet' : ' — The Master Mind Room');
+      if(i === TOTAL_ROOMS-1) label += ' — ' + comboName(state.lang);
+      row.innerHTML = '<span class="dot"></span><span>' + label + '</span>';
+      els.mapTrack.appendChild(row);
+    }
+  }
+
+  // ================= Canvas scene =================
+  var canvas = document.getElementById('scene');
+  var ctx = canvas.getContext('2d');
+  var animStart = performance.now();
+
+  // ---- Wireframe shape diagrams (Geometry room) ----
+  function strokeShape(ctx, key, cx, cy, s){
+    ctx.beginPath();
+    if(key==='cuboid' || key==='cube'){
+      var hw = key==='cube' ? s*0.55 : s*0.7, hh = s*0.5;
+      var dx = s*0.32, dy = -s*0.22;
+      var x0=cx-hw, y0=cy-hh, x1=cx+hw, y1=cy+hh;
+      ctx.rect(x0, y0, x1-x0, y1-y0);
+      ctx.moveTo(x0,y0); ctx.lineTo(x0+dx,y0+dy);
+      ctx.moveTo(x1,y0); ctx.lineTo(x1+dx,y0+dy);
+      ctx.moveTo(x1,y1); ctx.lineTo(x1+dx,y1+dy);
+      ctx.moveTo(x0+dx,y0+dy); ctx.lineTo(x1+dx,y0+dy); ctx.lineTo(x1+dx,y1+dy);
+    } else if(key==='cylinder'){
+      var rx=s*0.7, ry=s*0.24, top=cy-s*0.65, bot=cy+s*0.65;
+      ctx.ellipse(cx, top, rx, ry, 0, 0, Math.PI*2);
+      ctx.moveTo(cx-rx, top); ctx.lineTo(cx-rx, bot);
+      ctx.moveTo(cx+rx, top); ctx.lineTo(cx+rx, bot);
+      ctx.moveTo(cx+rx, bot);
+      ctx.ellipse(cx, bot, rx, ry, 0, 0, Math.PI, false);
+    } else if(key==='sphere'){
+      var r=s*0.75;
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.moveTo(cx+r, cy);
+      ctx.ellipse(cx, cy, r, r*0.28, 0, 0, Math.PI*2);
+    } else if(key==='cone'){
+      var rx2=s*0.65, ry2=s*0.22, apex=cy-s*0.85, base=cy+s*0.45;
+      ctx.moveTo(cx, apex); ctx.lineTo(cx-rx2, base);
+      ctx.moveTo(cx, apex); ctx.lineTo(cx+rx2, base);
+      ctx.moveTo(cx+rx2, base);
+      ctx.ellipse(cx, base, rx2, ry2, 0, 0, Math.PI*2);
+    } else if(key==='pyramid'){
+      var apx=cx-s*0.05, apy=cy-s*0.85;
+      var p1=[cx-s*0.65, cy+s*0.45], p2=[cx+s*0.3, cy+s*0.55], p3=[cx+s*0.65, cy+s*0.1], p4=[cx-s*0.28, cy];
+      ctx.moveTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.lineTo(p3[0],p3[1]); ctx.lineTo(p4[0],p4[1]); ctx.closePath();
+      ctx.moveTo(apx,apy); ctx.lineTo(p1[0],p1[1]);
+      ctx.moveTo(apx,apy); ctx.lineTo(p2[0],p2[1]);
+      ctx.moveTo(apx,apy); ctx.lineTo(p3[0],p3[1]);
+      ctx.moveTo(apx,apy); ctx.lineTo(p4[0],p4[1]);
+    }
+    ctx.stroke();
+  }
+
+  function drawFramedShapes(ctx, w, h, keys){
+    var fx = w*0.18, fy = h*0.08, fw = w*0.64, fh = h*0.7;
+    ctx.fillStyle = '#173a5e';
+    ctx.fillRect(fx, fy, fw, fh);
+    ctx.strokeStyle = '#f4f0e6';
+    ctx.lineWidth = 2;
+    var n = keys.length;
+    var slot = fw / n;
+    keys.forEach(function(key, i){
+      strokeShape(ctx, key, fx + slot*(i+0.5), fy + fh*0.55, Math.min(slot, fh) * 0.34);
+    });
+  }
+
+  // ---- Coordinate grid diagram (Coordinate room) ----
+  function drawCoordGrid(ctx, w, h, range, marked){
+    var fx = w*0.12, fy = h*0.06, fw = w*0.76, fh = h*0.8;
+    ctx.fillStyle = '#0f2419';
+    ctx.fillRect(fx, fy, fw, fh);
+    var cx = fx + fw/2, cy = fy + fh/2;
+    var cells = range*2;
+    var cellW = fw/cells, cellH = fh/cells;
+    ctx.strokeStyle = 'rgba(120,200,150,0.35)';
+    ctx.lineWidth = 1;
+    for(var i=0;i<=cells;i++){
+      ctx.beginPath(); ctx.moveTo(fx+i*cellW, fy); ctx.lineTo(fx+i*cellW, fy+fh); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(fx, fy+i*cellH); ctx.lineTo(fx+fw, fy+i*cellH); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(190,235,200,0.9)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, fy); ctx.lineTo(cx, fy+fh); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(fx, cy); ctx.lineTo(fx+fw, cy); ctx.stroke();
+
+    if(marked && !isNaN(marked.x) && !isNaN(marked.y)){
+      var px = cx + marked.x*cellW, py = cy - marked.y*cellH;
+      ctx.strokeStyle = marked.ok ? '#5fd97a' : '#e0664a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(px-9,py-9); ctx.lineTo(px+9,py+9);
+      ctx.moveTo(px+9,py-9); ctx.lineTo(px-9,py+9);
+      ctx.stroke();
+    }
+  }
+
+  function drawScene(){
+    var w = canvas.width, h = canvas.height;
+    var ti = (performance.now() - animStart) / 1000;
+    ctx.clearRect(0,0,w,h);
+
+    if(state.set && state.set.isTrial && !state.set.finalized){
+      var item = state.set.items[state.set.idx];
+      if(item && item.draw){ item.draw(ctx, w, h, ti); return; }
+    }
+
+    var bg = ctx.createLinearGradient(0,0,0,h);
+    bg.addColorStop(0, '#1c130c'); bg.addColorStop(1, '#080503');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+
+    var cx = w/2, cy = h*0.52;
+    var stages = 6;
+    for(var i=stages;i>=1;i--){
+      var f = i/stages;
+      var hw = (w*0.5) * f, hh = (h*0.42) * f;
+      var shade = 20 + (stages-i)*10;
+      ctx.strokeStyle = 'rgba(' + (120+shade) + ',' + (90+shade*0.6) + ',' + (50+shade*0.3) + ',0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx-hw, cy-hh, hw*2, hh*2);
+    }
+    var portalW = w*0.5/stages, portalH = h*0.42/stages;
+    var pg = ctx.createRadialGradient(cx,cy, 4, cx,cy, Math.max(portalW,portalH)*1.4);
+    pg.addColorStop(0, 'rgba(246,199,102,0.55)'); pg.addColorStop(1, 'rgba(246,199,102,0)');
+    ctx.fillStyle = pg; ctx.fillRect(0,0,w,h);
+
+    ctx.strokeStyle = 'rgba(255,220,150,0.06)';
+    for(var j=-3;j<=3;j++){
+      ctx.beginPath(); ctx.moveTo(cx + j*40, h); ctx.lineTo(cx + j*6, cy + h*0.3); ctx.stroke();
+    }
+
+    function torch(x,y,scale){
+      var flick = 0.75 + 0.25*Math.sin(ti*9 + x*0.05) + 0.08*Math.sin(ti*23+x);
+      var r = 46*scale*flick;
+      var g = ctx.createRadialGradient(x,y,2,x,y,r);
+      g.addColorStop(0, 'rgba(255,220,140,0.9)'); g.addColorStop(0.4, 'rgba(230,140,50,0.45)'); g.addColorStop(1, 'rgba(230,140,50,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#3a2a1a'; ctx.fillRect(x-4*scale, y, 8*scale, 22*scale);
+      ctx.beginPath();
+      ctx.moveTo(x, y-4*scale);
+      ctx.quadraticCurveTo(x-9*scale*flick, y-24*scale*flick, x, y-40*scale*flick);
+      ctx.quadraticCurveTo(x+9*scale*flick, y-24*scale*flick, x, y-4*scale);
+      ctx.fillStyle = '#f6c766'; ctx.fill();
+    }
+    torch(w*0.14, h*0.62, 1.1); torch(w*0.86, h*0.62, 1.1);
+    torch(w*0.32, h*0.5, 0.7); torch(w*0.68, h*0.5, 0.7);
+
+    ctx.fillStyle = 'rgba(246,199,102,0.85)';
+    ctx.font = '600 ' + (h*0.05) + 'px "Cinzel", serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(t().chamber(state.room+1, TOTAL_ROOMS), cx, cy - h*0.32);
+
+    var vg = ctx.createRadialGradient(cx,h*0.55,h*0.15, cx,h*0.55,h*0.75);
+    vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.55)');
+    ctx.fillStyle = vg; ctx.fillRect(0,0,w,h);
+  }
+  (function loop(){ drawScene(); requestAnimationFrame(loop); })();
+
+  // ================= End states =================
+  function winGame(){
+    state.ended = true; clearInterval(state.timerId);
+    els.endOverlay.classList.remove('mummy');
+    els.endTitle.textContent = t().winTitle;
+    els.endBody.textContent = t().winBody;
+    els.endOverlay.classList.add('show');
+    try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(e){}
+  }
+  function loseGame(){
+    state.ended = true; clearInterval(state.timerId);
+    els.endOverlay.classList.add('mummy');
+    els.endTitle.textContent = t().loseTitle;
+    els.endBody.textContent = t().loseBody;
+    els.endOverlay.classList.add('show');
+    try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(e){}
+  }
+
+  function resetGame(){
+    state.room = 0; state.torches = MAX_TORCHES; state.visited = []; state.ended = false;
+    els.endOverlay.classList.remove('show');
+    renderTorches();
+    loadRoom(0);
+  }
+
+  // ================= Static text application =================
+  function applyStaticText(){
+    var s = t();
+    els.eyebrowText.textContent = s.eyebrow;
+    els.subtitleText.textContent = s.subtitle;
+    els.footerText.textContent = s.footer;
+    els.lblHint.textContent = s.hint;
+    els.lblMap.textContent = s.map;
+    els.lblSave.textContent = s.save;
+    els.lblLoad.textContent = s.load;
+    els.lblSettings.textContent = s.settings;
+    els.lblRestart.textContent = s.restart;
+    els.lblRules.textContent = s.rulesBtn;
+    els.rulesTitle.textContent = s.rulesTitle;
+    els.submitBtn.textContent = s.answerBtn;
+    els.input.placeholder = s.answerPlaceholder;
+    els.mapTitle.textContent = s.mapTitle;
+    els.mapCloseBtn.textContent = (s===STR.sv) ? 'Stäng' : 'Close';
+    els.rulesCloseBtn.textContent = (s===STR.sv) ? 'Stäng' : 'Close';
+    els.langLabel.textContent = s.langLabel;
+    els.levelLabel.textContent = s.levelLabel;
+    els.langSv.classList.toggle('active', state.lang==='sv');
+    els.langEn.classList.toggle('active', state.lang==='en');
+    renderLevelGrid();
+    els.levelBadge.textContent = s.levelNames[state.level-1];
+    if(!state.booted){
+      els.roomIndexLabel.textContent = s.chamber(1, TOTAL_ROOMS);
+      els.roomNameLabel.textContent = '—';
+      els.timerLabel.textContent = '01:00';
+    }
+  }
+
+  function renderLevelGrid(){
+    els.levelGrid.innerHTML = '';
+    t().levelNames.forEach(function(name, i){
+      var lvl = i+1;
+      var b = document.createElement('button');
+      b.type='button';
+      b.className = 'level-pill' + (lvl===10 ? ' college' : '') + (state.level===lvl ? ' active' : '');
+      b.textContent = name;
+      b.onclick = function(){ state.level = lvl; renderLevelGrid(); };
+      els.levelGrid.appendChild(b);
+    });
+  }
+
+  function refreshSetupOverlayText(){
+    var s = t();
+    if(state.settingsMode==='initial'){
+      els.setupTitle.textContent = s.settingsHeading;
+      els.setupSub.textContent = s.settingsSub;
+      els.setupPrimaryBtn.textContent = s.begin;
+      els.setupCancelBtn.style.display = 'none';
+    } else {
+      els.setupTitle.textContent = s.settingsHeadingReopen;
+      els.setupSub.textContent = s.settingsSubReopen;
+      els.setupPrimaryBtn.textContent = s.apply;
+      els.setupCancelBtn.style.display = '';
+      els.setupCancelBtn.textContent = s.cancel;
+    }
+  }
+
+  function openSetup(mode){
+    state.settingsMode = mode;
+    if(mode==='reopen') pauseTimer();
+    applyStaticText();
+    refreshSetupOverlayText();
+    els.setupOverlay.classList.add('show');
+  }
+
+  var introIdx = 0;
+  function openIntro(){
+    introIdx = 0;
+    renderIntroBeat();
+    els.introOverlay.classList.add('show');
+  }
+  function renderIntroBeat(){
+    var s = t();
+    var beat = s.introBeats[introIdx];
+    if(beat === null){
+      els.introBeatText.style.display = 'none';
+      els.introLetter.style.display = '';
+      els.introLetterText.textContent = s.introLetterText;
+    } else {
+      els.introLetter.style.display = 'none';
+      els.introBeatText.style.display = '';
+      els.introBeatText.textContent = beat;
+    }
+    els.introSkipBtn.textContent = s.introSkip;
+    els.introNextBtn.textContent = (introIdx === s.introBeats.length-1) ? s.introEnter : s.introNext;
+    els.introDots.innerHTML = '';
+    s.introBeats.forEach(function(_,i){
+      var d = document.createElement('span');
+      if(i===introIdx) d.className='on';
+      els.introDots.appendChild(d);
+    });
+  }
+  function closeIntroAndPlay(){
+    els.introOverlay.classList.remove('show');
+    resetGame();
+  }
+
+  function openRules(){
+    var s = t();
+    var body = s.rulesBodyDrill;
+    if(state.room === NIM_INDEX) body = s.rulesBodyNim;
+    else if(state.room === MASTERMIND_INDEX) body = s.rulesBodyMastermind;
+    else if(state.room === TOTAL_ROOMS-1) body = s.rulesBodyCombo;
+    els.rulesBody.textContent = body;
+    els.rulesOverlay.classList.add('show');
+  }
+
+  // ================= Wiring =================
+  els.submitBtn.addEventListener('click', checkAnswer);
+  els.input.addEventListener('keydown', function(e){ if(e.key==='Enter') checkAnswer(); });
+  els.hintBtn.addEventListener('click', function(){ els.hint.classList.toggle('show'); });
+  els.rulesBtn.addEventListener('click', openRules);
+  els.rulesCloseBtn.addEventListener('click', function(){ els.rulesOverlay.classList.remove('show'); });
+  els.mapBtn.addEventListener('click', function(){ renderMap(); els.mapOverlay.classList.add('show'); });
+  els.mapCloseBtn.addEventListener('click', function(){ els.mapOverlay.classList.remove('show'); });
+  els.restartBtn.addEventListener('click', function(){ els.endOverlay.classList.remove('show'); resetGame(); });
+  els.resetBtn.addEventListener('click', resetGame);
+
+  els.settingsBtn.addEventListener('click', function(){ openSetup('reopen'); });
+  els.langSv.addEventListener('click', function(){ state.lang='sv'; applyStaticText(); refreshSetupOverlayText(); });
+  els.langEn.addEventListener('click', function(){ state.lang='en'; applyStaticText(); refreshSetupOverlayText(); });
+  els.setupCancelBtn.addEventListener('click', function(){
+    els.setupOverlay.classList.remove('show');
+    if(!state.ended) runTimerInterval();
+  });
+  els.setupPrimaryBtn.addEventListener('click', function(){
+    saveSettings();
+    els.setupOverlay.classList.remove('show');
+    if(state.settingsMode === 'initial'){
+      openIntro();
+    } else {
+      resetGame();
+    }
+  });
+  els.introSkipBtn.addEventListener('click', closeIntroAndPlay);
+  els.introNextBtn.addEventListener('click', function(){
+    var s = t();
+    if(introIdx < s.introBeats.length-1){ introIdx++; renderIntroBeat(); }
+    else closeIntroAndPlay();
+  });
+
+  els.saveBtn.addEventListener('click', function(){
+    try{
+      localStorage.setItem('pyramid-reckoning-save', JSON.stringify({
+        room: state.room, torches: state.torches, visited: state.visited, lang: state.lang, level: state.level
+      }));
+      els.feedback.className='feedback good'; els.feedback.textContent = t().saveOk;
+    }catch(e){ els.feedback.className='feedback bad'; els.feedback.textContent = t().saveFail; }
+  });
+  els.loadBtn.addEventListener('click', function(){
+    try{
+      var raw = localStorage.getItem('pyramid-reckoning-save');
+      if(!raw){ els.feedback.className='feedback bad'; els.feedback.textContent = t().loadEmpty; return; }
+      var data = JSON.parse(raw);
+      if(data.lang) state.lang = data.lang;
+      if(data.level) state.level = data.level;
+      state.torches = data.torches; state.visited = data.visited || [];
+      state.ended = false;
+      els.endOverlay.classList.remove('show');
+      applyStaticText();
+      loadRoom(data.room||0);
+      els.feedback.className='feedback good'; els.feedback.textContent = t().loadOk;
+    }catch(e){ els.feedback.className='feedback bad'; els.feedback.textContent = t().loadFail; }
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(state.ended) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if(els.setupOverlay.classList.contains('show') || els.introOverlay.classList.contains('show')) return;
+    if(e.key==='Enter' && els.setContinueBtn.style.display !== 'none'){ els.setContinueBtn.click(); return; }
+    if(tag === 'INPUT') return;
+    if(e.key==='h' || e.key==='H') els.hint.classList.toggle('show');
+    if(e.key==='r' || e.key==='R') openRules();
+    if(e.key==='m' || e.key==='M'){ renderMap(); els.mapOverlay.classList.add('show'); }
+    if(e.key==='s' || e.key==='S') els.saveBtn.click();
+    if(e.key==='l' || e.key==='L') els.loadBtn.click();
+  });
+
+  function saveSettings(){
+    try{ localStorage.setItem('pyramid-reckoning-settings', JSON.stringify({ lang: state.lang, level: state.level })); }catch(e){}
+  }
+  function loadSettings(){
+    try{
+      var raw = localStorage.getItem('pyramid-reckoning-settings');
+      if(raw){ var d = JSON.parse(raw); if(d.lang) state.lang=d.lang; if(d.level) state.level=d.level; }
+    }catch(e){}
+  }
+
+  // ================= Boot =================
+  function start(savedData){
+    loadSettings();
+    renderTorches();
+    if(savedData && typeof savedData.room === 'number'){
+      if(savedData.lang) state.lang = savedData.lang;
+      if(savedData.level) state.level = savedData.level;
+      state.torches = savedData.torches != null ? savedData.torches : MAX_TORCHES;
+      state.visited = savedData.visited || [];
+      applyStaticText();
+      loadRoom(savedData.room, {});
+    } else {
+      applyStaticText();
+      openSetup('initial');
+    }
+  }
+
+  if(window.claude && window.claude.hot){
+    window.claude.hot.snapshot(function(){
+      return { room: state.room, torches: state.torches, visited: state.visited, lang: state.lang, level: state.level };
+    });
+    window.claude.hot.ready ? window.claude.hot.ready(start) : start(window.claude.hot.data || null);
+  } else {
+    start(null);
+  }
+})();
+</script>

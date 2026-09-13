@@ -1,0 +1,305 @@
+!u	Z!u	z!u	
+"u	K#u	_#u	
+$u	3$u	\$u	
+$u	b%u	
+&u	A&u	
+(u	F(u	
+)u	N)u	
+*u	V*u	
++u	^+u	
+0u	s0u	
+0u	;1u	
+1u	)2u	Z2u	
+3u	O3u	y3u	
+5u	N5u	~5u	
+7u	77u	a7u	t7u	
+7u	p9u	
+:u	";u	N;u	f;u	#<u	^<u	
+=u	:>u	w>u	
+?u	_?u	
+@u	9@u	UBu	
+Du	?Eu	pEu	{Eu	
+Fu	"Fu	TFu	
+Fu	VGu	wGu	
+vinjett
+Cheops Pyramid
+Ett  
+ventyr i matematikens
+      underbara v
+rld!U
+-       Version 4.2     930524      Skollicens
+     Tanumsskolan, TanumshedeU
+Vid ditt bes
+k i den ber
+mda Cheopspyramiden r
+kar du f
+rirra dig och kommer bort fr
+n guiden.
+pyrtre Pl
+tsligt st
+r du alldeles ensam
+i en kolsvart g
+ng ....U
+Du trevar dig fram
+t i g
+ngen,
+viker av 
+ger, 
+nster
+sedan snett upp
+t ....
+nder en t
+ndsticka.
+sticka
+ggen sitter ett gammalt,
+blekt pergament ....U
+perg1
+perg2
+egypten
+mumie
+bigtut
+triang
+korrljus
+durer
+mozart
+miljard	nefertite
+matta
+diofant
+money
+turord
+khufu
+Brunnen
+perpet
+ Ett program fr
+ Tid:      
+ Rum: 
+ F1  rumsregler 
+ F2  hj
+lp      
+ F3  karta      
+ F4  ljud  p
+ F8  spara rum  
+ F9  h
+mta rum  
+ F10  byta rum  
+ Esc  avsluta   U
+   G R A T T I S ! 
+ Du kl
+ttrar upp
+  GRATTIS !
+   Du kl
+ttrar upp
+     T Y V 
+ R R ! 
+   Du ramlar ned
+  TYV
+  Du ramlar ned
+       Inte s
+ illa !
+    Du f
+r en chans till!
+      Inte s
+ illa !
+r en chans till !U
+ Fel v
+rde - f
+k igen ! U
+      Luften 
+r slut och Din 
+    livstid i pyramiden 
+r ute!%Cheops beklagar att Du aldrig kom ut,
+      ... men ordnar s
+ att ...
+!    livstid  i pyramiden 
+r ute! 
+Mumie
+... din kropp mumifieras!
+PerPetU
+  Luften 
+r slut!  
+ Tillbaks ett rum! 
+                   
+mta ny luft!  
+r det s
+kert att du vill avsluta (J/N)?   * 
+r det s
+kert att du vill avsluta (J/N)? U
+Pyrtre
+DU KLARADE DET!
+Kamdark
+r Dina kameler ...
+skatt
+...och h
+r SKATTEN!
+slask
+gxSetDisplayPalette error: 
+pcxGetFilePalette error: 
+pcxFileDisplay error: 
+gxSetMode error: 
+gxSetDisplay error: #Image requires different hardware: 
+Hittar inte bilden!!!OByt diskett eller kontrollera att alla bilderna finns p
+ disketten/h
+rddisken..'...eller tryk p
+ ESC for at g
+ videre !U
+	slask.pcx
+DisplayFileU
+VWUPSQR
+&;E.t	&
+ZY[X]_^
+&*U!&
+&*U!&
+VWUPSQR
+ZY[X]_^
+01u	s
+01u	s
+1u	&:E
+DA&:E
+5u	XC;^
+x@GP3
+01u	s
+1u	:D
+W%u	r
+W%u	r
+W%u	r
+W%u	r
+W%u	r
+W%u	r
+W%u	r
+01u	s
+01u	s
+01u	s
+01u	s
+01u	s
+01u	s
+GBI;V
+GBI;V
+01u	s
+<\tA&
+01u	s
+O!u	=
+t+SQP
+&;EJu
+&;EDv
+]D&+]Ny
+EN&;EDr
+DL+DJ
+DL;DDr
+DL+DJ;DNr
+Cu	Zs
+01u	s
+1u	&:E
+M$&+M&w
+&;M*v
+M$&+M&w
+E(H&;M*v
+M$&+M&w
+E(H&;M*v
+E&@PQ
+M$&+M&w
+E(H&;M*v
+E&@PQ
+01u	s
+Graphics error: ;Enter full path to BGI driver or type <Ctrl-Break> to quit:U
+<*v <,t
+<{r7<
+<0r7<9w3
+<ar6<
+(Invalid number - press any key to resumeU
+!Error value must be in the range 
+ - press any key to resumeU
+Max screens exceeded
+Max Windows Exceeded$Insufficient memory to create screen!Screen not saved cannot activate.-Screen has not been created - cannot activate,Screen has not been created - cannot dispose,Screen has not been created - cannot restore"Screen does not exist cannot clear(Insufficient memory for Screen Copy/Move3Visible screen must be active for Window operations4Visible screen must be active for Message operations6Can only save 25 screen lines - check CONST SavedLines
+?) -- Utterly confused
+Fatal Error (WinTTT -- U
+<&v(<,r
+<2v <;r
+!PSQRVU
+3BGI Error: Graphics not initialized (use InitGraph) BGI Error:  Not in graphics modeU
+No error
+(BGI) graphics not installed
+Graphics hardware not detected
+Device driver file not found (
+Invalid device driver file ( Not enough memory to load driver
+Out of memory in scan fill
+Out of memory in flood fill
+Font file not found (
+Not enough memory to load font)Invalid graphics mode for selected driver
+Graphics error
+Graphics I/O error
+Invalid font file (
+Invalid font number
+Invalid version
+Graphics error (U
+.BGIU
+.CHRU
+PSQRW
+_ZY[X
+r/PS2
+WVSSPP
+XX[@;
+^X@;F
+ !H#l%
+GjI<K
+u6PSQR
+ZY[Xs#
+tO< r
+tcQRW
+Cheops.ovrU
+PATH=U
+PSQRVW
+_^ZY[X]
+EMMXXXX03
+X[YZ^_]
+#$456789:;<=>?uRuntime error 
+u	&;E
+WVQUSP
+sURSP
+Y^_PQ
+`1pF,
+RSPQW
+=$tD&
+=.u2GI
+s0CGISQW
+![YRP
+ GX Effects
+ 2.02
+ GX Kernel 2.00
+ GX Development Series Copyright (c) Genus Microprogramming, Inc. 1988-92
+ All Rights Reserved.
+ Christopher A. Howard
+CGA 320x200x4      
+CGA 640x200x2      
+EGA 320x200x16     
+EGA 640x200x16     
+EGA 640x350x2      
+EGA 640x350x16     
+VGA 640x480x2      
+VGA 640x480x16     
+VGA 320x200x256    
+Hercules 720x348x2 
+Tseng 640x350x256  
+Paradise 800x600x2 
+VESA 640x400x256   
+VESA 640x480x256   
+VESA 800x600x16    
+VESA 800x600x256   
+VESA 1024x768x256  
+*****?**
+?**?*??*
+*?**??*?
+??*?????
+   $$$(((---222888???
+'?--?1-?6-?:-??-??-:?-6?-1?--?1-?6-?:-??-:?-6?-1?--?--?1-?6-?:-??-:?-6?-1?
+ {5m#
+-`{714
+(%+Xk!
+O'$ATs
+/I)?,\
+ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+EGAVGA
+EGAVGA
+IBM8514
+IBM851
+PC3270
+PC3270
