@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    # No ports published here on purpose: most `make` targets (format, lint,
+    # test) need none, and a fixed mapping would fail to start whenever that
+    # host port is already taken by something unrelated. `make serve`/`report`
+    # publish a port explicitly, per invocation, only when one is needed.

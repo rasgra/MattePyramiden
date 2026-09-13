@@ -42,10 +42,11 @@ remake, not as content to redistribute verbatim if you ever publish it.
 - Full instruction-level recovery beyond this is impractical without a
   segment-aware disassembler (IDA/Ghidra with proper fixups) because of
   the 1,602 relocations and heavy overlay swapping — but it isn't needed
-  for a remake: the *content* (below) is what's worth mining, not the
+  for a remake: the _content_ (below) is what's worth mining, not the
   Pascal codegen.
 
 Raw dumps for your own digging:
+
 - `cheops_exe_strings.txt`, `cheops_ovr_strings.txt` — every printable
   string in each module (Swedish text uses the DOS/CP437 codepage, so
   å/ä/ö render as stray high-bit bytes in plain `strings` output).
@@ -74,6 +75,7 @@ reason). A handful of rooms are pure logic/strategy games rather than
 answer-a-question rooms.
 
 **Global UI (from the string table), bound to function keys:**
+
 - F1 — room rules, F2 — help/hint for current room, F3 — map, F4 —
   toggle sound, F8 — save current room, F9 — load saved room, F10 —
   jump to any previously-visited room ("byta rum"), Esc — quit (with a
@@ -92,7 +94,8 @@ answer-a-question rooms.
 
 **Full room roster recovered from strings** (grouped by kind):
 
-*Arithmetic & foundations*
+_Arithmetic & foundations_
+
 - Additions-rummet, Subtraktions-rummet, Multiplikations-rummet,
   Divisions-rummet — mental-math with a worked trick shown as the hint.
 - Överslags-rummet — estimation (rounding to nearest 10/100).
@@ -102,7 +105,8 @@ answer-a-question rooms.
 - Gissa-rummet — "guess the number I'm thinking of" (higher/lower,
   10 tries), classic binary-search teaching moment.
 
-*Algebra*
+_Algebra_
+
 - Ekvations-rummet — solve for x mentally.
 - 2:a grads-rummet — quadratic equations (two roots).
 - Logaritmiska rummet — log definition and values.
@@ -110,7 +114,8 @@ answer-a-question rooms.
 - Serie-rummet — sum an infinite geometric series.
 - Komplexa-rummet — complex numbers, plot on the Argand plane.
 
-*Geometry & trig*
+_Geometry & trig_
+
 - Geometri-rummet — parallel-line angle relationships.
 - Trekants-rummet / Fyrkants-rummet / Runda-rummet — perimeter & area
   of triangle/quadrilateral/circle, "name this shape" prompts.
@@ -125,7 +130,8 @@ answer-a-question rooms.
   negative slope, zero, max, min, inflection on a curve).
 - Grekiska rummet — name the Greek letter (σ, ω, π...).
 
-*Applied word problems tied to the Egypt setting*
+_Applied word problems tied to the Egypt setting_
+
 - Kart-rummet — read distances off a scaled map (Suez canal, Cairo↔
   El-Alamein) and unit-convert km/miles/cm.
 - Mikroskop-rummet — magnification word problem about a daphnia
@@ -133,7 +139,8 @@ answer-a-question rooms.
 - Pascals rum — reconstruct Pascal's triangle, told through Blaise
   Pascal's name.
 
-*Logic / strategy mini-games (the "arcade" rooms)*
+_Logic / strategy mini-games (the "arcade" rooms)_
+
 - Torn-rummet / "Mersennes rum" — **Towers of Hanoi**, player picks
   ring count (1–64), counts moves, and the game explicitly teaches the
   Mersenne-number connection (2ⁿ−1) as the payoff.
@@ -142,10 +149,11 @@ answer-a-question rooms.
 - Master Mind-rummet — full Mastermind clone (guess count, exact/
   partial-match feedback).
 - OTHELLO-rummet — full Othello/Reversi vs. computer AI.
-- Magiska-rummet — Dürer's magic-square engraving (*Melencolia I*):
+- Magiska-rummet — Dürer's magic-square engraving (_Melencolia I_):
   reconstruct the missing numbers.
 
-*Set-piece story puzzles (one-off narrative beats, not repeatable rooms)*
+_Set-piece story puzzles (one-off narrative beats, not repeatable rooms)_
+
 - Diophantus's age riddle (the classic epitaph algebra problem).
 - `SEND + MORE = MONEY` cryptarithm — you need "money" for the trip home.
 - A combination-lock puzzle (3-digit code, no repeats → 720 permutations).
@@ -166,7 +174,7 @@ answer-a-question rooms.
 The design holds up well; what's dated is the delivery, not the
 concept. A few things worth deciding before scaffolding a project:
 
-- **Fidelity vs. reinterpretation**: reuse the room *types* and
+- **Fidelity vs. reinterpretation**: reuse the room _types_ and
   pedagogical hints (all public-domain maths, safe to reuse in spirit)
   but write fresh problem text/numbers and new art instead of copying
   the PCX images or Swedish copy verbatim, since those are the parts

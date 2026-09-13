@@ -2,3 +2,9 @@ node_modules
 playwright-report
 test-results
 docs/reference
+
+# index.html is dense by design (multiple statements per line, minimal
+# blank lines) — Prettier's HTML/CSS/JS formatting would nearly double its
+# line count and rewrite almost every line. Lint it (eslint/stylelint) in
+# place instead; leave formatting to hand-editing.
+index.html

@@ -730,7 +730,7 @@
     {
       key:'angle', minLevel:5,
       name:{sv:'Den Triangulära Stämpeln', en:'The Triangular Seal'}, accent:'#a89a2f',
-      build:function(level){
+      build:function(_level){
         var a = randInt(30,85);
         var bMax = Math.max(21, 150-a-10);
         var b = randInt(20, bMax);
@@ -1742,7 +1742,7 @@
     els.endTitle.textContent = t().winTitle;
     els.endBody.textContent = t().winBody;
     els.endOverlay.classList.add('show');
-    try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(e){}
+    try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(_e){}
   }
   function loseGame(){
     state.ended = true; clearInterval(state.timerId);
@@ -1750,7 +1750,7 @@
     els.endTitle.textContent = t().loseTitle;
     els.endBody.textContent = t().loseBody;
     els.endOverlay.classList.add('show');
-    try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(e){}
+    try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(_e){}
   }
 
   function resetGame(){
@@ -1911,7 +1911,7 @@
         room: state.room, torches: state.torches, visited: state.visited, lang: state.lang, level: state.level
       }));
       els.feedback.className='feedback good'; els.feedback.textContent = t().saveOk;
-    }catch(e){ els.feedback.className='feedback bad'; els.feedback.textContent = t().saveFail; }
+    }catch(_e){ els.feedback.className='feedback bad'; els.feedback.textContent = t().saveFail; }
   });
   els.loadBtn.addEventListener('click', function(){
     try{
@@ -1926,7 +1926,7 @@
       applyStaticText();
       loadRoom(data.room||0);
       els.feedback.className='feedback good'; els.feedback.textContent = t().loadOk;
-    }catch(e){ els.feedback.className='feedback bad'; els.feedback.textContent = t().loadFail; }
+    }catch(_e){ els.feedback.className='feedback bad'; els.feedback.textContent = t().loadFail; }
   });
 
   document.addEventListener('keydown', function(e){
@@ -1943,13 +1943,13 @@
   });
 
   function saveSettings(){
-    try{ localStorage.setItem('pyramid-reckoning-settings', JSON.stringify({ lang: state.lang, level: state.level })); }catch(e){}
+    try{ localStorage.setItem('pyramid-reckoning-settings', JSON.stringify({ lang: state.lang, level: state.level })); }catch(_e){}
   }
   function loadSettings(){
     try{
       var raw = localStorage.getItem('pyramid-reckoning-settings');
       if(raw){ var d = JSON.parse(raw); if(d.lang) state.lang=d.lang; if(d.level) state.level=d.level; }
-    }catch(e){}
+    }catch(_e){}
   }
 
   // ================= Boot =================

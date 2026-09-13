@@ -1,28 +1,27 @@
-import html from "eslint-plugin-html";
-import globals from "globals";
+import html from 'eslint-plugin-html';
+import globals from 'globals';
 
 export default [
-  { ignores: ["node_modules", "playwright-report", "test-results", "docs/reference"] },
+  { ignores: ['node_modules', 'playwright-report', 'test-results', 'docs/reference'] },
   {
-    files: ["**/*.html"],
+    files: ['**/*.html'],
     plugins: { html },
-    processor: "html/html",
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: "script",
-      globals: { ...globals.browser },
+      sourceType: 'script',
+      globals: { ...globals.browser }
     },
     rules: {
-      "no-undef": "error",
-      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-    },
+      'no-undef': 'error',
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }]
+    }
   },
   {
-    files: ["tests/**/*.js", "playwright.config.js"],
+    files: ['tests/**/*.js', 'playwright.config.js'],
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: "module",
-      globals: { ...globals.node },
-    },
-  },
+      sourceType: 'module',
+      globals: { ...globals.node }
+    }
+  }
 ];

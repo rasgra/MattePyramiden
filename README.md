@@ -1,6 +1,6 @@
 # Matte Pyramiden — Pyramid Reckoning
 
-A modern, browser-based homage to *Cheops Pyramid* (Alega Skolmateriel, 1993),
+A modern, browser-based homage to _Cheops Pyramid_ (Alega Skolmateriel, 1993),
 a Swedish maths-adventure floppy game by Göran Hjalmarsson. Built from a
 reverse-engineering pass over the original `CHEOPS.EXE`/`CHEOPS.OVR` — see
 [`docs/CHEOPS_DESIGN_NOTES.md`](docs/CHEOPS_DESIGN_NOTES.md) for the technical
@@ -15,7 +15,7 @@ step, no dependencies.
 ## What's here
 
 A single-page game (`index.html`, vanilla HTML/CSS/JS, no build tooling) —
-*Pyramid Reckoning*:
+_Pyramid Reckoning_:
 
 - 12 chambers: 9 random maths topics (arithmetic, percent, geometry, algebra,
   sequences, number bases, Pythagoras, quadratics — 12 topic generators in
@@ -33,27 +33,30 @@ A single-page game (`index.html`, vanilla HTML/CSS/JS, no build tooling) —
   control scheme.
 - Original art direction (a torch-lit stone-corridor aesthetic) — the
   original's `.PCX` art and exact copy are not reused; only the game
-  *mechanics and structure* are carried over.
+  _mechanics and structure_ are carried over.
 
 ## Development
 
 The game itself has no build step or dependencies — `index.html` is
 self-contained on purpose (it's also published as a Claude Artifact, which
-requires a single inline file). The tooling below is dev-only, kept out of
-the runtime entirely.
+requires a single inline file). All dev tooling (Node, npm packages,
+Playwright's browser) lives in a Docker image; nothing is installed on the
+host beyond Docker itself.
 
 ```
-make install     # one-time: installs prettier/eslint/stylelint/Playwright
-make dev          # serve the game at http://localhost:8000 (needs only Python)
-make format       # check formatting               make format-fix  # apply it
-make lint         # eslint (inline <script>) + stylelint (inline <style>)
-make test         # Playwright smoke tests, headless
-make check        # format + lint + test — what CI should run
+make install      # one-time: builds the tooling image (npm install runs inside it)
+make dev           # serve the game at http://localhost:8080 (PORT=... to override)
+make format        # check formatting               make format-fix  # apply it
+make lint          # eslint (inline <script>) + stylelint (inline <style>)
+make test          # Playwright smoke tests, headless
+make report        # view the last test run's HTML report at http://localhost:9223
+make check         # format + lint + test — what CI should run
 ```
 
-Run `make help` for the full list. `make dev`/`make serve` only need Python
-(already on most systems) — everything else needs Node.js (`make install`
-pulls the rest, including a Chromium build for the tests).
+Run `make help` for the full list, or `make shell` to poke around inside the
+container. Every command runs via `docker compose run`, with `node_modules`
+kept in an anonymous volume — it's never written to the project directory
+on the host.
 
 ## Status
 

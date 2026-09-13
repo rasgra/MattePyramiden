@@ -1,33 +1,39 @@
-.PHONY: help install dev serve format format-fix lint lint-js lint-css test test-ui check clean
+.PHONY: help install dev serve format format-fix lint lint-js lint-css test report check shell clean
+
+PORT ?= 8080
+REPORT_PORT ?= 9223
+DC_RUN = docker compose run --rm app
 
 help: ## show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
 
-install: ## install format/lint/test tooling and the Playwright browser
-	npm install
-	npx playwright install --with-deps chromium
+install: ## build the tooling image (npm install runs inside it — nothing touches the host)
+	docker compose build
 
 dev: serve ## alias for serve
-serve: ## run the game locally at http://localhost:8000 (no build step, no npm needed)
-	python3 -m http.server 8000
+serve: ## run the game at http://localhost:$(PORT) (fully containerized, no host installs; override with PORT=...)
+	docker compose run --rm -p $(PORT):$(PORT) app npx http-server . -p $(PORT)
 
 format: ## check formatting (no changes)
-	npx prettier --check .
+	$(DC_RUN) npx prettier --check .
 format-fix: ## fix formatting
-	npx prettier --write .
+	$(DC_RUN) npx prettier --write .
 
 lint: lint-js lint-css ## lint the inline <script> and <style> in index.html
 lint-js:
-	npx eslint .
+	$(DC_RUN) npx eslint .
 lint-css:
-	npx stylelint index.html
+	$(DC_RUN) npx stylelint index.html
 
 test: ## run the Playwright smoke-test suite headlessly
-	npx playwright test
-test-ui: ## run the Playwright suite in headed/UI mode for debugging
-	npx playwright test --ui
+	$(DC_RUN) npx playwright test
+report: ## serve the last Playwright HTML report at http://localhost:$(REPORT_PORT)
+	docker compose run --rm -p $(REPORT_PORT):$(REPORT_PORT) app npx playwright show-report --host 0.0.0.0 --port $(REPORT_PORT)
 
 check: format lint test ## run everything (format + lint + test)
 
-clean: ## remove installed tooling and test artifacts
-	rm -rf node_modules test-results playwright-report
+shell: ## open a shell in the tooling container
+	$(DC_RUN) bash
+
+clean: ## remove containers, the built image, and volumes (nothing to clean on the host)
+	docker compose down --rmi local -v
