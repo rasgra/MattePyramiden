@@ -402,6 +402,7 @@
     <button class="rail-btn" id="mapBtn">🗺 <span id="lblMap">Map</span> <kbd>M</kbd></button>
     <button class="rail-btn" id="saveBtn">⛏ <span id="lblSave">Save</span> <kbd>S</kbd></button>
     <button class="rail-btn" id="loadBtn">📜 <span id="lblLoad">Load</span> <kbd>L</kbd></button>
+    <button class="rail-btn" id="soundBtn"><span id="soundIcon">🔊</span> <span id="lblSound">Sound</span></button>
     <button class="rail-btn" id="settingsBtn">⚙ <span id="lblSettings">Settings</span></button>
     <button class="rail-btn" id="resetBtn">↺ <span id="lblRestart">Restart</span></button>
   </div>
@@ -451,6 +452,55 @@
   }
   function T(level, arr){ return arr[tierOf(level)]; }
 
+  // ================= Sound =================
+  // Small synthesized cues via Web Audio — no audio files to keep the page
+  // self-contained. The context is created lazily on the first call, which
+  // always happens from inside a click/keydown handler, satisfying browsers'
+  // "needs a user gesture" autoplay rule without any separate unlock step.
+  var audioCtx = null;
+  function getAudioCtx(){
+    if(audioCtx) return audioCtx;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    try{ audioCtx = new AC(); }catch(_e){ audioCtx = null; }
+    return audioCtx;
+  }
+  function playTone(freq, startDelay, duration, type, peak){
+    if(!state.soundOn) return;
+    var ctx = getAudioCtx();
+    if(!ctx) return;
+    if(ctx.state === 'suspended') ctx.resume().catch(function(){});
+    var t0 = ctx.currentTime + startDelay;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.03);
+  }
+  function playPositive(){
+    playTone(1046.5, 0, 0.11, 'sine', 0.2);   // C6
+    playTone(1318.5, 0.08, 0.16, 'sine', 0.18); // E6
+  }
+  function playNegative(){
+    playTone(220.0, 0, 0.16, 'square', 0.09);  // A3
+    playTone(196.0, 0.10, 0.22, 'square', 0.08); // G3 — a small descending buzz
+  }
+  function playCheer(){
+    [523.25, 659.25, 783.99, 1046.5].forEach(function(f, i){ // C5 E5 G5 C6
+      playTone(f, i*0.09, 0.22, 'triangle', 0.15);
+    });
+  }
+  function playVictory(){
+    var run = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // C5 E5 G5 C6 E6
+    run.forEach(function(f, i){ playTone(f, i*0.1, 0.22, 'triangle', 0.16); });
+    [783.99, 1046.5, 1318.5].forEach(function(f){ playTone(f, run.length*0.1, 0.55, 'triangle', 0.13); });
+  }
+
   // ================= Localized fixed strings =================
   var STR = {
     sv: {
@@ -459,6 +509,7 @@
       footer: 'Talen skapas på nytt varje gång, så pyramiden löses aldrig likadant två gånger.',
       chamber: function(n,total){ return 'KAMMARE ' + n + ' / ' + total; },
       hint:'Ledtråd', map:'Karta', save:'Spara', load:'Hämta', settings:'Inställningar', restart:'Börja om',
+      soundOnLabel:'Ljud', soundOffLabel:'Ljud av',
       answerBtn:'Svara', answerPlaceholder:'Ditt svar', continueBtn:'Fortsätt',
       mapTitle:'Karta över gångarna',
       correct:'Rätt!',
@@ -505,6 +556,7 @@
       footer: 'Numbers regenerate on every descent, so the pyramid never solves the same way twice.',
       chamber: function(n,total){ return 'CHAMBER ' + n + ' / ' + total; },
       hint:'Hint', map:'Map', save:'Save', load:'Load', settings:'Settings', restart:'Restart',
+      soundOnLabel:'Sound', soundOffLabel:'Muted',
       answerBtn:'Answer', answerPlaceholder:'Your answer', continueBtn:'Continue',
       mapTitle:'Passage map',
       correct:'Correct!',
@@ -1262,6 +1314,7 @@
     recentTopics: [],           // drill-topic keys used recently, for variety
     lastMinigameType: null,     // avoids the same mini-game in both slots
     visitedMinigameTypes: {},   // index -> mini-game type, for the map labels
+    soundOn: true,
     settingsMode: 'initial' // 'initial' | 'reopen'
   };
 
@@ -1269,7 +1322,7 @@
   ['eyebrowText','subtitleText','footerText','levelBadge','roomIndexLabel','roomNameLabel','torchRow','timerLabel',
    'promptText','subPromptText','answerInput','submitBtn','feedbackText','hintText','hintBtn','mapBtn',
    'wsTip','worksheet','wsColLeft','wsColRight','tallyRow','setTallyLabel','setContinueBtn','mmHistory','trialCharges',
-   'mapOverlay','mapTrack','mapCloseBtn','mapTitle','saveBtn','loadBtn','settingsBtn','resetBtn',
+   'mapOverlay','mapTrack','mapCloseBtn','mapTitle','saveBtn','loadBtn','settingsBtn','resetBtn','soundBtn','soundIcon','lblSound',
    'rulesBtn','rulesOverlay','rulesTitle','rulesBody','rulesCloseBtn','lblRules',
    'setupOverlay','setupTitle','setupSub','langLabel','langSv','langEn','levelLabel','levelGrid',
    'setupPrimaryBtn','setupCancelBtn','introOverlay','introBeatText','introLetter','introLetterText','introLetterSig','introDots','introSkipBtn','introNextBtn',
@@ -1566,6 +1619,7 @@
     set.results[idx] = correct ? 'correct' : 'wrong';
     item.answered = val.trim();
     item.answeredCorrect = correct;
+    correct ? playPositive() : playNegative();
 
     if(set.isTrial){
       renderTrialCharges();
@@ -1650,9 +1704,11 @@
     if(pass){
       els.prompt.textContent = s.setPerfect;
       els.sub.textContent = s.setPassSub;
+      playCheer();
     } else {
       els.prompt.textContent = s.setFail(correctCount, set ? set.items.length : SET_SIZE);
       els.sub.textContent = timedOut ? s.setTimeUp : s.setFailSub;
+      playNegative();
     }
 
     els.setContinueBtn.textContent = s.continueBtn;
@@ -1682,6 +1738,8 @@
     clearInterval(state.timerId);
     els.feedback.className = 'feedback good';
     els.feedback.textContent = t().correct;
+    playPositive();
+    playCheer();
     setTimeout(function(){
       if(state.room >= TOTAL_ROOMS-1) winGame();
       else loadRoom(state.room+1);
@@ -1694,6 +1752,7 @@
     clearInterval(state.timerId);
     state.torches--;
     renderTorches();
+    playNegative();
     if(state.torches <= 0){ loseGame(); return; }
     els.feedback.className = 'feedback bad';
     els.feedback.textContent = message || t().wrongGeneric;
@@ -2132,6 +2191,7 @@
     els.endTitle.textContent = t().winTitle;
     els.endBody.textContent = t().winBody;
     els.endOverlay.classList.add('show');
+    playVictory();
     try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(_e){}
   }
   function loseGame(){
@@ -2163,6 +2223,7 @@
     els.lblLoad.textContent = s.load;
     els.lblSettings.textContent = s.settings;
     els.lblRestart.textContent = s.restart;
+    renderSoundButton();
     els.lblRules.textContent = s.rulesBtn;
     els.rulesTitle.textContent = s.rulesTitle;
     els.submitBtn.textContent = s.answerBtn;
@@ -2276,6 +2337,17 @@
   els.restartBtn.addEventListener('click', function(){ els.endOverlay.classList.remove('show'); resetGame(); });
   els.resetBtn.addEventListener('click', resetGame);
 
+  function renderSoundButton(){
+    els.soundIcon.textContent = state.soundOn ? '🔊' : '🔇';
+    els.lblSound.textContent = state.soundOn ? t().soundOnLabel : t().soundOffLabel;
+  }
+  els.soundBtn.addEventListener('click', function(){
+    state.soundOn = !state.soundOn;
+    renderSoundButton();
+    saveSettings();
+    if(state.soundOn) playPositive(); // immediate confirmation that sound is back on
+  });
+
   els.settingsBtn.addEventListener('click', function(){ openSetup('reopen'); });
   els.langSv.addEventListener('click', function(){ state.lang='sv'; applyStaticText(); refreshSetupOverlayText(); });
   els.langEn.addEventListener('click', function(){ state.lang='en'; applyStaticText(); refreshSetupOverlayText(); });
@@ -2353,12 +2425,17 @@
   });
 
   function saveSettings(){
-    try{ localStorage.setItem('pyramid-reckoning-settings', JSON.stringify({ lang: state.lang, level: state.level })); }catch(_e){}
+    try{ localStorage.setItem('pyramid-reckoning-settings', JSON.stringify({ lang: state.lang, level: state.level, sound: state.soundOn })); }catch(_e){}
   }
   function loadSettings(){
     try{
       var raw = localStorage.getItem('pyramid-reckoning-settings');
-      if(raw){ var d = JSON.parse(raw); if(d.lang) state.lang=d.lang; if(d.level) state.level=d.level; }
+      if(raw){
+        var d = JSON.parse(raw);
+        if(d.lang) state.lang=d.lang;
+        if(d.level) state.level=d.level;
+        if(typeof d.sound === 'boolean') state.soundOn = d.sound;
+      }
     }catch(_e){}
   }
 

@@ -142,6 +142,35 @@ test('a sequential visual chamber (Geometry Vault / Coordinate Grid / Triangular
   await expect(page.locator('#feedbackText')).not.toHaveText('');
 });
 
+test('the sound toggle switches icon/label and survives a reload', async ({ page }) => {
+  await startGame(page);
+  await expect(page.locator('#soundIcon')).toHaveText('🔊');
+  await expect(page.locator('#lblSound')).toHaveText('Sound');
+
+  await page.click('#soundBtn');
+  await expect(page.locator('#soundIcon')).toHaveText('🔇');
+  await expect(page.locator('#lblSound')).toHaveText('Muted');
+
+  // A reload starts back at the setup screen (this test never saved a run),
+  // but the persisted sound preference should already show through there.
+  await page.reload();
+  await expect(page.locator('#soundIcon')).toHaveText('🔇');
+});
+
+test('answering questions triggers no console errors (audio cues included)', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (err) => errors.push(err));
+
+  await startGame(page);
+  if (await page.locator('#worksheet').isVisible()) {
+    await page.fill('#answerInput', '0');
+    await page.click('#submitBtn'); // plays the positive or negative cue
+    await page.waitForTimeout(200);
+  }
+
+  expect(errors).toEqual([]);
+});
+
 test('opening settings mid-run can be cancelled without restarting', async ({ page }) => {
   await startGame(page);
   await page.click('#settingsBtn');
