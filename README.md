@@ -17,16 +17,20 @@ step, no dependencies.
 A single-page game (`index.html`, vanilla HTML/CSS/JS, no build tooling) —
 _Pyramid Reckoning_:
 
-- 12 chambers: 9 random maths topics (arithmetic, percent, geometry, algebra,
-  sequences, number bases, Pythagoras, quadratics — 12 topic generators in
-  the pool, each producing fresh random problems every run) drawn as a
-  two-column worksheet of 10 problems, plus a Nim room, a full Mastermind
-  room, and a combinatorics riddle finale.
-- Two "sequential visual" chambers (Geometry Vault — name 3D wireframe
-  shapes to earn dynamite charges and blast through a wall; Coordinate Grid —
-  plot points to collect melons) sharing one canvas-driven engine.
+- 12 chambers: 9 are random maths topics (arithmetic, percent, geometry,
+  algebra, sequences, number bases, Pythagoras, quadratics, and two
+  "sequential visual" topics — Geometry Vault and Coordinate Grid — sharing
+  a canvas-driven engine), drawn as a two-column worksheet of 10 problems.
+  The same topic never runs in back-to-back-ish chambers (no repeats within
+  the last 4). Chambers 5 and 10 are always one of four mini-games — Nim,
+  Mastermind, a Guess-the-Number game with too-high/too-low feedback, or
+  tic-tac-toe against a minimax opponent (with a per-difficulty chance of a
+  deliberate slip, so younger grades get a real shot at an outright win) —
+  picked at random and never the same type in both slots. Chamber 12 is
+  always the combinatorics riddle finale.
 - Difficulty selectable by Swedish school year (Åk 1–9) or College, which
-  changes both number ranges and which topics can appear.
+  changes number ranges, which topics can appear, and the mini-games'
+  opponent strength.
 - Swedish/English language toggle, a skippable narrated intro, a torch/life
   system, save/load via `localStorage`, an in-game map, and separate
   Hint (F2-style) and Rules (F1-style) panels per the original's own

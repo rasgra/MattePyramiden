@@ -139,6 +139,16 @@
   .mm-row .mm-code{ font-weight:700; letter-spacing:.15em; }
   .mm-row .mm-score{ color:#5c4a2c; white-space:nowrap; }
   .mm-row.win .mm-score{ color:#2e6b3e; font-weight:700; }
+  .ttt-grid{ display:grid; grid-template-columns:repeat(3, 56px); grid-template-rows:repeat(3, 56px); gap:6px; margin-top:6px; }
+  .ttt-cell{
+    font-family:'Cinzel',serif; font-weight:700; font-size:1.7rem; line-height:1;
+    border-radius:6px; border:1px solid rgba(43,32,19,.3); background:rgba(43,32,19,.06);
+    color:#2b2013; cursor:pointer; padding:0;
+  }
+  .ttt-cell:not(:disabled):hover{ background:rgba(74,146,182,.18); }
+  .ttt-cell:disabled{ cursor:default; }
+  .ttt-cell.x{ color:var(--lapis-dim); }
+  .ttt-cell.o{ color:#8a2f1c; }
   .trial-charges{ display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
   .trial-charge{ font-size:1.3rem; opacity:.25; filter:grayscale(1); transition:opacity .2s, filter .2s; }
   .trial-charge.lit{ opacity:1; filter:none; }
@@ -459,6 +469,8 @@
       rulesBodyNim:'Ta 1–3 tegelstenar i din tur. Den som tvingas ta den sista stenen förlorar. Besegra din motståndare för att komma vidare; förlorar du slocknar en fackla.',
       rulesBodyCombo:'En gåta, en chans. Svara rätt för att öppna valvet. Ett felaktigt svar kostar en fackla och skickar dig tillbaka ett rum.',
       rulesBodyMastermind:'Tre hemliga siffror (0–9, kan upprepas) väntar på att knäckas. Efter varje gissning får du veta hur många siffror som satt helt rätt, och hur många som fanns med men på fel plats. Du har 15 gissningar — tar de slut utan att du knäcker koden slocknar en fackla.',
+      rulesBodyGuess:'Ett hemligt tal väntar på att gissas. Efter varje gissning får du veta om talet du sökte är högre eller lägre. Du har 10 gissningar — halvera intervallet varje gång för att hitta det snabbast. Tar gissningarna slut slocknar en fackla.',
+      rulesBodyTtt:'Tre-i-rad mot väktaren. Du är X och sätter första draget; klicka på en ruta för att spela. Vinner du eller blir det oavgjort öppnas vägen — förlorar du slocknar en fackla.',
       setQuestion: function(n,total){ return 'Uppgift ' + n + ' / ' + total; },
       setTally: function(n){ return 'Antal rätt: ' + n; },
       setPerfect:'Alla rätt — vägen öppnas!',
@@ -503,6 +515,8 @@
       rulesBodyNim:'Take 1–3 bricks on your turn. Whoever is forced to take the last brick loses. Beat your rival to move on; lose, and a torch burns out.',
       rulesBodyCombo:'One riddle, one chance. Answer correctly to open the vault. A wrong answer costs a torch and sends you back a chamber.',
       rulesBodyMastermind:'Three secret digits (0–9, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses — run out without cracking it and a torch burns out.',
+      rulesBodyGuess:'A secret number is waiting to be guessed. After each guess you learn whether the number you want is higher or lower. You have 10 guesses — halve the remaining range each time to find it fastest. Run out of guesses and a torch burns out.',
+      rulesBodyTtt:'Tic-tac-toe against the guardian. You’re X and move first — click a square to play. Win or draw and the way opens; lose and a torch burns out.',
       setQuestion: function(n,total){ return 'Question ' + n + ' / ' + total; },
       setTally: function(n){ return 'Correct: ' + n; },
       setPerfect:'Flawless — the way opens!',
@@ -1011,24 +1025,47 @@
     }
   ];
 
-  var NIM_INDEX = 8;
-  var MASTERMIND_INDEX = 9;
+  var MINIGAME_SLOTS = [4, 9];      // 0-indexed — chambers 5 and 10 are always a mini-game
+  var MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'tictactoe'];
+  var MINIGAME_SECONDS = { nim:60, mastermind:240, guess:240, tictactoe:150 };
   var TOTAL_ROOMS = 12;
   var MAX_TORCHES = 3;
-  var ROOM_SECONDS = 60;      // Nim single moves
-  var MASTERMIND_SECONDS = 240; // whole Mastermind puzzle
-  var SET_SIZE = 10;       // exercises per drill chamber
+  var ROOM_SECONDS = 60;    // fallback single-shot timer
+  var SET_SIZE = 10;        // exercises per drill chamber
+  var TOPIC_MEMORY = 4;     // a topic can't repeat within this many drill chambers
   // The original's own room-rules screens (Subtraktions-rummet, Överslags-rummet)
   // state "för att klättra uppåt krävs alla rätt" — all 10 correct, no partial credit.
 
   function nimName(lang){ return lang==='sv' ? 'Räknemuren' : 'The Counting Wall'; }
   function comboName(lang){ return lang==='sv' ? 'Skattkammardörren' : 'The Treasury Door'; }
+  function minigameName(mgType, lang){
+    if(mgType==='nim') return nimName(lang);
+    if(mgType==='mastermind') return lang==='sv' ? 'Master Mind-rummet' : 'The Master Mind Room';
+    if(mgType==='guess') return lang==='sv' ? 'Gissa-rummet' : 'The Guessing Room';
+    if(mgType==='tictactoe') return lang==='sv' ? 'Tre-i-rad-rummet' : 'The Tic-Tac-Toe Room';
+    return '';
+  }
+
+  function isMinigameSlot(index){ return MINIGAME_SLOTS.indexOf(index) !== -1; }
+
+  function pickMinigameType(){
+    var pool = MINIGAME_TYPES.filter(function(k){ return k !== state.lastMinigameType; });
+    var type = pick(pool.length ? pool : MINIGAME_TYPES);
+    state.lastMinigameType = type;
+    return type;
+  }
 
   // Build a themed worksheet of SET_SIZE independent problems from one topic.
+  // Avoids repeating a topic that appeared in the last TOPIC_MEMORY drill
+  // chambers, so the same kind of problem never runs back-to-back.
   function buildDrillSet(level, lang){
     var pool = ROOMS.filter(function(r){ return r.minLevel <= level; });
     if(pool.length===0) pool = ROOMS.filter(function(r){ return r.minLevel===1; });
-    var def = pick(pool);
+    var recent = state.recentTopics.slice(-TOPIC_MEMORY);
+    var freshPool = pool.filter(function(r){ return recent.indexOf(r.key) === -1; });
+    var def = pick(freshPool.length ? freshPool : pool);
+    state.recentTopics.push(def.key);
+    if(state.recentTopics.length > TOPIC_MEMORY*2) state.recentTopics.shift();
     var seconds = T(level, [220,200,180,150,130]);
 
     if(def.isTrial){
@@ -1142,6 +1179,67 @@
     };
   }
 
+  var GUESS_MAX_TRIES = 10;
+  function buildGuessRoom(level, lang){
+    var maxN = T(level, [50,120,300,600,1000]);
+    state.guessState = { secret: randInt(1,maxN), maxN:maxN, guesses:[], over:false };
+    return {
+      name: minigameName('guess', lang),
+      prompt: lang==='sv'
+        ? 'Jag tänker på ett tal mellan 1 och ' + maxN + '. Du har ' + GUESS_MAX_TRIES + ' gissningar på dig.'
+        : 'I’m thinking of a number between 1 and ' + maxN + '. You have ' + GUESS_MAX_TRIES + ' guesses.',
+      sub: lang==='sv' ? 'Skriv en gissning och tryck Svara.' : 'Type a guess and press Answer.',
+      hint: lang==='sv'
+        ? 'Gissa på mitten av det intervall som återstår varje gång — då hittar du talet snabbast.'
+        : 'Guess the middle of whatever range is left each time — that finds the number fastest.',
+      check: function(){ return false; }
+    };
+  }
+
+  // ---- Tic-tac-toe (minimax, with a per-difficulty chance of a deliberate
+  // slip so younger grades get a real shot at an outright win rather than
+  // only ever managing a draw against flawless play). ----
+  var TTT_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  function tttWinner(board){
+    for(var i=0;i<TTT_LINES.length;i++){
+      var l = TTT_LINES[i];
+      if(board[l[0]] && board[l[0]]===board[l[1]] && board[l[1]]===board[l[2]]) return board[l[0]];
+    }
+    return null;
+  }
+  function tttEmpties(board){
+    var out = []; for(var i=0;i<9;i++) if(!board[i]) out.push(i); return out;
+  }
+  function tttBest(board, mark){
+    var winner = tttWinner(board);
+    if(winner==='O') return {score:1};
+    if(winner==='X') return {score:-1};
+    var empties = tttEmpties(board);
+    if(empties.length===0) return {score:0};
+    var moves = empties.map(function(i){
+      var b2 = board.slice(); b2[i] = mark;
+      return {index:i, score: tttBest(b2, mark==='O'?'X':'O').score};
+    });
+    var target = mark==='O' ? Math.max.apply(null, moves.map(function(m){return m.score;}))
+                             : Math.min.apply(null, moves.map(function(m){return m.score;}));
+    return pick(moves.filter(function(m){ return m.score===target; }));
+  }
+
+  function buildTicTacToeRoom(level, lang){
+    state.tttState = { board:new Array(9).fill(null), over:false, mistakeChance: T(level, [0.5,0.35,0.2,0.08,0]) };
+    return {
+      name: minigameName('tictactoe', lang),
+      prompt: lang==='sv'
+        ? 'Spela tre-i-rad mot väktaren. Du är X och börjar. Vinst eller oavgjort tar dig vidare.'
+        : 'Play tic-tac-toe against the guardian. You’re X and go first. A win or a draw gets you through.',
+      sub: lang==='sv' ? 'Klicka på en ruta för att placera ditt X.' : 'Click a square to place your X.',
+      hint: lang==='sv'
+        ? 'Ta mitten om du kan, och titta alltid efter en rad där motståndaren har två i rad — blockera den!'
+        : 'Take the center if you can, and always check for a row where your opponent has two in a row — block it!',
+      check: function(){ return false; }
+    };
+  }
+
   // ================= State =================
   var state = {
     lang: 'en',
@@ -1154,11 +1252,16 @@
     timerId: null,
     nimState: null,
     mmState: null,
+    guessState: null,
+    tttState: null,
     set: null,
     ended: false,
     resolved: false,
     booted: false,
     timerTotal: ROOM_SECONDS,
+    recentTopics: [],           // drill-topic keys used recently, for variety
+    lastMinigameType: null,     // avoids the same mini-game in both slots
+    visitedMinigameTypes: {},   // index -> mini-game type, for the map labels
     settingsMode: 'initial' // 'initial' | 'reopen'
   };
 
@@ -1183,7 +1286,7 @@
   function t(){ return STR[state.lang]; }
 
   // ================= Room lifecycle =================
-  function isSpecialRoom(index){ return index === NIM_INDEX || index === MASTERMIND_INDEX || index === TOTAL_ROOMS-1; }
+  function isSpecialRoom(index){ return isMinigameSlot(index) || index === TOTAL_ROOMS-1; }
 
   function renderTorches(){
     els.torchRow.innerHTML = '';
@@ -1219,12 +1322,12 @@
     els.timerLabel.style.color = frac < 0.25 ? 'var(--ochre)' : (frac < 0.5 ? 'var(--torch)' : 'var(--papyrus)');
   }
 
-  var nimControlsEl = null;
+  var customControlsEl = null;
 
   function loadRoom(index, opts){
     opts = opts || {};
     state.booted = true;
-    if(nimControlsEl){ nimControlsEl.remove(); nimControlsEl = null; }
+    if(customControlsEl){ customControlsEl.remove(); customControlsEl = null; }
     state.room = index;
     state.resolved = false;
     state.set = null;
@@ -1232,7 +1335,9 @@
     els.feedback.textContent = '';
     els.feedback.className = 'feedback';
     els.input.style.display = '';
+    els.input.disabled = false;
     els.submitBtn.style.display = '';
+    els.submitBtn.disabled = false;
     els.setContinueBtn.style.display = 'none';
     els.mmHistory.style.display = 'none';
     els.mmHistory.innerHTML = '';
@@ -1254,24 +1359,38 @@
       els.prompt.style.display = '';
       els.sub.style.display = '';
       els.parchment.style.setProperty('--room-accent', '#4a92b6');
-      if(index === NIM_INDEX) state.current = buildNimRoom(state.level, state.lang);
-      else if(index === MASTERMIND_INDEX) state.current = buildMastermindRoom(state.level, state.lang);
-      else state.current = buildComboRoom(state.level, state.lang);
+
+      var mgType = null, seconds = ROOM_SECONDS;
+      if(isMinigameSlot(index)){
+        mgType = pickMinigameType();
+        state.visitedMinigameTypes[index] = mgType;
+        if(mgType==='nim') state.current = buildNimRoom(state.level, state.lang);
+        else if(mgType==='mastermind') state.current = buildMastermindRoom(state.level, state.lang);
+        else if(mgType==='guess') state.current = buildGuessRoom(state.level, state.lang);
+        else state.current = buildTicTacToeRoom(state.level, state.lang);
+        seconds = MINIGAME_SECONDS[mgType];
+      } else {
+        state.current = buildComboRoom(state.level, state.lang);
+      }
+      state.current.minigameType = mgType;
+
       els.hint.textContent = state.current.hint;
       els.roomNameLabel.textContent = state.current.name;
       els.prompt.textContent = state.current.prompt;
       els.sub.textContent = state.current.sub || '';
 
-      if(index === NIM_INDEX){
+      var usesCustomControls = mgType==='nim' || mgType==='tictactoe';
+      if(usesCustomControls){
         els.answerRow.style.display = 'none';
-        nimControlsEl = renderNimControls();
-        els.parchment.appendChild(nimControlsEl);
+        customControlsEl = mgType==='nim' ? renderNimControls() : renderTttGrid();
+        els.parchment.appendChild(customControlsEl);
+        if(mgType==='tictactoe') renderTttBoard();
       } else {
         els.answerRow.style.display = '';
         setTimeout(function(){ els.input.focus(); }, 50);
       }
-      if(index === MASTERMIND_INDEX) els.mmHistory.style.display = '';
-      if(!opts.skipTimer) startTimer(index === MASTERMIND_INDEX ? MASTERMIND_SECONDS : ROOM_SECONDS);
+      els.mmHistory.style.display = (mgType==='mastermind' || mgType==='guess') ? '' : 'none';
+      if(!opts.skipTimer) startTimer(seconds);
     } else {
       els.answerRow.style.display = '';
       state.set = buildDrillSet(state.level, state.lang);
@@ -1584,15 +1703,21 @@
 
   function checkAnswer(){
     var val = els.input.value;
-    if(state.room === NIM_INDEX) return;
+    var mgType = state.current && state.current.minigameType;
+    if(mgType==='nim' || mgType==='tictactoe') return; // played via their own on-screen controls
     if(state.set){
       if(val.trim() === '') return;
       checkAnswerForSet(val);
       return;
     }
-    if(state.room === MASTERMIND_INDEX){
+    if(mgType==='mastermind'){
       if(val.trim() === '') return;
       submitMastermindGuess(val);
+      return;
+    }
+    if(mgType==='guess'){
+      if(val.trim() === '') return;
+      submitNumberGuess(val);
       return;
     }
     if(!state.current) return;
@@ -1640,6 +1765,97 @@
     }
   }
 
+  function submitNumberGuess(val){
+    var g = state.guessState;
+    if(!g || g.over) return;
+    var n = parseInt(normAnswer(val).replace(/[^0-9-]/g,''), 10);
+    if(isNaN(n)){
+      els.feedback.className = 'feedback bad';
+      els.feedback.textContent = state.lang==='sv' ? 'Ange ett heltal.' : 'Enter a whole number.';
+      return;
+    }
+    g.guesses.push(n);
+    els.input.value = '';
+    els.feedback.textContent = '';
+
+    var correct = n === g.secret;
+    var resultText = correct
+      ? (state.lang==='sv' ? 'rätt!' : 'correct!')
+      : (n < g.secret ? (state.lang==='sv' ? 'för lågt' : 'too low') : (state.lang==='sv' ? 'för högt' : 'too high'));
+
+    var row = document.createElement('div');
+    row.className = 'mm-row' + (correct ? ' win' : '');
+    var left = document.createElement('span');
+    left.className = 'mm-code';
+    left.textContent = (state.lang==='sv' ? 'Gissning ' : 'Guess ') + g.guesses.length + ': ' + n;
+    var right = document.createElement('span');
+    right.className = 'mm-score';
+    right.textContent = resultText;
+    row.appendChild(left); row.appendChild(right);
+    els.mmHistory.appendChild(row);
+    els.mmHistory.scrollTop = els.mmHistory.scrollHeight;
+
+    if(correct){
+      g.over = true;
+      onSuccess();
+    } else if(g.guesses.length >= GUESS_MAX_TRIES){
+      g.over = true;
+      onFail(state.lang==='sv' ? 'Du gissade slut på försök.' : 'You ran out of guesses.');
+    }
+  }
+
+  // ---------------- Tic-tac-toe controls ----------------
+  function renderTttGrid(){
+    var wrap = document.createElement('div');
+    wrap.className = 'ttt-grid';
+    for(var i=0;i<9;i++){
+      var cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'ttt-cell';
+      cell.onclick = (function(idx){ return function(){ tttPlayerMove(idx); }; })(i);
+      wrap.appendChild(cell);
+    }
+    return wrap;
+  }
+  function renderTttBoard(){
+    var tt = state.tttState;
+    if(!customControlsEl || !tt) return;
+    var cells = customControlsEl.querySelectorAll('.ttt-cell');
+    for(var i=0;i<cells.length;i++){
+      var mark = tt.board[i];
+      cells[i].textContent = mark || '';
+      cells[i].className = 'ttt-cell' + (mark==='X' ? ' x' : mark==='O' ? ' o' : '');
+      cells[i].disabled = !!mark || tt.over;
+    }
+  }
+  function tttPlayerMove(i){
+    var tt = state.tttState;
+    if(!tt || tt.over || tt.board[i]) return;
+    tt.board[i] = 'X';
+    renderTttBoard();
+    if(tttWinner(tt.board)==='X'){ tttFinish(true, state.lang==='sv' ? 'Du vann! En dörr öppnas.' : 'You won! A door opens.'); return; }
+    if(tttEmpties(tt.board).length===0){ tttFinish(true, state.lang==='sv' ? 'Oavgjort — du tar dig vidare!' : 'A draw — through you go!'); return; }
+    setTimeout(tttComputerTurn, 450);
+  }
+  function tttComputerTurn(){
+    var tt = state.tttState;
+    if(!tt || tt.over) return;
+    var empties = tttEmpties(tt.board);
+    var idx = Math.random() < tt.mistakeChance ? pick(empties) : tttBest(tt.board.slice(), 'O').index;
+    tt.board[idx] = 'O';
+    renderTttBoard();
+    if(tttWinner(tt.board)==='O'){ tttFinish(false, state.lang==='sv' ? 'Väktaren vann. En fackla slocknar.' : 'The guardian won. A torch burns out.'); return; }
+    if(tttEmpties(tt.board).length===0) tttFinish(true, state.lang==='sv' ? 'Oavgjort — du tar dig vidare!' : 'A draw — through you go!');
+  }
+  function tttFinish(passed, message){
+    var tt = state.tttState;
+    tt.over = true;
+    renderTttBoard();
+    els.feedback.className = 'feedback ' + (passed ? 'good' : 'bad');
+    els.feedback.textContent = message;
+    setTimeout(function(){ if(passed) onSuccess(); else onFail(message); }, 900);
+  }
+
   // ---------------- Nim controls ----------------
   function renderNimControls(){
     var wrap = document.createElement('div');
@@ -1660,7 +1876,7 @@
     ns.heap -= n;
     if(ns.heap <= 0){
       ns.over = true;
-      if(nimControlsEl){ nimControlsEl.remove(); nimControlsEl = null; }
+      if(customControlsEl){ customControlsEl.remove(); customControlsEl = null; }
       els.feedback.className='feedback bad';
       els.feedback.textContent = state.lang==='sv'
         ? 'Du tog den sista stenen — muren rasar på din sida! En fackla slocknar.'
@@ -1681,7 +1897,7 @@
     ns.heap -= take;
     if(ns.heap <= 0){
       ns.over = true;
-      if(nimControlsEl){ nimControlsEl.remove(); nimControlsEl = null; }
+      if(customControlsEl){ customControlsEl.remove(); customControlsEl = null; }
       els.feedback.className='feedback good';
       els.feedback.textContent = state.lang==='sv' ? 'Din motståndare tar den sista stenen. Passagen är din!' : 'Your rival takes the last brick. The passage is yours!';
       setTimeout(onSuccess, 900);
@@ -1701,8 +1917,7 @@
       else if(state.visited.indexOf(i) !== -1) cls += ' done';
       row.className = cls;
       var label = t().chamber(i+1, TOTAL_ROOMS);
-      if(i === NIM_INDEX) label += ' — ' + nimName(state.lang);
-      if(i === MASTERMIND_INDEX) label += (state.lang==='sv' ? ' — Master Mind-rummet' : ' — The Master Mind Room');
+      if(isMinigameSlot(i) && state.visitedMinigameTypes[i]) label += ' — ' + minigameName(state.visitedMinigameTypes[i], state.lang);
       if(i === TOTAL_ROOMS-1) label += ' — ' + comboName(state.lang);
       row.innerHTML = '<span class="dot"></span><span>' + label + '</span>';
       els.mapTrack.appendChild(row);
@@ -1930,6 +2145,7 @@
 
   function resetGame(){
     state.room = 0; state.torches = MAX_TORCHES; state.visited = []; state.ended = false;
+    state.recentTopics = []; state.lastMinigameType = null; state.visitedMinigameTypes = {};
     els.endOverlay.classList.remove('show');
     renderTorches();
     loadRoom(0);
@@ -2038,9 +2254,12 @@
 
   function openRules(){
     var s = t();
+    var mgType = state.current && state.current.minigameType;
     var body = s.rulesBodyDrill;
-    if(state.room === NIM_INDEX) body = s.rulesBodyNim;
-    else if(state.room === MASTERMIND_INDEX) body = s.rulesBodyMastermind;
+    if(mgType==='nim') body = s.rulesBodyNim;
+    else if(mgType==='mastermind') body = s.rulesBodyMastermind;
+    else if(mgType==='guess') body = s.rulesBodyGuess;
+    else if(mgType==='tictactoe') body = s.rulesBodyTtt;
     else if(state.room === TOTAL_ROOMS-1) body = s.rulesBodyCombo;
     els.rulesBody.textContent = body;
     els.rulesOverlay.classList.add('show');
@@ -2158,6 +2377,14 @@
       applyStaticText();
       openSetup('initial');
     }
+  }
+
+  // Test-only hook: never active unless the page is loaded with ?debug=1,
+  // so ordinary play never sees it. Lets the Playwright suite jump straight
+  // to a room and read the real game state (which room, which mini-game,
+  // topic history) without having to solve arbitrary worksheets first.
+  if(/(?:^|[?&])debug=1(?:&|$)/.test(location.search)){
+    window.__debug = { state: state, loadRoom: loadRoom, isMinigameSlot: isMinigameSlot, minigameName: minigameName };
   }
 
   if(window.claude && window.claude.hot){
