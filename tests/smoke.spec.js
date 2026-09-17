@@ -51,6 +51,44 @@ test('the answer blank sits inline at the end of the current worksheet row', asy
   }
 });
 
+test('arrow keys navigate between not-yet-correct worksheet rows, and a wrong row can be revisited', async ({
+  page
+}) => {
+  await startGame(page);
+  const worksheet = page.locator('#worksheet');
+  if (!(await worksheet.isVisible())) return; // chamber 1 landed on a non-worksheet room this run
+
+  await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
+
+  // Down moves within the left column to the next not-yet-correct row,
+  // and leaves row 0 showing its "?" placeholder again, not an empty gap.
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#wsSlot-1 #answerInput')).toBeVisible();
+  await expect(page.locator('#wsSlot-0')).toHaveClass(/placeholder/);
+  await expect(page.locator('#wsSlot-0')).toHaveText('?');
+
+  await page.keyboard.press('ArrowUp');
+  await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
+
+  // Right hops across to the same row in the other column, Left hops back.
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#wsSlot-5 #answerInput')).toBeVisible();
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
+
+  // A wrong answer no longer locks the row out for the rest of the sheet —
+  // it hands off to another row, but row 0 stays revisitable afterward.
+  await page.fill('#answerInput', '999999999');
+  await page.click('#submitBtn');
+  await expect(page.locator('#wsSlot-0')).toHaveClass(/wrong/);
+  await page.waitForTimeout(800); // clears the 700ms hand-off delay
+  await expect(page.locator('#wsSlot-0 #answerInput')).toHaveCount(0);
+
+  await page.keyboard.press('ArrowUp'); // back up to row 0 from wherever the hand-off landed
+  await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
+  await expect(page.locator('#wsSlot-0')).not.toHaveClass(/wrong/);
+});
+
 test('the hint, rules and map panels open and close', async ({ page }) => {
   await startGame(page);
 
