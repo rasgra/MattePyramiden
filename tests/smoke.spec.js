@@ -76,6 +76,34 @@ test('switching to Swedish updates on-screen text', async ({ page }) => {
   await expect(page.locator('#levelGrid .level-pill').first()).toHaveText('Åk 1');
 });
 
+test('a sequential visual chamber (Geometry Vault / Coordinate Grid / Triangular Seal) plays through one step', async ({
+  page
+}) => {
+  await startGame(page);
+  const charges = page.locator('#trialCharges');
+  let tries = 0;
+  while (!(await charges.isVisible()) && tries < 60) {
+    await page.click('#resetBtn');
+    tries++;
+  }
+  if (!(await charges.isVisible())) return; // unlucky streak of worksheet-only rooms; nothing to assert
+
+  // The diagram lives on the shared canvas, which the parchment card overlays —
+  // this is exactly the layout that once let the parchment cut a diagram off,
+  // so the canvas must stay visible and reasonably tall alongside it.
+  const canvasBox = await page.locator('#scene').boundingBox();
+  expect(canvasBox.height).toBeGreaterThan(100);
+  await expect(page.locator('.trial-charge').first()).toBeVisible();
+  await expect(page.locator('#promptText')).not.toHaveText('');
+
+  await page.fill('#answerInput', '0');
+  await page.click('#submitBtn');
+  // Right or wrong (content is randomized), answering should register — either
+  // the tally moved, or (Nim/Mastermind-style rooms aside) the room's own
+  // feedback/prompt updated to the next step.
+  await expect(page.locator('#feedbackText')).not.toHaveText('');
+});
+
 test('opening settings mid-run can be cancelled without restarting', async ({ page }) => {
   await startGame(page);
   await page.click('#settingsBtn');

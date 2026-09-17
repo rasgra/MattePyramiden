@@ -734,27 +734,44 @@
       check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0.05); }
     },
     {
-      key:'angle', minLevel:5,
-      name:{sv:'Den Triangulära Stämpeln', en:'The Triangular Seal'}, accent:'#a89a2f',
-      build:function(_level){
-        var a = randInt(30,85);
-        var bMax = Math.max(21, 150-a-10);
-        var b = randInt(20, bMax);
-        return {a:a, b:b, ans: 180-a-b};
-      },
-      text:function(lang,v){
-        return lang==='sv' ? {
-          prompt:'En triangulär stämpel har vinklarna ' + v.a + '° och ' + v.b + '°. Vad är den tredje vinkeln, i grader?',
-          sub:'De tre vinklarna i en triangel summerar alltid till samma tal.',
-          hint:'En triangels vinklar summerar alltid till 180°, så den saknade vinkeln är 180 − ' + v.a + ' − ' + v.b + '.'
-        } : {
-          prompt:'A triangular seal has angles ' + v.a + '° and ' + v.b + '°. What is the third angle, in degrees?',
-          sub:'A triangle’s three angles always add to the same total.',
-          hint:'A triangle’s angles always sum to 180°, so the missing one is 180 − ' + v.a + ' − ' + v.b + '.'
+      key:'angle', minLevel:5, isTrial:true, accent:'#a89a2f', chargeIcon:'📐',
+      name:{sv:'Den Triangulära Stämpeln', en:'The Triangular Seal'},
+      buildSet:function(level, lang){
+        var items = [];
+        for(var i=0;i<6;i++){
+          var a = randInt(30,85);
+          var bMax = Math.max(21, 150-a-10);
+          var b = randInt(20, bMax);
+          var ans = 180-a-b;
+          items.push((function(a,b,ans){
+            var self = { revealed:false, wasCorrect:false };
+            self.prompt = lang==='sv'
+              ? 'En triangulär stämpel har vinklarna ' + a + '° och ' + b + '°. Vad är den tredje vinkeln, i grader?'
+              : 'A triangular seal has angles ' + a + '° and ' + b + '°. What is the third angle, in degrees?';
+            self.sub = lang==='sv'
+              ? 'De tre vinklarna i en triangel summerar alltid till 180°.'
+              : 'A triangle’s three angles always add up to 180°.';
+            self.hint = lang==='sv'
+              ? 'En triangels vinklar summerar alltid till 180°, så den saknade vinkeln är 180 − ' + a + ' − ' + b + '.'
+              : 'A triangle’s angles always sum to 180°, so the missing one is 180 − ' + a + ' − ' + b + '.';
+            self.draw = function(ctx,w,h,ti,safeH){ drawAngleTriangle(ctx,w,h,a,b,self.revealed,self.wasCorrect,safeH); };
+            self.check = function(s){
+              var ok = numEq(parseFloat(normAnswer(s)), ans, 0);
+              self.revealed = true; self.wasCorrect = ok;
+              return ok;
+            };
+            return self;
+          })(a,b,ans));
+        }
+        return {
+          name: lang==='sv' ? 'Den Triangulära Stämpeln' : 'The Triangular Seal',
+          sub: lang==='sv'
+            ? 'Varje triangel har tre vinklar som alltid summerar till 180°.'
+            : 'Every triangle’s three angles always add up to 180°.',
+          seconds: T(level, [200,190,170,150,130]),
+          items: items
         };
-      },
-      short:function(lang,v){ return v.a + '° + ' + v.b + '° + ? = 180°'; },
-      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+      }
     },
     {
       key:'equation', minLevel:5,
@@ -936,7 +953,7 @@
             prompt: lang==='sv' ? 'Vad kallas denna geometriska figur?' : 'What is this geometric shape called?',
             sub: '',
             hint: lang==='sv' ? 'Räkna hörn, kanter och sidoytor — jämför med ett föremål du känner igen.' : 'Count corners, edges and faces — compare it to an object you recognize.',
-            draw: function(ctx,w,h){ drawFramedShapes(ctx,w,h,[key]); },
+            draw: function(ctx,w,h,ti,safeH){ drawFramedShapes(ctx,w,h,[key],safeH); },
             check: function(s){ var n=normShape(s); return synonyms[key].some(function(alt){ return normShape(alt)===n; }); }
           };
         });
@@ -944,7 +961,7 @@
           prompt: lang==='sv' ? 'Hur många dimensioner har dessa figurer?' : 'How many dimensions do these shapes have?',
           sub: '',
           hint: lang==='sv' ? 'Dimensioner = antal riktningar figuren sträcker sig i (längd, bredd, höjd).' : 'Dimensions = the number of directions a shape extends in (length, width, height).',
-          draw: function(ctx,w,h){ drawFramedShapes(ctx,w,h,['cube','sphere','cylinder']); },
+          draw: function(ctx,w,h,ti,safeH){ drawFramedShapes(ctx,w,h,['cube','sphere','cylinder'],safeH); },
           check: function(s){ return parseFloat(normAnswer(s)) === 3; }
         });
         return {
@@ -972,7 +989,7 @@
               hint: lang==='sv'
                 ? 'Första talet är x (vågrätt), andra är y (lodrätt). Positivt går åt höger/uppåt, negativt åt vänster/nedåt.'
                 : 'The first number is x (horizontal), the second is y (vertical). Positive goes right/up, negative goes left/down.',
-              draw: function(ctx,w,h){ drawCoordGrid(ctx,w,h,range,this.markedPoint); },
+              draw: function(ctx,w,h,ti,safeH){ drawCoordGrid(ctx,w,h,range,this.markedPoint,safeH); },
               check: function(s){
                 var parts = String(s).replace(/[()]/g,'').split(/[,;\s]+/).filter(function(x){ return x!==''; }).map(Number);
                 var ok = parts.length===2 && parts[0]===tx && parts[1]===ty;
@@ -1659,8 +1676,8 @@
     ctx.stroke();
   }
 
-  function drawFramedShapes(ctx, w, h, keys){
-    var fx = w*0.18, fy = h*0.08, fw = w*0.64, fh = h*0.7;
+  function drawFramedShapes(ctx, w, h, keys, safeH){
+    var fx = w*0.18, fy = safeH*0.08, fw = w*0.64, fh = safeH*0.82;
     ctx.fillStyle = '#173a5e';
     ctx.fillRect(fx, fy, fw, fh);
     ctx.strokeStyle = '#f4f0e6';
@@ -1673,8 +1690,8 @@
   }
 
   // ---- Coordinate grid diagram (Coordinate room) ----
-  function drawCoordGrid(ctx, w, h, range, marked){
-    var fx = w*0.12, fy = h*0.06, fw = w*0.76, fh = h*0.8;
+  function drawCoordGrid(ctx, w, h, range, marked, safeH){
+    var fx = w*0.12, fy = safeH*0.06, fw = w*0.76, fh = safeH*0.88;
     ctx.fillStyle = '#0f2419';
     ctx.fillRect(fx, fy, fw, fh);
     var cx = fx + fw/2, cy = fy + fh/2;
@@ -1702,6 +1719,56 @@
     }
   }
 
+  // ---- Angle-sum triangle diagram (Triangular Seal room) ----
+  // Draws an actual triangle whose base angles are angA/angB (uniformly scaled
+  // to fit the frame, so the picture is genuinely to scale, not just a stand-in).
+  function drawAngleTriangle(ctx, w, h, angA, angB, revealed, correct, safeH){
+    var fx = w*0.14, fy = safeH*0.08, fw = w*0.72, fh = safeH*0.84;
+    ctx.fillStyle = '#241a10';
+    ctx.fillRect(fx, fy, fw, fh);
+
+    var rad = Math.PI/180;
+    var tanA = Math.tan(angA*rad), tanB = Math.tan(angB*rad);
+    var xUnit = tanB/(tanA+tanB); // base = 1 unit
+    var yUnit = xUnit*tanA;
+    var scale = Math.min((fw*0.72)/1, (fh*0.72)/yUnit);
+    var base = scale, apexX = xUnit*scale, apexY = yUnit*scale;
+
+    var A = { x: fx + (fw-base)/2, y: fy + fh*0.82 };
+    var B = { x: A.x + base, y: A.y };
+    var C = { x: A.x + apexX, y: A.y - apexY };
+
+    ctx.fillStyle = 'rgba(217,154,61,0.16)';
+    ctx.strokeStyle = '#f4d9a0';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(C.x, C.y); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    ctx.font = '600 ' + Math.round(h*0.048) + 'px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f6c766';
+    ctx.fillText(angA + '°', A.x + (C.x>A.x?26:-26), A.y - 16);
+    ctx.fillText(angB + '°', B.x + (C.x<B.x?26:-26), B.y - 16);
+
+    ctx.fillStyle = revealed ? (correct ? '#5fd97a' : '#e0664a') : '#eae0c8';
+    ctx.font = '700 ' + Math.round(h*0.052) + 'px "IBM Plex Mono", monospace';
+    ctx.fillText(revealed ? (180-angA-angB) + '°' : '?', C.x, C.y + 24);
+  }
+
+  // The parchment card overlays the bottom of the canvas, and its height
+  // depends on the current room's prompt/sub/hint text — so trial-room
+  // diagrams (which share the canvas) need to know how much of it is
+  // actually still visible above the card, not just assume all of it is.
+  function visibleCanvasHeight(){
+    var canvasRect = canvas.getBoundingClientRect();
+    if(canvasRect.height <= 0) return canvas.height * 0.45;
+    var parchRect = els.parchment.getBoundingClientRect();
+    var frac = (parchRect.top - canvasRect.top) / canvasRect.height;
+    if(!isFinite(frac) || frac < 0.15) frac = 0.45;
+    return canvas.height * Math.min(frac, 0.95);
+  }
+
   function drawScene(){
     var w = canvas.width, h = canvas.height;
     var ti = (performance.now() - animStart) / 1000;
@@ -1709,7 +1776,7 @@
 
     if(state.set && state.set.isTrial && !state.set.finalized){
       var item = state.set.items[state.set.idx];
-      if(item && item.draw){ item.draw(ctx, w, h, ti); return; }
+      if(item && item.draw){ item.draw(ctx, w, h, ti, visibleCanvasHeight()); return; }
     }
 
     var bg = ctx.createLinearGradient(0,0,0,h);
