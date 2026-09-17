@@ -28,18 +28,26 @@ test('skipping the intro drops you into chamber 1', async ({ page }) => {
   await expect(page.locator('#roomIndexLabel')).toContainText('CHAMBER 1 / 12');
 });
 
-test('answering a worksheet question marks the row and updates the tally', async ({ page }) => {
+test('the answer blank sits inline at the end of the current worksheet row', async ({ page }) => {
   await startGame(page);
   const worksheet = page.locator('#worksheet');
   // Not every chamber is a worksheet room (Nim/Mastermind/Treasury Door aren't) —
   // this test only asserts the worksheet interaction when chamber 1 happens to be one.
   if (await worksheet.isVisible()) {
+    // "X + Y = __" — the blank itself is the shared #answerInput, relocated into
+    // the row's own slot, not a separate field below the sheet.
+    await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
+    await expect(page.locator('#answerRow')).toBeHidden();
+
     await page.fill('#answerInput', '0');
     await page.click('#submitBtn');
     // The answer itself may be right or wrong (problems are randomized) — only
-    // assert that the row left its unanswered "placeholder" state either way.
+    // assert that the row left its unanswered "placeholder" state either way,
+    // and that the blank moved on to the next row rather than vanishing.
     await expect(page.locator('#wsSlot-0')).not.toHaveClass(/placeholder/);
+    await expect(page.locator('#wsSlot-0 #answerInput')).toHaveCount(0);
     await expect(page.locator('#setTallyLabel')).toHaveText(/^Correct: [01]$/);
+    await expect(page.locator('#wsSlot-1 #answerInput')).toBeVisible();
   }
 });
 

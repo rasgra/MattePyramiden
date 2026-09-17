@@ -110,14 +110,14 @@
   }
   .ws-col{ display:flex; flex-direction:column; gap:1px; }
   .ws-row{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
     font-family:'IBM Plex Mono',monospace; font-size:.92rem; padding:4px 6px; border-radius:4px;
   }
   .ws-row.current{ background:rgba(43,32,19,.08); box-shadow:inset 3px 0 0 var(--room-accent); }
   .ws-num{ white-space:nowrap; }
   .ws-slot{
     font-weight:700; min-width:30px; text-align:right; font-variant-numeric:tabular-nums;
-    display:inline-flex; align-items:baseline; gap:6px; justify-content:flex-end;
+    display:inline-flex; align-items:center; gap:4px; justify-content:flex-end;
   }
   .ws-slot.placeholder{ color:var(--lapis-dim); opacity:.7; }
   .ws-slot.correct{ color:#2e6b3e; }
@@ -144,11 +144,17 @@
   .trial-charge.lit{ opacity:1; filter:none; }
   .trial-charge.spent{ opacity:.5; filter:grayscale(1) brightness(.6); }
   .answer-row{ display:flex; gap:8px; flex-wrap:wrap; }
-  .answer-row input{
-    flex:1 1 160px; min-width:0; font-family:'IBM Plex Mono',monospace; font-size:1rem;
+  /* #answerInput's base look holds regardless of which container it's currently
+     living in — it relocates into the worksheet's blank at the end of each line
+     (like a fill-in-the-blank), and back into .answer-row for non-worksheet rooms. */
+  #answerInput{
+    font-family:'IBM Plex Mono',monospace; font-size:1rem;
     padding:9px 10px; border-radius:6px; border:1px solid #a68c5c; background:#f7efdc; color:#2b2013;
   }
-  .answer-row input:focus{ outline:2px solid var(--lapis); outline-offset:1px; }
+  #answerInput:focus{ outline:2px solid var(--lapis); outline-offset:1px; }
+  .answer-row #answerInput{ flex:1 1 160px; min-width:0; }
+  .ws-slot #answerInput{ width:4.5em; min-width:0; padding:3px 5px; font-size:.92rem; border-radius:4px; }
+  .ws-slot #submitBtn{ padding:3px 9px; font-size:.7rem; border-radius:4px; }
   .btn{
     font-family:'Manrope',sans-serif; font-weight:700; font-size:.88rem; border:none; border-radius:6px;
     padding:9px 16px; cursor:pointer; color:var(--basalt);
@@ -1213,6 +1219,12 @@
     els.setContinueBtn.style.display = 'none';
     els.mmHistory.style.display = 'none';
     els.mmHistory.innerHTML = '';
+    // #answerInput/#submitBtn may currently be parked inline in a worksheet row
+    // from the last room — insertBefore moves a node from wherever it already
+    // is, so this always restores their normal home-row order before anything
+    // else (a fresh renderWorksheet() included) touches the DOM around them.
+    els.answerRow.insertBefore(els.input, els.answerRow.firstChild);
+    els.answerRow.insertBefore(els.submitBtn, els.setContinueBtn);
     els.levelBadge.textContent = t().levelNames[state.level-1];
     els.roomIndexLabel.textContent = t().chamber(index+1, TOTAL_ROOMS);
     els.input.value = '';
@@ -1263,6 +1275,7 @@
         els.trialCharges.style.display = 'none';
         els.prompt.style.display = 'none';
         els.sub.style.display = 'none';
+        els.answerRow.style.display = 'none'; // the blank lives inline at the end of the current row instead
         els.wsTip.textContent = state.set.topicSub || '';
         renderWorksheet();
       }
@@ -1340,6 +1353,15 @@
       renderTrialCharges();
     } else {
       updateRowHighlight();
+      // Drop the answer + submit control right into the blank at the end of
+      // the current line — "X + Y = __" gets its __ filled in in place.
+      var slot = document.getElementById('wsSlot-' + set.idx);
+      if(slot){
+        slot.innerHTML = '';
+        slot.className = 'ws-slot';
+        slot.appendChild(els.input);
+        slot.appendChild(els.submitBtn);
+      }
     }
     setTimeout(function(){ els.input.focus(); }, 30);
   }
@@ -1359,6 +1381,11 @@
     } else {
       var slot = document.getElementById('wsSlot-' + idx);
       if(slot){
+        // Pull the shared input/button back out before wiping the slot's
+        // markup — they're about to be re-homed in the next row (or in
+        // .answer-row, once the sheet is finalized), never destroyed.
+        els.input.remove();
+        els.submitBtn.remove();
         slot.innerHTML = '';
         var valSpan = document.createElement('span');
         valSpan.textContent = val.trim();
@@ -1398,6 +1425,7 @@
     els.input.disabled = true;
     els.input.style.display = 'none';
     els.submitBtn.style.display = 'none';
+    els.answerRow.style.display = ''; // holds #setContinueBtn — worksheet mode hides this row during play
     els.setContinueBtn.style.display = '';
     els.feedback.textContent = '';
     els.prompt.style.display = '';
