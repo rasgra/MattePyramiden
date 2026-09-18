@@ -1628,7 +1628,7 @@
         els.answerRow.style.display = '';
         setTimeout(function(){ els.input.focus(); }, 50);
       }
-      els.mmHistory.style.display = (mgType==='mastermind' || mgType==='guess') ? '' : 'none';
+      els.mmHistory.style.display = (mgType==='mastermind' || mgType==='guess') ? 'block' : 'none';
       if(!opts.skipTimer) startTimer(seconds);
     } else {
       els.answerRow.style.display = '';

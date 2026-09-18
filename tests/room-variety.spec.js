@@ -108,13 +108,46 @@ test('minesweeper: clicking a mummy burns a torch and sends you back a chamber',
   await expect(page.locator('.torch-icon.out')).toHaveCount(1);
 });
 
-test('the guessing room gives too-high/too-low feedback', async ({ page }) => {
+test('the guessing room gives too-high/too-low feedback, visible in a growing history', async ({ page }) => {
+  // Regression test: #mmHistory's stylesheet rule is `display:none` by
+  // default, so the old `els.mmHistory.style.display = ''` reset never
+  // actually revealed it — it just cleared the inline override and fell
+  // straight back to the CSS default. Guesses were recorded correctly but
+  // the whole history (and so every guess's too-high/too-low answer)
+  // stayed invisible. Must be an explicit 'block', not ''.
   await startWithDebug(page);
   test.skip(!(await landOnMinigame(page, 'guess')), 'the guessing room did not come up in the sample of attempts');
 
+  const history = page.locator('#mmHistory');
+  await expect(history).toBeVisible();
+
   await page.fill('#answerInput', '1');
   await page.click('#submitBtn');
-  await expect(page.locator('.mm-row').first()).toContainText(/too low|correct!/);
+  await expect(history.locator('.mm-row')).toHaveCount(1);
+  await expect(history.locator('.mm-row').first()).toBeVisible();
+  await expect(history.locator('.mm-row').first()).toContainText(/too low|correct!/);
+
+  await page.fill('#answerInput', '2');
+  await page.click('#submitBtn');
+  // Earlier guesses stay in the history rather than being replaced.
+  await expect(history.locator('.mm-row')).toHaveCount(2);
+  await expect(history.locator('.mm-row').first()).toContainText('Guess 1');
+  await expect(history.locator('.mm-row').nth(1)).toContainText('Guess 2');
+});
+
+test('mastermind guesses are also visible in a growing history', async ({ page }) => {
+  // Same #mmHistory element and bug as the guessing room above.
+  await startWithDebug(page);
+  test.skip(!(await landOnMinigame(page, 'mastermind')), 'mastermind did not come up in the sample of attempts');
+
+  const history = page.locator('#mmHistory');
+  await expect(history).toBeVisible();
+
+  await page.fill('#answerInput', '012');
+  await page.click('#submitBtn');
+  await expect(history.locator('.mm-row')).toHaveCount(1);
+  await expect(history.locator('.mm-row').first()).toBeVisible();
+  await expect(history.locator('.mm-row').first()).toContainText(/exact/);
 });
 
 test('the worksheet still answers correctly right after a Nim/Minesweeper chamber', async ({ page }) => {
