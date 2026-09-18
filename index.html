@@ -208,19 +208,47 @@
   /* ---------- Generic full-stage overlays ---------- */
   .overlay{
     display:none; position:absolute; inset:16px; background:rgba(10,7,4,.96);
-    border-radius:10px; border:1px solid rgba(138,106,52,.5); padding:20px; z-index:8; overflow:auto;
+    border-radius:10px; border:1px solid rgba(138,106,52,.5); padding:20px; z-index:8;
+    overflow:auto;
   }
+  /* Overlays with an .overlay-body wrapper (rules, map) scroll only that
+     inner region, so the header and Close button never scroll out of
+     reach. Overlays without one (setup, intro, end) fall back to scrolling
+     the whole box via the overflow:auto above. */
   .overlay.show{ display:flex; flex-direction:column; }
-  .overlay h3{ color:var(--torch-bright); margin-bottom:4px; font-size:1.15rem; }
-  .overlay .overlay-sub{ color:var(--papyrus-dim); font-size:.85rem; margin-bottom:16px; }
+  .overlay h3{ color:var(--torch-bright); margin-bottom:4px; font-size:1.15rem; flex:none; }
+  .overlay .overlay-sub{ color:var(--papyrus-dim); font-size:.85rem; margin-bottom:16px; flex:none; }
+  .overlay-body{ flex:1 1 auto; min-height:0; overflow:auto; }
+  .overlay-close{ margin-top:16px; align-self:flex-start; flex:none; }
+  .overlay-x{
+    position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%;
+    border:1px solid rgba(138,106,52,.5); background:var(--wall-2); color:var(--papyrus);
+    font-size:1.1rem; line-height:1; cursor:pointer;
+  }
+  .overlay-x:hover{ border-color:var(--torch); color:var(--torch-bright); }
 
   /* Map */
-  .map-track{ display:flex; flex-direction:column; gap:6px; }
-  .map-room{ display:flex; align-items:center; gap:10px; font-size:.82rem; padding:6px 8px; border-radius:6px; color:var(--papyrus-dim); }
-  .map-room.done{ color:var(--lapis); }
-  .map-room.current{ color:var(--torch-bright); background:rgba(217,154,61,.1); }
-  .map-room .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; flex:none; }
-  .overlay-close{ margin-top:16px; align-self:flex-start; }
+  .pyramid-map{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px 0 14px; }
+  .pyramid-row{ display:flex; gap:6px; }
+  .map-node{
+    position:relative; width:44px; height:38px; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:700;
+    background:linear-gradient(180deg, var(--wall-2), var(--wall)); color:var(--papyrus-dim);
+    border:1px solid rgba(138,106,52,.4); border-radius:4px;
+  }
+  .map-node.current{
+    background:linear-gradient(180deg, var(--torch-bright), var(--torch)); color:var(--basalt);
+    border-color:transparent; box-shadow:0 0 10px rgba(217,154,61,.6);
+  }
+  .map-node.done{ background:linear-gradient(180deg, #4a92b6, #3a6f8a); color:#eaf4f9; border-color:transparent; }
+  .map-node .badge{ position:absolute; top:-8px; right:-8px; font-size:.8rem; }
+  .map-legend{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:.76rem; color:var(--papyrus-dim); }
+  .map-swatch{
+    display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px;
+    background:linear-gradient(180deg, var(--wall-2), var(--wall)); border:1px solid rgba(138,106,52,.4);
+  }
+  .map-swatch.current{ background:linear-gradient(180deg, var(--torch-bright), var(--torch)); border-color:transparent; }
+  .map-swatch.done{ background:linear-gradient(180deg, #4a92b6, #3a6f8a); border-color:transparent; }
 
   /* Setup */
   .field-label{ font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gilt); margin:14px 0 8px; }
@@ -339,14 +367,26 @@
     </div>
 
     <div class="overlay" id="rulesOverlay">
+      <button class="overlay-x" id="rulesXBtn" aria-label="Close" type="button">×</button>
       <h3 id="rulesTitle">Room rules</h3>
-      <p class="overlay-sub" id="rulesBody" style="margin-bottom:0;">Solve all 10 problems…</p>
+      <div class="overlay-body">
+        <p class="overlay-sub" id="rulesBody" style="margin-bottom:0;">Solve all 10 problems…</p>
+      </div>
       <button class="btn secondary overlay-close" id="rulesCloseBtn">Close</button>
     </div>
 
     <div class="overlay" id="mapOverlay">
-      <h3 id="mapTitle">Passage map</h3>
-      <div class="map-track" id="mapTrack"></div>
+      <button class="overlay-x" id="mapXBtn" aria-label="Close" type="button">×</button>
+      <h3 id="mapTitle">The pyramid</h3>
+      <p class="overlay-sub" id="mapSub">Chamber 1 is at the top; the treasury waits at the base.</p>
+      <div class="overlay-body">
+        <div class="pyramid-map" id="mapTrack"></div>
+        <div class="map-legend" id="mapLegend">
+          <span><i class="map-swatch current"></i><span id="mapLegendHere">Here now</span></span>
+          <span><i class="map-swatch done"></i><span id="mapLegendCleared">Cleared</span></span>
+          <span><i class="map-swatch"></i><span id="mapLegendAhead">Ahead</span></span>
+        </div>
+      </div>
       <button class="btn secondary overlay-close" id="mapCloseBtn">Close</button>
     </div>
 
@@ -511,7 +551,9 @@
       hint:'Ledtråd', map:'Karta', save:'Spara', load:'Hämta', settings:'Inställningar', restart:'Börja om',
       soundOnLabel:'Ljud', soundOffLabel:'Ljud av',
       answerBtn:'Svara', answerPlaceholder:'Ditt svar', continueBtn:'Fortsätt',
-      mapTitle:'Karta över gångarna',
+      mapTitle:'Pyramiden',
+      mapSub:'Kammare 1 ligger högst upp, skattkammaren väntar vid basen.',
+      mapLegendHere:'Här nu', mapLegendCleared:'Klarad', mapLegendAhead:'Framför dig',
       correct:'Rätt!',
       wrongAnswer:'Fel.',
       wordCorrect:'Rätt', wordWrong:'Fel',
@@ -558,7 +600,9 @@
       hint:'Hint', map:'Map', save:'Save', load:'Load', settings:'Settings', restart:'Restart',
       soundOnLabel:'Sound', soundOffLabel:'Muted',
       answerBtn:'Answer', answerPlaceholder:'Your answer', continueBtn:'Continue',
-      mapTitle:'Passage map',
+      mapTitle:'The Pyramid',
+      mapSub:'Chamber 1 sits at the top; the treasury waits at the base.',
+      mapLegendHere:'Here now', mapLegendCleared:'Cleared', mapLegendAhead:'Ahead',
       correct:'Correct!',
       wrongAnswer:'Not quite.',
       wordCorrect:'Correct', wordWrong:'Wrong',
@@ -1322,8 +1366,9 @@
   ['eyebrowText','subtitleText','footerText','levelBadge','roomIndexLabel','roomNameLabel','torchRow','timerLabel',
    'promptText','subPromptText','answerInput','submitBtn','feedbackText','hintText','hintBtn','mapBtn',
    'wsTip','worksheet','wsColLeft','wsColRight','tallyRow','setTallyLabel','setContinueBtn','mmHistory','trialCharges',
-   'mapOverlay','mapTrack','mapCloseBtn','mapTitle','saveBtn','loadBtn','settingsBtn','resetBtn','soundBtn','soundIcon','lblSound',
-   'rulesBtn','rulesOverlay','rulesTitle','rulesBody','rulesCloseBtn','lblRules',
+   'mapOverlay','mapTrack','mapCloseBtn','mapXBtn','mapTitle','mapSub','mapLegendHere','mapLegendCleared','mapLegendAhead',
+   'saveBtn','loadBtn','settingsBtn','resetBtn','soundBtn','soundIcon','lblSound',
+   'rulesBtn','rulesOverlay','rulesTitle','rulesBody','rulesCloseBtn','rulesXBtn','lblRules',
    'setupOverlay','setupTitle','setupSub','langLabel','langSv','langEn','levelLabel','levelGrid',
    'setupPrimaryBtn','setupCancelBtn','introOverlay','introBeatText','introLetter','introLetterText','introLetterSig','introDots','introSkipBtn','introNextBtn',
    'endOverlay','endTitle','endBody','restartBtn','parchment','lblHint','lblMap','lblSave','lblLoad','lblSettings','lblRestart'
@@ -1968,20 +2013,46 @@
   }
 
   // ---------------- Map ----------------
+  // Row sizes from the apex down, summing to TOTAL_ROOMS — never narrower
+  // than the row above, so the layout itself reads as a pyramid silhouette.
+  var MAP_ROWS = [1, 2, 3, 3, 3];
   function renderMap(){
     els.mapTrack.innerHTML = '';
-    for(var i=0;i<TOTAL_ROOMS;i++){
-      var row = document.createElement('div');
-      var cls = 'map-room';
-      if(i === state.room) cls += ' current';
-      else if(state.visited.indexOf(i) !== -1) cls += ' done';
-      row.className = cls;
-      var label = t().chamber(i+1, TOTAL_ROOMS);
-      if(isMinigameSlot(i) && state.visitedMinigameTypes[i]) label += ' — ' + minigameName(state.visitedMinigameTypes[i], state.lang);
-      if(i === TOTAL_ROOMS-1) label += ' — ' + comboName(state.lang);
-      row.innerHTML = '<span class="dot"></span><span>' + label + '</span>';
-      els.mapTrack.appendChild(row);
+    var i = 0;
+    MAP_ROWS.forEach(function(count){
+      var rowEl = document.createElement('div');
+      rowEl.className = 'pyramid-row';
+      for(var c=0; c<count && i<TOTAL_ROOMS; c++, i++){
+        rowEl.appendChild(buildMapNode(i));
+      }
+      els.mapTrack.appendChild(rowEl);
+    });
+  }
+  function buildMapNode(i){
+    var node = document.createElement('div');
+    var cls = 'map-node';
+    if(i === state.room) cls += ' current';
+    else if(state.visited.indexOf(i) !== -1) cls += ' done';
+    node.className = cls;
+    node.textContent = i+1;
+
+    var titleText = t().chamber(i+1, TOTAL_ROOMS);
+    var badgeIcon = null;
+    if(i === TOTAL_ROOMS-1){
+      titleText += ' — ' + comboName(state.lang);
+      badgeIcon = '🏺';
+    } else if(isMinigameSlot(i) && state.visitedMinigameTypes[i]){
+      titleText += ' — ' + minigameName(state.visitedMinigameTypes[i], state.lang);
+      badgeIcon = '🎲';
     }
+    node.title = titleText;
+    if(badgeIcon){
+      var badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = badgeIcon;
+      node.appendChild(badge);
+    }
+    return node;
   }
 
   // ================= Canvas scene =================
@@ -2230,6 +2301,10 @@
     els.submitBtn.textContent = s.answerBtn;
     els.input.placeholder = s.answerPlaceholder;
     els.mapTitle.textContent = s.mapTitle;
+    els.mapSub.textContent = s.mapSub;
+    els.mapLegendHere.textContent = s.mapLegendHere;
+    els.mapLegendCleared.textContent = s.mapLegendCleared;
+    els.mapLegendAhead.textContent = s.mapLegendAhead;
     els.mapCloseBtn.textContent = (s===STR.sv) ? 'Stäng' : 'Close';
     els.rulesCloseBtn.textContent = (s===STR.sv) ? 'Stäng' : 'Close';
     els.langLabel.textContent = s.langLabel;
@@ -2326,15 +2401,23 @@
     els.rulesBody.textContent = body;
     els.rulesOverlay.classList.add('show');
   }
+  function closeRules(){ els.rulesOverlay.classList.remove('show'); }
+  function toggleRules(){ els.rulesOverlay.classList.contains('show') ? closeRules() : openRules(); }
+
+  function openMap(){ renderMap(); els.mapOverlay.classList.add('show'); }
+  function closeMap(){ els.mapOverlay.classList.remove('show'); }
+  function toggleMap(){ els.mapOverlay.classList.contains('show') ? closeMap() : openMap(); }
 
   // ================= Wiring =================
   els.submitBtn.addEventListener('click', checkAnswer);
   els.input.addEventListener('keydown', function(e){ if(e.key==='Enter') checkAnswer(); });
   els.hintBtn.addEventListener('click', function(){ els.hint.classList.toggle('show'); });
-  els.rulesBtn.addEventListener('click', openRules);
-  els.rulesCloseBtn.addEventListener('click', function(){ els.rulesOverlay.classList.remove('show'); });
-  els.mapBtn.addEventListener('click', function(){ renderMap(); els.mapOverlay.classList.add('show'); });
-  els.mapCloseBtn.addEventListener('click', function(){ els.mapOverlay.classList.remove('show'); });
+  els.rulesBtn.addEventListener('click', toggleRules);
+  els.rulesCloseBtn.addEventListener('click', closeRules);
+  els.rulesXBtn.addEventListener('click', closeRules);
+  els.mapBtn.addEventListener('click', toggleMap);
+  els.mapCloseBtn.addEventListener('click', closeMap);
+  els.mapXBtn.addEventListener('click', closeMap);
   els.restartBtn.addEventListener('click', function(){ els.endOverlay.classList.remove('show'); resetGame(); });
   els.resetBtn.addEventListener('click', resetGame);
 
@@ -2401,6 +2484,11 @@
     var tag = (e.target && e.target.tagName) || '';
     if(els.setupOverlay.classList.contains('show') || els.introOverlay.classList.contains('show')) return;
     if(e.key==='Enter' && els.setContinueBtn.style.display !== 'none'){ els.setContinueBtn.click(); return; }
+    if(e.key==='Escape'){
+      if(els.mapOverlay.classList.contains('show')) closeMap();
+      if(els.rulesOverlay.classList.contains('show')) closeRules();
+      return;
+    }
 
     if(e.key==='ArrowUp' || e.key==='ArrowDown' || e.key==='ArrowLeft' || e.key==='ArrowRight'){
       // Up/Down have no native meaning in a single-line input, so they're
@@ -2419,8 +2507,8 @@
 
     if(tag === 'INPUT') return;
     if(e.key==='h' || e.key==='H') els.hint.classList.toggle('show');
-    if(e.key==='r' || e.key==='R') openRules();
-    if(e.key==='m' || e.key==='M'){ renderMap(); els.mapOverlay.classList.add('show'); }
+    if(e.key==='r' || e.key==='R') toggleRules();
+    if(e.key==='m' || e.key==='M') toggleMap();
     if(e.key==='s' || e.key==='S') els.saveBtn.click();
     if(e.key==='l' || e.key==='L') els.loadBtn.click();
   });

@@ -102,9 +102,36 @@ test('the hint, rules and map panels open and close', async ({ page }) => {
 
   await page.click('#mapBtn');
   await expect(page.locator('#mapOverlay')).toBeVisible();
-  await expect(page.locator('#mapTrack .map-room')).toHaveCount(12);
+  await expect(page.locator('#mapTrack .map-node')).toHaveCount(12);
   await page.click('#mapCloseBtn');
   await expect(page.locator('#mapOverlay')).toBeHidden();
+});
+
+test('the map opens/closes via the corner X, Escape, and the M-key toggle — and never traps the player', async ({
+  page
+}) => {
+  await startGame(page);
+
+  // Corner close button.
+  await page.click('#mapBtn');
+  await expect(page.locator('#mapOverlay')).toBeVisible();
+  await page.click('#mapXBtn');
+  await expect(page.locator('#mapOverlay')).toBeHidden();
+
+  // Escape key.
+  await page.click('#mapBtn');
+  await expect(page.locator('#mapOverlay')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#mapOverlay')).toBeHidden();
+
+  // M toggles it open, then closed again, without getting stuck.
+  await page.keyboard.press('m');
+  await expect(page.locator('#mapOverlay')).toBeVisible();
+  await page.keyboard.press('m');
+  await expect(page.locator('#mapOverlay')).toBeHidden();
+
+  // With the map closed, the game underneath is interactive again.
+  await expect(page.locator('#roomIndexLabel')).toContainText('CHAMBER 1 / 12');
 });
 
 test('switching to Swedish updates on-screen text', async ({ page }) => {
