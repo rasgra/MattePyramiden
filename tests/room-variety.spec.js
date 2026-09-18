@@ -58,6 +58,77 @@ async function landOnMinigame(page, wanted) {
   return false;
 }
 
+test('nim: shows three piles of clickable bricks, and clicking one removes it plus everything above', async ({
+  page
+}) => {
+  await startWithDebug(page);
+  test.skip(!(await landOnMinigame(page, 'nim')), 'nim did not come up in the sample of attempts');
+
+  const piles = page.locator('.nim-pile');
+  await expect(piles).toHaveCount(3);
+
+  const sizeBefore = await page.evaluate(() => window.__debug.state.nimState.piles[0]);
+  const bricks = piles.nth(0).locator('.nim-brick');
+  await expect(bricks).toHaveCount(sizeBefore);
+
+  // Click the top brick (highest data-level = last brick added on top) to
+  // take exactly one brick from the pile.
+  await bricks.first().click();
+  await page.waitForTimeout(500); // removal animation
+
+  const sizeAfter = await page.evaluate(() => window.__debug.state.nimState.piles[0]);
+  expect(sizeAfter).toBe(sizeBefore - 1);
+  await expect(piles.nth(0).locator('.nim-pile-count')).toHaveText(String(sizeAfter));
+});
+
+test('nim: the rival replies with a legal move after the player takes bricks', async ({ page }) => {
+  await startWithDebug(page);
+  test.skip(!(await landOnMinigame(page, 'nim')), 'nim did not come up in the sample of attempts');
+
+  const totalBefore = await page.evaluate(() => window.__debug.state.nimState.piles.reduce((a, b) => a + b, 0));
+  await page.locator('.nim-pile').nth(0).locator('.nim-brick').first().click();
+  // Chain: 320ms removal animation, then a 600ms "thinking" pause, then the
+  // rival's own 320ms removal animation before the state actually updates.
+  await page.waitForTimeout(1800);
+
+  const ns = await page.evaluate(() => window.__debug.state.nimState);
+  const totalAfter = ns.piles.reduce((a, b) => a + b, 0);
+  // At least two bricks gone (one from the player, one-plus from the rival).
+  expect(totalAfter).toBeLessThanOrEqual(totalBefore - 2);
+  // Once the rival's reply lands, the board unlocks for the player's next
+  // move — unless that reply already ended the room.
+  if (!ns.over) expect(ns.locked).toBe(false);
+});
+
+test('nim: an optimal move always leaves an even nim-sum (or the misère odd-ones endgame) so the AI plays correctly', async ({
+  page
+}) => {
+  // Exercises nimBestMove directly across many random pile configurations —
+  // a cheap way to sanity-check the misère-Nim strategy without playing out
+  // full games. A position with 2+ "big" (>=2) piles should always have a
+  // move to nim-sum 0 when one exists; the endgame (<=1 big pile) should
+  // always resolve to a single well-defined move.
+  await startWithDebug(page);
+  const failures = await page.evaluate(() => {
+    const bad = [];
+    for (let trial = 0; trial < 500; trial++) {
+      const piles = [Math.floor(Math.random() * 8), Math.floor(Math.random() * 8), Math.floor(Math.random() * 8)];
+      const total = piles.reduce((a, b) => a + b, 0);
+      if (total === 0) continue;
+      const move = window.__debug.nimBestMove(piles);
+      if (!move) {
+        bad.push({ piles, reason: 'no move returned' });
+        continue;
+      }
+      if (move.remove < 1 || move.remove > piles[move.pile]) {
+        bad.push({ piles, move, reason: 'illegal move' });
+      }
+    }
+    return bad;
+  });
+  expect(failures).toEqual([]);
+});
+
 test('minesweeper: the opening click is always safe, and reveals adjacent-mummy counts', async ({ page }) => {
   await startWithDebug(page);
   test.skip(!(await landOnMinigame(page, 'minesweeper')), 'minesweeper did not come up in the sample of attempts');

@@ -197,6 +197,22 @@
   .ms-cell.n6{ color:#1c8a7c; }
   .ms-cell.n7{ color:#2b2013; }
   .ms-cell.n8{ color:#5c4a2c; }
+  .nim-piles{ display:flex; gap:22px; margin-top:10px; align-items:flex-end; justify-content:center; flex-wrap:wrap; }
+  .nim-pile{ display:flex; flex-direction:column; align-items:center; }
+  .nim-bricks{ display:flex; flex-direction:column; gap:3px; }
+  .nim-pile-count{
+    margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:.85rem; font-weight:700; color:#5c4a2c;
+  }
+  .nim-brick{
+    width:64px; height:16px; border-radius:3px; cursor:pointer;
+    background:linear-gradient(180deg, #b5502f, #8a3620);
+    border:1px solid rgba(43,32,19,.4);
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.15), inset 0 2px 0 rgba(255,255,255,.2);
+    transition: transform .3s ease, opacity .3s ease, background .15s ease;
+  }
+  .nim-brick:not(.disabled):hover, .nim-brick.preview{ background:linear-gradient(180deg, #e08a54, #b5502f); }
+  .nim-brick.removing{ transform:scale(.3) rotate(14deg); opacity:0; }
+  .nim-brick.disabled{ cursor:default; }
   .trial-charges{ display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
   .trial-charge{ font-size:1.3rem; opacity:.25; filter:grayscale(1); transition:opacity .2s, filter .2s; }
   .trial-charge.lit{ opacity:1; filter:none; }
@@ -626,7 +642,7 @@
       wordCorrect:'Rätt', wordWrong:'Fel',
       rulesBtn:'Regler', rulesTitle:'Rumsregler',
       rulesBodyDrill:'Lös alla 10 uppgifterna — för att klättra uppåt krävs alla rätt. Svarar du fel får du en ny chans senare: använd piltangenterna för att hoppa till en annan olöst uppgift, eller tillbaka till en du missade. Facklan ovanför mäter tiden för hela arbetsbladet — tar den slut innan allt är rätt slocknar en fackla och du ramlar ned ett rum.',
-      rulesBodyNim:'Ta 1–3 tegelstenar i din tur. Den som tvingas ta den sista stenen förlorar. Besegra din motståndare för att komma vidare; förlorar du slocknar en fackla.',
+      rulesBodyNim:'Tre murar av tegelstenar. På din tur väljer du EN mur och tar valfritt antal stenar från den — klicka på en tegelsten för att ta den och alla ovanför. Den som tvingas ta den allra sista stenen förlorar. Besegra din motståndare för att komma vidare; förlorar du slocknar en fackla.',
       rulesBodyCombo:'En gåta, en chans. Svara rätt för att öppna valvet. Ett felaktigt svar kostar en fackla och skickar dig tillbaka ett rum.',
       rulesBodyMastermind:'Tre hemliga siffror (0–9, kan upprepas) väntar på att knäckas. Efter varje gissning får du veta hur många siffror som satt helt rätt, och hur många som fanns med men på fel plats. Du har 15 gissningar — tar de slut utan att du knäcker koden slocknar en fackla.',
       rulesBodyGuess:'Ett hemligt tal väntar på att gissas. Efter varje gissning får du veta om talet du sökte är högre eller lägre. Du har 10 gissningar — halvera intervallet varje gång för att hitta det snabbast. Tar gissningarna slut slocknar en fackla.',
@@ -677,7 +693,7 @@
       wordCorrect:'Correct', wordWrong:'Wrong',
       rulesBtn:'Rules', rulesTitle:'Room rules',
       rulesBodyDrill:'Solve all 10 problems — climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed. The torch above times the whole worksheet — if it runs out before everything is correct, a torch burns out and you fall back a chamber.',
-      rulesBodyNim:'Take 1–3 bricks on your turn. Whoever is forced to take the last brick loses. Beat your rival to move on; lose, and a torch burns out.',
+      rulesBodyNim:'Three walls of bricks. On your turn, choose ONE wall and take any number of bricks from it — click a brick to take it and every one above it. Whoever is forced to take the very last brick loses. Beat your rival to move on; lose, and a torch burns out.',
       rulesBodyCombo:'One riddle, one chance. Answer correctly to open the vault. A wrong answer costs a torch and sends you back a chamber.',
       rulesBodyMastermind:'Three secret digits (0–9, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses — run out without cracking it and a torch burns out.',
       rulesBodyGuess:'A secret number is waiting to be guessed. After each guess you learn whether the number you want is higher or lower. You have 10 guesses — halve the remaining range each time to find it fastest. Run out of guesses and a torch burns out.',
@@ -1226,7 +1242,7 @@
 
   var MINIGAME_SLOTS = [4, 9];      // 0-indexed — chambers 5 and 10 are always a mini-game
   var MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'minesweeper'];
-  var MINIGAME_SECONDS = { nim:60, mastermind:240, guess:240, minesweeper:280 };
+  var MINIGAME_SECONDS = { nim:120, mastermind:240, guess:240, minesweeper:280 };
   // Each room kind gets its own accent color and small icon (shown on the
   // parchment's top edge and next to the room name) purely so chambers read
   // as visually distinct at a glance — a plain worksheet still looks like a
@@ -1341,19 +1357,64 @@
     };
   }
 
+  var NIM_PILE_COUNT = 3;
   function buildNimRoom(level, lang){
-    var range = T(level, [[6,9],[9,13],[12,17],[14,20],[20,30]]);
-    var heap = randInt(range[0], range[1]);
-    state.nimState = { heap: heap, over:false };
+    var range = T(level, [[2,4],[3,5],[3,6],[4,7],[5,8]]);
+    var piles = [];
+    for(var i=0;i<NIM_PILE_COUNT;i++) piles.push(randInt(range[0], range[1]));
+    state.nimState = {
+      piles: piles, over:false, locked:false,
+      mistakeChance: T(level, [0.5,0.35,0.2,0.08,0])
+    };
     return {
       name: nimName(lang),
       prompt: lang==='sv'
-        ? 'En mur av ' + heap + ' lösa tegelstenar blockerar passagen. Turas om att ta 1–3 stenar. Den som tvingas ta den SISTA stenen måste hitta en annan väg runt — försök tvinga din motståndare att ta den.'
-        : 'A wall of ' + heap + ' loose bricks blocks the passage. Take turns removing 1–3 bricks. Whoever takes the LAST brick must find another way around — try to force your rival to take it.',
-      sub: lang==='sv' ? 'Klicka på ett tal nedan för att ta så många stenar.' : 'Click a number below to take that many bricks.',
-      hint: lang==='sv' ? 'Försök lämna din motståndare en multipel av 4 stenar. Om du alltid kan det vinner du.' : 'Try to leave your opponent a multiple of 4 bricks. If you always can, you win.',
+        ? 'Tre murar av lösa tegelstenar blockerar passagen. På din tur tar du valfritt antal stenar från EN av murarna. Den som tvingas ta den allra SISTA stenen måste hitta en annan väg runt.'
+        : 'Three walls of loose bricks block the passage. On your turn, take any number of bricks from ONE wall. Whoever is forced to take the very LAST brick must find another way around.',
+      sub: lang==='sv' ? 'Klicka på en tegelsten för att ta den och alla stenar ovanför den.' : 'Click a brick to take it and every brick stacked above it.',
+      hint: lang==='sv'
+        ? 'Titta på alla tre murarna tillsammans, inte bara en i taget — försök lämna din motståndare utan ett säkert drag.'
+        : 'Look at all three walls together, not just one at a time — try to leave your rival with no safe move.',
       check: function(){ return false; }
     };
+  }
+  // Optimal misère-Nim move: normal nim-sum strategy while two or more
+  // piles hold 2+ bricks; once at most one pile does, switch to leaving an
+  // ODD number of single-brick piles for the opponent (the standard
+  // misère-play endgame adjustment) — since whoever takes the last brick
+  // loses, not wins.
+  function nimBestMove(piles){
+    var bigPiles = [];
+    for(var i=0;i<piles.length;i++) if(piles[i]>=2) bigPiles.push(i);
+
+    if(bigPiles.length >= 2){
+      var nimSum = piles.reduce(function(a,b){ return a^b; }, 0);
+      if(nimSum !== 0){
+        for(var j=0;j<piles.length;j++){
+          var target = piles[j] ^ nimSum;
+          if(target < piles[j]) return { pile:j, remove: piles[j]-target };
+        }
+      }
+      var maxIdx = piles.indexOf(Math.max.apply(null, piles));
+      return { pile:maxIdx, remove:1 };
+    }
+
+    if(bigPiles.length === 1){
+      var bIdx = bigPiles[0];
+      var ones = 0;
+      for(var k=0;k<piles.length;k++) if(k!==bIdx && piles[k]===1) ones++;
+      return (ones % 2 === 0)
+        ? { pile:bIdx, remove: piles[bIdx]-1 }   // leave the big pile at 1
+        : { pile:bIdx, remove: piles[bIdx] };    // clear the big pile entirely
+    }
+
+    var oneIdx = piles.findIndex(function(p){ return p===1; });
+    return oneIdx===-1 ? null : { pile:oneIdx, remove:1 };
+  }
+  function nimRandomMove(piles){
+    var options = [];
+    for(var p=0;p<piles.length;p++) for(var r=1;r<=piles[p];r++) options.push({pile:p, remove:r});
+    return pick(options);
   }
 
   var MM_CODE_LEN = 3;
@@ -1623,7 +1684,7 @@
         els.answerRow.style.display = 'none';
         customControlsEl = mgType==='nim' ? renderNimControls() : renderMsGrid();
         els.parchment.appendChild(customControlsEl);
-        if(mgType==='minesweeper') renderMsBoard();
+        if(mgType==='nim') renderNimBoard(); else renderMsBoard();
       } else {
         els.answerRow.style.display = '';
         setTimeout(function(){ els.input.focus(); }, 50);
@@ -2167,54 +2228,112 @@
   }
 
   // ---------------- Nim controls ----------------
+  // Each pile is a vertical stack of clickable bricks, numbered 1 (bottom)
+  // to size (top) in `data-level`. Clicking a brick takes it and every
+  // brick above it — the classic "cut point" way to pick both a pile and a
+  // count in one gesture — with a brief pop-and-fade animation standing in
+  // for physically pulling bricks out of the wall.
   function renderNimControls(){
     var wrap = document.createElement('div');
-    wrap.style.display = 'flex'; wrap.style.gap = '8px'; wrap.style.marginTop = '4px';
-    [1,2,3].forEach(function(n){
-      var b = document.createElement('button');
-      b.className = 'btn secondary';
-      b.textContent = (state.lang==='sv' ? 'Ta ' : 'Take ') + n;
-      b.onclick = function(){ nimPlayerMove(n); };
-      wrap.appendChild(b);
-    });
+    wrap.className = 'nim-piles';
+    for(var p=0; p<NIM_PILE_COUNT; p++){
+      var col = document.createElement('div');
+      col.className = 'nim-pile';
+      var bricks = document.createElement('div');
+      bricks.className = 'nim-bricks';
+      col.appendChild(bricks);
+      var count = document.createElement('div');
+      count.className = 'nim-pile-count';
+      col.appendChild(count);
+      wrap.appendChild(col);
+    }
     return wrap;
   }
-  function nimPlayerMove(n){
+  function renderNimBoard(){
     var ns = state.nimState;
-    if(!ns || ns.over) return;
-    n = Math.min(n, ns.heap);
-    ns.heap -= n;
-    if(ns.heap <= 0){
-      ns.over = true;
-      if(customControlsEl){ customControlsEl.remove(); customControlsEl = null; }
-      els.feedback.className='feedback bad';
-      els.feedback.textContent = state.lang==='sv'
-        ? 'Du tog den sista stenen — muren rasar på din sida! En fackla slocknar.'
-        : 'You took the last brick — the wall collapses on your side! A torch burns out.';
-      setTimeout(function(){ onFail(els.feedback.textContent); }, 1000);
-      return;
+    if(!customControlsEl || !ns) return;
+    var cols = customControlsEl.querySelectorAll('.nim-pile');
+    for(var p=0; p<cols.length; p++){
+      var size = ns.piles[p];
+      var bricksEl = cols[p].querySelector('.nim-bricks');
+      bricksEl.innerHTML = '';
+      for(var level=size; level>=1; level--){
+        var brick = document.createElement('div');
+        brick.className = 'nim-brick';
+        brick.dataset.level = level;
+        if(ns.over || ns.locked){
+          brick.classList.add('disabled');
+        } else {
+          brick.addEventListener('click', (function(pile,lvl){ return function(){ nimPlayerMove(pile,lvl); }; })(p, level));
+          brick.addEventListener('mouseenter', (function(pile,lvl){ return function(){ nimPreview(pile,lvl,true); }; })(p, level));
+          brick.addEventListener('mouseleave', (function(pile,lvl){ return function(){ nimPreview(pile,lvl,false); }; })(p, level));
+        }
+        bricksEl.appendChild(brick);
+      }
+      cols[p].querySelector('.nim-pile-count').textContent = size;
     }
-    els.sub.textContent = ns.heap + (state.lang==='sv' ? ' stenar kvar.' : ' bricks remain.');
-    drawScene();
-    setTimeout(nimComputerMove, 500);
+  }
+  function nimPreview(pile, level, on){
+    var ns = state.nimState;
+    if(!customControlsEl || !ns || ns.over || ns.locked) return;
+    var bricksEl = customControlsEl.querySelectorAll('.nim-pile')[pile].querySelector('.nim-bricks');
+    var kids = bricksEl.children;
+    for(var i=0;i<kids.length;i++){
+      kids[i].classList.toggle('preview', on && parseInt(kids[i].dataset.level,10) >= level);
+    }
+  }
+  function nimAnimateRemoval(pile, count, done){
+    if(!customControlsEl){ done(); return; }
+    var bricksEl = customControlsEl.querySelectorAll('.nim-pile')[pile].querySelector('.nim-bricks');
+    var kids = Array.prototype.slice.call(bricksEl.children, 0, count); // top `count` bricks are the first DOM children
+    kids.forEach(function(el){ el.classList.remove('preview'); el.classList.add('removing'); });
+    setTimeout(done, 320);
+  }
+  function nimPlayerMove(pile, level){
+    var ns = state.nimState;
+    if(!ns || ns.over || ns.locked) return;
+    var removeCount = ns.piles[pile] - (level - 1);
+    if(removeCount <= 0) return;
+    ns.locked = true;
+    nimAnimateRemoval(pile, removeCount, function(){
+      ns.piles[pile] = level - 1;
+      renderNimBoard();
+      if(ns.piles.reduce(function(a,b){ return a+b; }, 0) === 0){
+        ns.over = true;
+        finishNimRoom(false);
+        return;
+      }
+      els.sub.textContent = state.lang==='sv' ? 'Motståndaren funderar …' : 'Your rival is thinking…';
+      setTimeout(nimComputerMove, 600);
+    });
   }
   function nimComputerMove(){
     var ns = state.nimState;
     if(!ns || ns.over) return;
-    var take = ns.heap % 4;
-    if(take === 0) take = randInt(1,3);
-    take = Math.min(take, ns.heap);
-    ns.heap -= take;
-    if(ns.heap <= 0){
-      ns.over = true;
-      if(customControlsEl){ customControlsEl.remove(); customControlsEl = null; }
-      els.feedback.className='feedback good';
-      els.feedback.textContent = state.lang==='sv' ? 'Din motståndare tar den sista stenen. Passagen är din!' : 'Your rival takes the last brick. The passage is yours!';
-      setTimeout(onSuccess, 900);
-      return;
-    }
-    els.sub.textContent = (state.lang==='sv' ? 'Motståndaren tar ' : 'Your rival takes ') + take + '. ' + ns.heap + (state.lang==='sv' ? ' stenar kvar.' : ' bricks remain.');
-    drawScene();
+    var move = (Math.random() < ns.mistakeChance) ? nimRandomMove(ns.piles) : nimBestMove(ns.piles);
+    if(!move) return;
+    ns.locked = true;
+    nimAnimateRemoval(move.pile, move.remove, function(){
+      ns.piles[move.pile] -= move.remove;
+      if(ns.piles.reduce(function(a,b){ return a+b; }, 0) === 0){
+        ns.over = true;
+        renderNimBoard();
+        finishNimRoom(true);
+        return;
+      }
+      ns.locked = false;
+      renderNimBoard();
+      els.sub.textContent = state.lang==='sv' ? 'Din tur — klicka på en tegelsten.' : 'Your turn — click a brick.';
+    });
+  }
+  function finishNimRoom(passed){
+    if(customControlsEl){ customControlsEl.remove(); customControlsEl = null; }
+    var msg = passed
+      ? (state.lang==='sv' ? 'Din motståndare tar den sista stenen. Passagen är din!' : 'Your rival takes the last brick. The passage is yours!')
+      : (state.lang==='sv' ? 'Du tog den sista stenen — muren rasar på din sida! En fackla slocknar.' : 'You took the last brick — the wall collapses on your side! A torch burns out.');
+    els.feedback.className = 'feedback ' + (passed ? 'good' : 'bad');
+    els.feedback.textContent = msg;
+    setTimeout(function(){ if(passed) onSuccess(); else onFail(msg); }, passed ? 900 : 1000);
   }
 
   // ---------------- Map ----------------
@@ -2757,7 +2876,8 @@
   if(/(?:^|[?&])debug=1(?:&|$)/.test(location.search)){
     window.__debug = {
       state: state, loadRoom: loadRoom, isMinigameSlot: isMinigameSlot, minigameName: minigameName,
-      onSuccess: onSuccess, advanceRoom: advanceRoom
+      onSuccess: onSuccess, advanceRoom: advanceRoom,
+      nimPlayerMove: nimPlayerMove, nimBestMove: nimBestMove
     };
   }
 
