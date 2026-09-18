@@ -139,16 +139,36 @@
   .mm-row .mm-code{ font-weight:700; letter-spacing:.15em; }
   .mm-row .mm-score{ color:#5c4a2c; white-space:nowrap; }
   .mm-row.win .mm-score{ color:#2e6b3e; font-weight:700; }
-  .ttt-grid{ display:grid; grid-template-columns:repeat(3, 56px); grid-template-rows:repeat(3, 56px); gap:6px; margin-top:6px; }
-  .ttt-cell{
-    font-family:'Cinzel',serif; font-weight:700; font-size:1.7rem; line-height:1;
-    border-radius:6px; border:1px solid rgba(43,32,19,.3); background:rgba(43,32,19,.06);
-    color:#2b2013; cursor:pointer; padding:0;
+  .ms-wrap{ margin-top:6px; }
+  .ms-toolbar{ display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+  .ms-counter{
+    font-family:'IBM Plex Mono',monospace; font-size:.85rem; font-weight:700;
+    background:rgba(43,32,19,.08); border-radius:6px; padding:3px 8px;
   }
-  .ttt-cell:not(:disabled):hover{ background:rgba(74,146,182,.18); }
-  .ttt-cell:disabled{ cursor:default; }
-  .ttt-cell.x{ color:var(--lapis-dim); }
-  .ttt-cell.o{ color:#8a2f1c; }
+  .ms-flag-btn.active{ background:var(--torch); color:#2b2013; border-color:transparent; }
+  .ms-grid{
+    display:grid; grid-template-columns:repeat(10, 1fr); gap:2px;
+    width:100%; max-width:320px;
+  }
+  .ms-cell{
+    aspect-ratio:1; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:.72rem;
+    line-height:1; border-radius:3px; border:1px solid rgba(43,32,19,.3);
+    background:linear-gradient(180deg, rgba(255,255,255,.5), rgba(43,32,19,.1));
+    color:#2b2013; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;
+  }
+  .ms-cell:not(:disabled):hover{ background:rgba(74,146,182,.18); }
+  .ms-cell:disabled{ cursor:default; }
+  .ms-cell.revealed{ background:rgba(43,32,19,.06); border-color:rgba(43,32,19,.18); }
+  .ms-cell.mine{ background:rgba(138,40,20,.25); border-color:rgba(138,40,20,.4); }
+  .ms-cell.flagged{ font-size:.85rem; }
+  .ms-cell.n1{ color:var(--lapis-dim); }
+  .ms-cell.n2{ color:#2e6b3e; }
+  .ms-cell.n3{ color:#8a2f1c; }
+  .ms-cell.n4{ color:#5c2f8a; }
+  .ms-cell.n5{ color:#8a5c1c; }
+  .ms-cell.n6{ color:#1c8a7c; }
+  .ms-cell.n7{ color:#2b2013; }
+  .ms-cell.n8{ color:#5c4a2c; }
   .trial-charges{ display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
   .trial-charge{ font-size:1.3rem; opacity:.25; filter:grayscale(1); transition:opacity .2s, filter .2s; }
   .trial-charge.lit{ opacity:1; filter:none; }
@@ -563,7 +583,7 @@
       rulesBodyCombo:'En gåta, en chans. Svara rätt för att öppna valvet. Ett felaktigt svar kostar en fackla och skickar dig tillbaka ett rum.',
       rulesBodyMastermind:'Tre hemliga siffror (0–9, kan upprepas) väntar på att knäckas. Efter varje gissning får du veta hur många siffror som satt helt rätt, och hur många som fanns med men på fel plats. Du har 15 gissningar — tar de slut utan att du knäcker koden slocknar en fackla.',
       rulesBodyGuess:'Ett hemligt tal väntar på att gissas. Efter varje gissning får du veta om talet du sökte är högre eller lägre. Du har 10 gissningar — halvera intervallet varje gång för att hitta det snabbast. Tar gissningarna slut slocknar en fackla.',
-      rulesBodyTtt:'Tre-i-rad mot väktaren. Du är X och sätter första draget; klicka på en ruta för att spela. Vinner du eller blir det oavgjort öppnas vägen — förlorar du slocknar en fackla.',
+      rulesBodyMinesweeper:'Ett 10×10-fält döljer sovande mumier. Klicka på en ruta för att avslöja den — siffran visar hur många mumier som gömmer sig i rutorna runt omkring. Klarar du hela fältet utan att väcka en mumie öppnas vägen; klickar du på en mumie slocknar en fackla. Högerklicka (eller slå på flaggläge) för att märka ut rutor du misstänker.',
       setQuestion: function(n,total){ return 'Uppgift ' + n + ' / ' + total; },
       setTally: function(n){ return 'Antal rätt: ' + n; },
       setPerfect:'Alla rätt — vägen öppnas!',
@@ -612,7 +632,7 @@
       rulesBodyCombo:'One riddle, one chance. Answer correctly to open the vault. A wrong answer costs a torch and sends you back a chamber.',
       rulesBodyMastermind:'Three secret digits (0–9, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses — run out without cracking it and a torch burns out.',
       rulesBodyGuess:'A secret number is waiting to be guessed. After each guess you learn whether the number you want is higher or lower. You have 10 guesses — halve the remaining range each time to find it fastest. Run out of guesses and a torch burns out.',
-      rulesBodyTtt:'Tic-tac-toe against the guardian. You’re X and move first — click a square to play. Win or draw and the way opens; lose and a torch burns out.',
+      rulesBodyMinesweeper:'A 10×10 field hides sleeping mummies. Click a tile to reveal it — the number shows how many mummies lurk in the tiles around it. Clear the whole field without waking a mummy and the way opens; click a mummy and a torch burns out. Right-click (or switch on flag mode) to mark tiles you suspect.',
       setQuestion: function(n,total){ return 'Question ' + n + ' / ' + total; },
       setTally: function(n){ return 'Correct: ' + n; },
       setPerfect:'Flawless — the way opens!',
@@ -1122,8 +1142,8 @@
   ];
 
   var MINIGAME_SLOTS = [4, 9];      // 0-indexed — chambers 5 and 10 are always a mini-game
-  var MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'tictactoe'];
-  var MINIGAME_SECONDS = { nim:60, mastermind:240, guess:240, tictactoe:150 };
+  var MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'minesweeper'];
+  var MINIGAME_SECONDS = { nim:60, mastermind:240, guess:240, minesweeper:280 };
   var TOTAL_ROOMS = 12;
   var MAX_TORCHES = 3;
   var ROOM_SECONDS = 60;    // fallback single-shot timer
@@ -1138,7 +1158,7 @@
     if(mgType==='nim') return nimName(lang);
     if(mgType==='mastermind') return lang==='sv' ? 'Master Mind-rummet' : 'The Master Mind Room';
     if(mgType==='guess') return lang==='sv' ? 'Gissa-rummet' : 'The Guessing Room';
-    if(mgType==='tictactoe') return lang==='sv' ? 'Tre-i-rad-rummet' : 'The Tic-Tac-Toe Room';
+    if(mgType==='minesweeper') return lang==='sv' ? 'Mumiefältet' : 'The Mummy Field';
     return '';
   }
 
@@ -1292,46 +1312,72 @@
     };
   }
 
-  // ---- Tic-tac-toe (minimax, with a per-difficulty chance of a deliberate
-  // slip so younger grades get a real shot at an outright win rather than
-  // only ever managing a draw against flawless play). ----
-  var TTT_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  function tttWinner(board){
-    for(var i=0;i<TTT_LINES.length;i++){
-      var l = TTT_LINES[i];
-      if(board[l[0]] && board[l[0]]===board[l[1]] && board[l[1]]===board[l[2]]) return board[l[0]];
+  // ---- Minesweeper, reskinned as sleeping mummies on a 10x10 field. The
+  // mine layout is generated lazily on the first reveal, excluding that
+  // tile and its neighbors, so the opening click can never be an instant
+  // loss. ----
+  var MS_SIZE = 10;
+  function msNeighbors(i, size){
+    var r = Math.floor(i/size), c = i%size, out = [];
+    for(var dr=-1; dr<=1; dr++){
+      for(var dc=-1; dc<=1; dc++){
+        if(dr===0 && dc===0) continue;
+        var nr = r+dr, nc = c+dc;
+        if(nr>=0 && nr<size && nc>=0 && nc<size) out.push(nr*size+nc);
+      }
     }
-    return null;
+    return out;
   }
-  function tttEmpties(board){
-    var out = []; for(var i=0;i<9;i++) if(!board[i]) out.push(i); return out;
+  function msPlaceMines(ms, safeIndex){
+    var safe = [safeIndex].concat(msNeighbors(safeIndex, ms.size));
+    var pool = [];
+    for(var i=0;i<ms.total;i++) if(safe.indexOf(i)===-1) pool.push(i);
+    for(var i=pool.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+    }
+    ms.mines = new Array(ms.total).fill(false);
+    pool.slice(0, ms.mummyCount).forEach(function(idx){ ms.mines[idx] = true; });
+    ms.counts = new Array(ms.total).fill(0);
+    for(var k=0;k<ms.total;k++){
+      if(ms.mines[k]) continue;
+      ms.counts[k] = msNeighbors(k, ms.size).filter(function(j){ return ms.mines[j]; }).length;
+    }
   }
-  function tttBest(board, mark){
-    var winner = tttWinner(board);
-    if(winner==='O') return {score:1};
-    if(winner==='X') return {score:-1};
-    var empties = tttEmpties(board);
-    if(empties.length===0) return {score:0};
-    var moves = empties.map(function(i){
-      var b2 = board.slice(); b2[i] = mark;
-      return {index:i, score: tttBest(b2, mark==='O'?'X':'O').score};
-    });
-    var target = mark==='O' ? Math.max.apply(null, moves.map(function(m){return m.score;}))
-                             : Math.min.apply(null, moves.map(function(m){return m.score;}));
-    return pick(moves.filter(function(m){ return m.score===target; }));
+  function msReveal(i){
+    var ms = state.msState;
+    if(ms.revealed[i] || ms.flagged[i]) return;
+    ms.revealed[i] = true;
+    if(ms.mines[i]) return;
+    if(ms.counts[i]===0) msNeighbors(i, ms.size).forEach(function(j){ if(!ms.revealed[j]) msReveal(j); });
+  }
+  function msCheckWin(){
+    var ms = state.msState;
+    for(var i=0;i<ms.total;i++) if(!ms.mines[i] && !ms.revealed[i]) return false;
+    return true;
   }
 
-  function buildTicTacToeRoom(level, lang){
-    state.tttState = { board:new Array(9).fill(null), over:false, mistakeChance: T(level, [0.5,0.35,0.2,0.08,0]) };
+  function buildMinesweeperRoom(level, lang){
+    var size = MS_SIZE;
+    var mummyCount = T(level, [8,10,13,16,18]);
+    state.msState = {
+      size: size, total: size*size, mummyCount: mummyCount,
+      mines: null, counts: null,
+      revealed: new Array(size*size).fill(false),
+      flagged: new Array(size*size).fill(false),
+      flagMode: false, over: false
+    };
     return {
-      name: minigameName('tictactoe', lang),
+      name: minigameName('minesweeper', lang),
       prompt: lang==='sv'
-        ? 'Spela tre-i-rad mot väktaren. Du är X och börjar. Vinst eller oavgjort tar dig vidare.'
-        : 'Play tic-tac-toe against the guardian. You’re X and go first. A win or a draw gets you through.',
-      sub: lang==='sv' ? 'Klicka på en ruta för att placera ditt X.' : 'Click a square to place your X.',
+        ? 'Ett fält på 10×10 rutor döljer sovande mumier. Avslöja alla rutor utan mumie för att ta dig vidare.'
+        : 'A 10×10 field hides sleeping mummies. Reveal every tile without one to move on.',
+      sub: lang==='sv'
+        ? 'Klicka för att avslöja en ruta; siffran visar mumier i rutorna runt om.'
+        : 'Click to reveal a tile; the number counts mummies in the tiles around it.',
       hint: lang==='sv'
-        ? 'Ta mitten om du kan, och titta alltid efter en rad där motståndaren har två i rad — blockera den!'
-        : 'Take the center if you can, and always check for a row where your opponent has two in a row — block it!',
+        ? 'Slå på flaggläge för att märka ut rutor du misstänker gömmer en mumie, så klickar du inte fel av misstag.'
+        : 'Switch on flag mode to mark tiles you suspect hide a mummy, so you don’t click them by accident.',
       check: function(){ return false; }
     };
   }
@@ -1349,7 +1395,7 @@
     nimState: null,
     mmState: null,
     guessState: null,
-    tttState: null,
+    msState: null,
     set: null,
     ended: false,
     resolved: false,
@@ -1466,7 +1512,7 @@
         if(mgType==='nim') state.current = buildNimRoom(state.level, state.lang);
         else if(mgType==='mastermind') state.current = buildMastermindRoom(state.level, state.lang);
         else if(mgType==='guess') state.current = buildGuessRoom(state.level, state.lang);
-        else state.current = buildTicTacToeRoom(state.level, state.lang);
+        else state.current = buildMinesweeperRoom(state.level, state.lang);
         seconds = MINIGAME_SECONDS[mgType];
       } else {
         state.current = buildComboRoom(state.level, state.lang);
@@ -1478,12 +1524,12 @@
       els.prompt.textContent = state.current.prompt;
       els.sub.textContent = state.current.sub || '';
 
-      var usesCustomControls = mgType==='nim' || mgType==='tictactoe';
+      var usesCustomControls = mgType==='nim' || mgType==='minesweeper';
       if(usesCustomControls){
         els.answerRow.style.display = 'none';
-        customControlsEl = mgType==='nim' ? renderNimControls() : renderTttGrid();
+        customControlsEl = mgType==='nim' ? renderNimControls() : renderMsGrid();
         els.parchment.appendChild(customControlsEl);
-        if(mgType==='tictactoe') renderTttBoard();
+        if(mgType==='minesweeper') renderMsBoard();
       } else {
         els.answerRow.style.display = '';
         setTimeout(function(){ els.input.focus(); }, 50);
@@ -1809,7 +1855,7 @@
   function checkAnswer(){
     var val = els.input.value;
     var mgType = state.current && state.current.minigameType;
-    if(mgType==='nim' || mgType==='tictactoe') return; // played via their own on-screen controls
+    if(mgType==='nim' || mgType==='minesweeper') return; // played via their own on-screen controls
     if(state.set){
       if(val.trim() === '') return;
       checkAnswerForSet(val);
@@ -1909,53 +1955,95 @@
     }
   }
 
-  // ---------------- Tic-tac-toe controls ----------------
-  function renderTttGrid(){
+  // ---------------- Minesweeper controls ----------------
+  function renderMsGrid(){
+    var ms = state.msState;
     var wrap = document.createElement('div');
-    wrap.className = 'ttt-grid';
-    for(var i=0;i<9;i++){
+    wrap.className = 'ms-wrap';
+    var toolbar = document.createElement('div');
+    toolbar.className = 'ms-toolbar';
+    var counter = document.createElement('span');
+    counter.className = 'ms-counter';
+    var flagBtn = document.createElement('button');
+    flagBtn.type = 'button';
+    flagBtn.className = 'btn secondary ms-flag-btn';
+    flagBtn.onclick = function(){ ms.flagMode = !ms.flagMode; renderMsBoard(); };
+    toolbar.appendChild(counter);
+    toolbar.appendChild(flagBtn);
+    wrap.appendChild(toolbar);
+    var grid = document.createElement('div');
+    grid.className = 'ms-grid';
+    for(var i=0;i<ms.total;i++){
       var cell = document.createElement('button');
       cell.type = 'button';
-      cell.className = 'ttt-cell';
-      cell.onclick = (function(idx){ return function(){ tttPlayerMove(idx); }; })(i);
-      wrap.appendChild(cell);
+      cell.className = 'ms-cell';
+      cell.onclick = (function(idx){ return function(){ msCellClick(idx); }; })(i);
+      cell.oncontextmenu = (function(idx){ return function(e){ e.preventDefault(); msToggleFlag(idx); }; })(i);
+      grid.appendChild(cell);
     }
+    wrap.appendChild(grid);
     return wrap;
   }
-  function renderTttBoard(){
-    var tt = state.tttState;
-    if(!customControlsEl || !tt) return;
-    var cells = customControlsEl.querySelectorAll('.ttt-cell');
+  function renderMsBoard(){
+    var ms = state.msState;
+    if(!customControlsEl || !ms) return;
+    var remaining = ms.mummyCount - ms.flagged.filter(Boolean).length;
+    customControlsEl.querySelector('.ms-counter').textContent = '🧟 ' + remaining;
+    var flagBtn = customControlsEl.querySelector('.ms-flag-btn');
+    flagBtn.textContent = ms.flagMode
+      ? (state.lang==='sv' ? 'Flaggläge: på' : 'Flag mode: on')
+      : (state.lang==='sv' ? 'Flaggläge: av' : 'Flag mode: off');
+    flagBtn.classList.toggle('active', ms.flagMode);
+    var cells = customControlsEl.querySelectorAll('.ms-cell');
     for(var i=0;i<cells.length;i++){
-      var mark = tt.board[i];
-      cells[i].textContent = mark || '';
-      cells[i].className = 'ttt-cell' + (mark==='X' ? ' x' : mark==='O' ? ' o' : '');
-      cells[i].disabled = !!mark || tt.over;
+      var cell = cells[i];
+      var isMine = ms.mines && ms.mines[i];
+      cell.className = 'ms-cell';
+      if(ms.over && isMine){
+        cell.classList.add('mine');
+        cell.textContent = '🧟';
+        cell.disabled = true;
+      } else if(ms.revealed[i]){
+        cell.classList.add('revealed');
+        var cnt = ms.counts[i];
+        cell.textContent = cnt>0 ? String(cnt) : '';
+        if(cnt>0) cell.classList.add('n'+cnt);
+        cell.disabled = true;
+      } else if(ms.flagged[i]){
+        cell.classList.add('flagged');
+        cell.textContent = '🚩';
+        cell.disabled = ms.over;
+      } else {
+        cell.textContent = '';
+        cell.disabled = ms.over;
+      }
     }
   }
-  function tttPlayerMove(i){
-    var tt = state.tttState;
-    if(!tt || tt.over || tt.board[i]) return;
-    tt.board[i] = 'X';
-    renderTttBoard();
-    if(tttWinner(tt.board)==='X'){ tttFinish(true, state.lang==='sv' ? 'Du vann! En dörr öppnas.' : 'You won! A door opens.'); return; }
-    if(tttEmpties(tt.board).length===0){ tttFinish(true, state.lang==='sv' ? 'Oavgjort — du tar dig vidare!' : 'A draw — through you go!'); return; }
-    setTimeout(tttComputerTurn, 450);
+  function msToggleFlag(i){
+    var ms = state.msState;
+    if(!ms || ms.over || ms.revealed[i]) return;
+    ms.flagged[i] = !ms.flagged[i];
+    renderMsBoard();
   }
-  function tttComputerTurn(){
-    var tt = state.tttState;
-    if(!tt || tt.over) return;
-    var empties = tttEmpties(tt.board);
-    var idx = Math.random() < tt.mistakeChance ? pick(empties) : tttBest(tt.board.slice(), 'O').index;
-    tt.board[idx] = 'O';
-    renderTttBoard();
-    if(tttWinner(tt.board)==='O'){ tttFinish(false, state.lang==='sv' ? 'Väktaren vann. En fackla slocknar.' : 'The guardian won. A torch burns out.'); return; }
-    if(tttEmpties(tt.board).length===0) tttFinish(true, state.lang==='sv' ? 'Oavgjort — du tar dig vidare!' : 'A draw — through you go!');
+  function msCellClick(i){
+    var ms = state.msState;
+    if(!ms || ms.over) return;
+    if(ms.flagMode){ msToggleFlag(i); return; }
+    if(ms.flagged[i] || ms.revealed[i]) return;
+    if(!ms.mines) msPlaceMines(ms, i);
+    msReveal(i);
+    var hitMine = ms.mines[i];
+    renderMsBoard();
+    if(hitMine){
+      msFinish(false, state.lang==='sv' ? 'Du väckte en mumie. En fackla slocknar.' : 'You woke a mummy. A torch burns out.');
+    } else if(msCheckWin()){
+      msFinish(true, state.lang==='sv' ? 'Fältet är säkrat! En dörr öppnas.' : 'The field is clear! A door opens.');
+    }
   }
-  function tttFinish(passed, message){
-    var tt = state.tttState;
-    tt.over = true;
-    renderTttBoard();
+  function msFinish(passed, message){
+    var ms = state.msState;
+    ms.over = true;
+    renderMsBoard();
     els.feedback.className = 'feedback ' + (passed ? 'good' : 'bad');
     els.feedback.textContent = message;
     setTimeout(function(){ if(passed) onSuccess(); else onFail(message); }, 900);
@@ -2396,7 +2484,7 @@
     if(mgType==='nim') body = s.rulesBodyNim;
     else if(mgType==='mastermind') body = s.rulesBodyMastermind;
     else if(mgType==='guess') body = s.rulesBodyGuess;
-    else if(mgType==='tictactoe') body = s.rulesBodyTtt;
+    else if(mgType==='minesweeper') body = s.rulesBodyMinesweeper;
     else if(state.room === TOTAL_ROOMS-1) body = s.rulesBodyCombo;
     els.rulesBody.textContent = body;
     els.rulesOverlay.classList.add('show');

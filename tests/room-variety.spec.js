@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test';
 // there. Ordinary play never loads with that query param, so the hook is
 // never present for real players.
 
-const MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'tictactoe'];
+const MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'minesweeper'];
 const MINIGAME_SLOTS = [4, 9]; // chambers 5 and 10
 const DRILL_SLOTS = [0, 1, 2, 3, 5, 6, 7, 8, 10]; // every other chamber before the finale (11)
 
@@ -50,17 +50,54 @@ async function landOnMinigame(page, wanted) {
   return false;
 }
 
-test('tic-tac-toe: clicking a cell places X and the guardian replies with O', async ({ page }) => {
+test('minesweeper: the opening click is always safe, and reveals adjacent-mummy counts', async ({ page }) => {
   await startWithDebug(page);
-  test.skip(!(await landOnMinigame(page, 'tictactoe')), 'tic-tac-toe did not come up in the sample of attempts');
+  test.skip(!(await landOnMinigame(page, 'minesweeper')), 'minesweeper did not come up in the sample of attempts');
 
-  const cells = page.locator('.ttt-cell');
-  await expect(cells).toHaveCount(9);
-  await cells.nth(4).click(); // center
-  await expect(cells.nth(4)).toHaveText('X');
-  await page.waitForTimeout(700); // the guardian's reply is deliberately delayed
-  const marks = await cells.allTextContents();
-  expect(marks.filter((m) => m === 'O').length).toBe(1);
+  const cells = page.locator('.ms-cell');
+  await expect(cells).toHaveCount(100);
+
+  // Mines are placed lazily, excluding the clicked tile and its neighbors,
+  // specifically so the first click can never be an instant loss.
+  await cells.nth(0).click();
+  await expect(cells.nth(0)).toHaveClass(/revealed/);
+  await expect(page.locator('.torch-icon.out')).toHaveCount(0);
+});
+
+test('minesweeper: flag mode marks a tile without revealing it, and the mummy counter updates', async ({ page }) => {
+  await startWithDebug(page);
+  test.skip(!(await landOnMinigame(page, 'minesweeper')), 'minesweeper did not come up in the sample of attempts');
+
+  const cells = page.locator('.ms-cell');
+  await cells.nth(0).click(); // seeds the mine layout
+  const mineIndex = await page.evaluate(() => window.__debug.state.msState.mines.findIndex((m) => m));
+
+  const counterBefore = await page.locator('.ms-counter').textContent();
+  await page.click('.ms-flag-btn');
+  await cells.nth(mineIndex).click();
+  await expect(cells.nth(mineIndex)).toHaveText('🚩');
+  const counterAfter = await page.locator('.ms-counter').textContent();
+  expect(counterAfter).not.toBe(counterBefore);
+
+  // Flagged tiles are protected from an accidental reveal even after
+  // switching flag mode back off.
+  await page.click('.ms-flag-btn');
+  await cells.nth(mineIndex).click();
+  await expect(cells.nth(mineIndex)).not.toHaveClass(/revealed/);
+});
+
+test('minesweeper: clicking a mummy burns a torch and sends you back a chamber', async ({ page }) => {
+  await startWithDebug(page);
+  test.skip(!(await landOnMinigame(page, 'minesweeper')), 'minesweeper did not come up in the sample of attempts');
+
+  const cells = page.locator('.ms-cell');
+  await cells.nth(0).click(); // seeds the mine layout, safely
+  const mineIndex = await page.evaluate(() => window.__debug.state.msState.mines.findIndex((m) => m));
+
+  await cells.nth(mineIndex).click();
+  await expect(page.locator('#feedbackText')).not.toHaveText('');
+  await page.waitForTimeout(1000); // onFail's hand-off delay
+  await expect(page.locator('.torch-icon.out')).toHaveCount(1);
 });
 
 test('the guessing room gives too-high/too-low feedback', async ({ page }) => {
@@ -72,16 +109,16 @@ test('the guessing room gives too-high/too-low feedback', async ({ page }) => {
   await expect(page.locator('.mm-row').first()).toContainText(/too low|correct!/);
 });
 
-test('the worksheet still answers correctly right after a Nim/Tic-Tac-Toe chamber', async ({ page }) => {
-  // Regression test: Nim and Tic-Tac-Toe are the two mini-game types whose
+test('the worksheet still answers correctly right after a Nim/Minesweeper chamber', async ({ page }) => {
+  // Regression test: Nim and Minesweeper are the two mini-game types whose
   // checkAnswer() short-circuits (they're played via their own on-screen
   // controls, not the shared input). state.current used to only ever be
   // *set* when entering one of those rooms, never cleared afterward — so
   // the next room, even a plain worksheet, would inherit its stale
   // minigameType and silently swallow every Enter press and Answer click.
   await startWithDebug(page);
-  const landed = (await landOnMinigame(page, 'nim')) || (await landOnMinigame(page, 'tictactoe'));
-  test.skip(!landed, 'neither Nim nor tic-tac-toe came up in the sample of attempts');
+  const landed = (await landOnMinigame(page, 'nim')) || (await landOnMinigame(page, 'minesweeper'));
+  test.skip(!landed, 'neither Nim nor minesweeper came up in the sample of attempts');
 
   const roomAfter = MINIGAME_SLOTS[0] + 1;
   await page.evaluate((idx) => window.__debug.loadRoom(idx, { skipTimer: true }), roomAfter);

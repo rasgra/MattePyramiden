@@ -23,11 +23,10 @@ _Pyramid Reckoning_:
   a canvas-driven engine), drawn as a two-column worksheet of 10 problems.
   The same topic never runs in back-to-back-ish chambers (no repeats within
   the last 4). Chambers 5 and 10 are always one of four mini-games — Nim,
-  Mastermind, a Guess-the-Number game with too-high/too-low feedback, or
-  tic-tac-toe against a minimax opponent (with a per-difficulty chance of a
-  deliberate slip, so younger grades get a real shot at an outright win) —
-  picked at random and never the same type in both slots. Chamber 12 is
-  always the combinatorics riddle finale.
+  Mastermind, a Guess-the-Number game with too-high/too-low feedback, or a
+  10×10 Minesweeper field where the mines are sleeping mummies (the first
+  click is always safe) — picked at random and never the same type in both
+  slots. Chamber 12 is always the combinatorics riddle finale.
 - Difficulty selectable by Swedish school year (Åk 1–9) or College, which
   changes number ranges, which topics can appear, and the mini-games'
   opponent strength.
