@@ -186,3 +186,34 @@ test('a worksheet/trial chamber never shows the same problem twice at any diffic
 
   expect(failures).toEqual([]);
 });
+
+test('clearing a mini-game chamber shows a "You won!" banner, then transitions to the next chamber', async ({
+  page
+}) => {
+  await startWithDebug(page);
+  await page.evaluate((i) => window.__debug.loadRoom(i, { skipTimer: true }), MINIGAME_SLOTS[0]);
+
+  await page.evaluate(() => window.__debug.onSuccess());
+  await expect(page.locator('#roomClearBanner')).toHaveClass(/show/);
+  await expect(page.locator('#roomClearText')).toHaveText('You won! 🎉');
+
+  // The banner fades, the stage hands off, and the next chamber loads.
+  await page.waitForTimeout(1500);
+  await expect(page.locator('#roomClearBanner')).not.toHaveClass(/show/);
+  await expect(page.locator('#roomIndexLabel')).toContainText(`CHAMBER ${MINIGAME_SLOTS[0] + 2} / 12`);
+});
+
+test('clearing a worksheet/trial chamber shows a "You did it!" banner, then transitions to the next chamber', async ({
+  page
+}) => {
+  await startWithDebug(page);
+  await page.evaluate((i) => window.__debug.loadRoom(i, { skipTimer: true }), DRILL_SLOTS[0]);
+
+  await page.evaluate(() => window.__debug.advanceRoom());
+  await expect(page.locator('#roomClearBanner')).toHaveClass(/show/);
+  await expect(page.locator('#roomClearText')).toHaveText('You did it!');
+
+  await page.waitForTimeout(1500);
+  await expect(page.locator('#roomClearBanner')).not.toHaveClass(/show/);
+  await expect(page.locator('#roomIndexLabel')).toContainText(`CHAMBER ${DRILL_SLOTS[0] + 2} / 12`);
+});

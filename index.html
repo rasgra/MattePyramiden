@@ -90,6 +90,32 @@
   }
 
   .stage{ position:relative; }
+  .stage.leaving{ animation: stageLeave .35s ease forwards; }
+  .stage.entering{ animation: stageEnter .4s ease; }
+  @keyframes stageLeave{ to{ opacity:0; transform:translateY(14px) scale(.98); } }
+  @keyframes stageEnter{ from{ opacity:0; transform:translateY(-14px) scale(.98); } to{ opacity:1; transform:none; } }
+
+  .room-clear-banner{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; z-index:7;
+  }
+  .room-clear-banner.show{ opacity:1; animation: roomClearPop .9s ease forwards; }
+  .room-clear-banner span{
+    font-family:'Cinzel',serif; font-weight:700; font-size:1.6rem; color:var(--torch-bright);
+    background:rgba(10,7,4,.88); border:1px solid rgba(217,154,61,.6); border-radius:12px;
+    padding:14px 30px; box-shadow:0 10px 40px rgba(0,0,0,.5), 0 0 30px rgba(217,154,61,.45);
+    text-shadow:0 0 14px rgba(217,154,61,.7);
+  }
+  @keyframes roomClearPop{
+    0%{ opacity:0; transform:scale(.7); }
+    18%{ opacity:1; transform:scale(1.08); }
+    30%{ transform:scale(1); }
+    82%{ opacity:1; transform:scale(1); }
+    100%{ opacity:0; transform:scale(1.03); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .stage.leaving, .stage.entering, .room-clear-banner.show{ animation:none; }
+  }
 
   .parchment{
     position:absolute; left:5%; right:5%; bottom:6%;
@@ -360,7 +386,7 @@
     </div>
   </div>
 
-  <div class="stage">
+  <div class="stage" id="stage">
     <canvas id="scene" width="960" height="540"></canvas>
 
     <div class="parchment" id="parchment">
@@ -385,6 +411,8 @@
       <div class="mm-history" id="mmHistory"></div>
       <div class="hint" id="hintText"></div>
     </div>
+
+    <div class="room-clear-banner" id="roomClearBanner" aria-live="polite"><span id="roomClearText"></span></div>
 
     <div class="overlay" id="rulesOverlay">
       <button class="overlay-x" id="rulesXBtn" aria-label="Close" type="button">×</button>
@@ -591,6 +619,8 @@
       mapLegendHere:'Här nu', mapLegendCleared:'Klarad', mapLegendAhead:'Framför dig',
       correct:'Rätt!',
       wrongAnswer:'Fel.',
+      roomClearGame:'Du vann! 🎉',
+      roomClearMath:'Du klarade det!',
       wordCorrect:'Rätt', wordWrong:'Fel',
       rulesBtn:'Regler', rulesTitle:'Rumsregler',
       rulesBodyDrill:'Lös alla 10 uppgifterna — för att klättra uppåt krävs alla rätt. Svarar du fel får du en ny chans senare: använd piltangenterna för att hoppa till en annan olöst uppgift, eller tillbaka till en du missade. Facklan ovanför mäter tiden för hela arbetsbladet — tar den slut innan allt är rätt slocknar en fackla och du ramlar ned ett rum.',
@@ -640,6 +670,8 @@
       mapLegendHere:'Here now', mapLegendCleared:'Cleared', mapLegendAhead:'Ahead',
       correct:'Correct!',
       wrongAnswer:'Not quite.',
+      roomClearGame:'You won! 🎉',
+      roomClearMath:'You did it!',
       wordCorrect:'Correct', wordWrong:'Wrong',
       rulesBtn:'Rules', rulesTitle:'Room rules',
       rulesBodyDrill:'Solve all 10 problems — climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed. The torch above times the whole worksheet — if it runs out before everything is correct, a torch burns out and you fall back a chamber.',
@@ -1444,7 +1476,8 @@
    'rulesBtn','rulesOverlay','rulesTitle','rulesBody','rulesCloseBtn','rulesXBtn','lblRules',
    'setupOverlay','setupTitle','setupSub','langLabel','langSv','langEn','levelLabel','levelGrid',
    'setupPrimaryBtn','setupCancelBtn','introOverlay','introBeatText','introLetter','introLetterText','introLetterSig','introDots','introSkipBtn','introNextBtn',
-   'endOverlay','endTitle','endBody','restartBtn','parchment','lblHint','lblMap','lblSave','lblLoad','lblSettings','lblRestart'
+   'endOverlay','endTitle','endBody','restartBtn','parchment','lblHint','lblMap','lblSave','lblLoad','lblSettings','lblRestart',
+   'stage','roomClearBanner','roomClearText'
   ].forEach(function(id){ els[id] = document.getElementById(id); });
   els.answerRow = document.querySelector('.answer-row');
   // short aliases used throughout the game logic below
@@ -1836,10 +1869,30 @@
     };
   }
 
+  // Small "You won!"/"You did it!" pop-up, then a short slide/fade as the
+  // stage hands off to the next chamber. Skipped entirely for the final
+  // room, since winGame() already has its own dedicated victory screen.
+  function celebrateAndAdvance(message, nextIndex){
+    els.roomClearText.textContent = message;
+    els.roomClearBanner.classList.remove('show');
+    void els.roomClearBanner.offsetWidth; // restart the animation if it's still mid-run
+    els.roomClearBanner.classList.add('show');
+    setTimeout(function(){
+      els.roomClearBanner.classList.remove('show');
+      els.stage.classList.add('leaving');
+      setTimeout(function(){
+        loadRoom(nextIndex);
+        els.stage.classList.remove('leaving');
+        els.stage.classList.add('entering');
+        setTimeout(function(){ els.stage.classList.remove('entering'); }, 420);
+      }, 350);
+    }, 900);
+  }
+
   function advanceRoom(){
     state.set = null;
-    if(state.room >= TOTAL_ROOMS-1) winGame();
-    else loadRoom(state.room+1);
+    if(state.room >= TOTAL_ROOMS-1){ winGame(); return; }
+    celebrateAndAdvance(t().roomClearMath, state.room+1);
   }
 
   function failRoom(){
@@ -1859,9 +1912,12 @@
     els.feedback.textContent = t().correct;
     playPositive();
     playCheer();
+    var mgType = state.current && state.current.minigameType;
+    var isGame = mgType==='nim' || mgType==='mastermind' || mgType==='guess' || mgType==='minesweeper';
+    var message = isGame ? t().roomClearGame : t().roomClearMath;
     setTimeout(function(){
-      if(state.room >= TOTAL_ROOMS-1) winGame();
-      else loadRoom(state.room+1);
+      if(state.room >= TOTAL_ROOMS-1){ winGame(); return; }
+      celebrateAndAdvance(message, state.room+1);
     }, 650);
   }
 
@@ -2665,7 +2721,10 @@
   // to a room and read the real game state (which room, which mini-game,
   // topic history) without having to solve arbitrary worksheets first.
   if(/(?:^|[?&])debug=1(?:&|$)/.test(location.search)){
-    window.__debug = { state: state, loadRoom: loadRoom, isMinigameSlot: isMinigameSlot, minigameName: minigameName };
+    window.__debug = {
+      state: state, loadRoom: loadRoom, isMinigameSlot: isMinigameSlot, minigameName: minigameName,
+      onSuccess: onSuccess, advanceRoom: advanceRoom
+    };
   }
 
   if(window.claude && window.claude.hot){
