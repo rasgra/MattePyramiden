@@ -118,10 +118,12 @@
   }
 
   .parchment{
-    position:absolute; left:5%; right:5%; bottom:6%;
+    position:absolute; left:5%; right:5%; bottom:6%; box-sizing:border-box;
     background: linear-gradient(180deg, #e9dcc0, #ddcda6);
     color:#2b2013; border-radius:6px; padding:16px 18px;
+    border-top:4px solid var(--room-accent);
     box-shadow: 0 18px 34px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.15);
+    transition: border-color .25s ease;
     --room-accent: #4a92b6;
   }
   .parchment .prompt{ font-size:1.02rem; line-height:1.5; font-weight:600; margin:0 0 10px; }
@@ -1202,6 +1204,16 @@
   var MINIGAME_SLOTS = [4, 9];      // 0-indexed — chambers 5 and 10 are always a mini-game
   var MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'minesweeper'];
   var MINIGAME_SECONDS = { nim:60, mastermind:240, guess:240, minesweeper:280 };
+  // Each room kind gets its own accent color and small icon (shown on the
+  // parchment's top edge and next to the room name) purely so chambers read
+  // as visually distinct at a glance — a plain worksheet still looks like a
+  // worksheet, but a mini-game or the finale now announce themselves before
+  // you even read the prompt.
+  var MINIGAME_ACCENTS = { nim:'#9c6b2f', mastermind:'#6b3f8a', guess:'#2f8a7a', minesweeper:'#8a3f2f' };
+  var MINIGAME_ICONS = { nim:'🧱', mastermind:'🎯', guess:'🔢', minesweeper:'🧟' };
+  var COMBO_ACCENT = '#c9a227';
+  var COMBO_ICON = '🏺';
+  var DRILL_ICON = '📜';
   var TOTAL_ROOMS = 12;
   var MAX_TORCHES = 3;
   var ROOM_SECONDS = 60;    // fallback single-shot timer
@@ -1563,8 +1575,6 @@
       els.trialCharges.style.display = 'none';
       els.prompt.style.display = '';
       els.sub.style.display = '';
-      els.parchment.style.setProperty('--room-accent', '#4a92b6');
-
       var mgType = null, seconds = ROOM_SECONDS;
       if(isMinigameSlot(index)){
         mgType = pickMinigameType();
@@ -1578,9 +1588,10 @@
         state.current = buildComboRoom(state.level, state.lang);
       }
       state.current.minigameType = mgType;
+      els.parchment.style.setProperty('--room-accent', mgType ? MINIGAME_ACCENTS[mgType] : COMBO_ACCENT);
 
       els.hint.textContent = state.current.hint;
-      els.roomNameLabel.textContent = state.current.name;
+      els.roomNameLabel.textContent = (mgType ? MINIGAME_ICONS[mgType] : COMBO_ICON) + ' ' + state.current.name;
       els.prompt.textContent = state.current.prompt;
       els.sub.textContent = state.current.sub || '';
 
@@ -1599,7 +1610,7 @@
     } else {
       els.answerRow.style.display = '';
       state.set = buildDrillSet(state.level, state.lang);
-      els.roomNameLabel.textContent = state.set.topicName;
+      els.roomNameLabel.textContent = (state.set.isTrial ? (state.set.chargeIcon || '🔥') : DRILL_ICON) + ' ' + state.set.topicName;
       els.parchment.style.setProperty('--room-accent', state.set.accent || '#4a92b6');
 
       if(state.set.isTrial){

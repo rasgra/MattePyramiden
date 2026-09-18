@@ -9,6 +9,14 @@ import { test, expect } from '@playwright/test';
 const MINIGAME_TYPES = ['nim', 'mastermind', 'guess', 'minesweeper'];
 const MINIGAME_SLOTS = [4, 9]; // chambers 5 and 10
 const DRILL_SLOTS = [0, 1, 2, 3, 5, 6, 7, 8, 10]; // every other chamber before the finale (11)
+const MINIGAME_ICONS = { nim: '🧱', mastermind: '🎯', guess: '🔢', minesweeper: '🧟' };
+const MINIGAME_ACCENTS = { nim: '#9c6b2f', mastermind: '#6b3f8a', guess: '#2f8a7a', minesweeper: '#8a3f2f' };
+
+async function roomAccent(page) {
+  return page.evaluate(() =>
+    getComputedStyle(document.getElementById('parchment')).getPropertyValue('--room-accent').trim()
+  );
+}
 
 async function startWithDebug(page) {
   await page.goto('/?debug=1');
@@ -216,4 +224,39 @@ test('clearing a worksheet/trial chamber shows a "You did it!" banner, then tran
   await page.waitForTimeout(1500);
   await expect(page.locator('#roomClearBanner')).not.toHaveClass(/show/);
   await expect(page.locator('#roomIndexLabel')).toContainText(`CHAMBER ${DRILL_SLOTS[0] + 2} / 12`);
+});
+
+test('each mini-game chamber gets its own icon and accent color', async ({ page }) => {
+  await startWithDebug(page);
+  for (const type of MINIGAME_TYPES) {
+    let found = false;
+    for (let i = 0; i < 40; i++) {
+      await page.evaluate((idx) => window.__debug.loadRoom(idx, { skipTimer: true }), MINIGAME_SLOTS[0]);
+      if ((await page.evaluate(() => window.__debug.state.current.minigameType)) === type) {
+        found = true;
+        break;
+      }
+    }
+    expect(found).toBe(true);
+    await expect(page.locator('#roomNameLabel')).toContainText(MINIGAME_ICONS[type]);
+    expect(await roomAccent(page)).toBe(MINIGAME_ACCENTS[type]);
+  }
+});
+
+test('the finale chamber gets its own icon and accent color, distinct from the mini-games', async ({ page }) => {
+  await startWithDebug(page);
+  await page.evaluate(() => window.__debug.loadRoom(11, { skipTimer: true }));
+  await expect(page.locator('#roomNameLabel')).toContainText('🏺');
+  expect(await roomAccent(page)).toBe('#c9a227');
+  expect(Object.values(MINIGAME_ACCENTS)).not.toContain(await roomAccent(page));
+});
+
+test('a drill chamber shows a room-type icon before its topic name', async ({ page }) => {
+  await startWithDebug(page);
+  await page.evaluate((idx) => window.__debug.loadRoom(idx, { skipTimer: true }), DRILL_SLOTS[0]);
+  const name = (await page.locator('#roomNameLabel').textContent()).trim();
+  expect(name.length).toBeGreaterThan(0);
+  // Every drill/trial topic name is prefixed with an emoji icon (a generic
+  // scroll for worksheets, or the trial room's own charge icon).
+  expect(/^\p{Extended_Pictographic}/u.test(name)).toBe(true);
 });
