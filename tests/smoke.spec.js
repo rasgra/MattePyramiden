@@ -234,3 +234,36 @@ test('opening settings mid-run can be cancelled without restarting', async ({ pa
   await expect(page.locator('#setupOverlay')).toBeHidden();
   await expect(page.locator('#roomIndexLabel')).toContainText('CHAMBER 1 / 12');
 });
+
+test('clearing the finale shows the treasure-chamber illustration; losing does not', async ({ page }) => {
+  await page.goto('/?debug=1');
+  await page.click('#langEn');
+  await page.click('#setupPrimaryBtn');
+  await page.click('#introSkipBtn');
+
+  await page.evaluate(() => window.__debug.loadRoom(11, { skipTimer: true }));
+  await page.evaluate(() => window.__debug.onSuccess());
+  await page.waitForTimeout(900); // onSuccess's own delay before winGame() fires
+
+  await expect(page.locator('#endOverlay')).toHaveClass(/show/);
+  await expect(page.locator('#endOverlay')).not.toHaveClass(/mummy/);
+  await expect(page.locator('#endScene')).toBeVisible();
+
+  // The scene should actually be drawing something, not sitting blank —
+  // sample a pixel a moment apart and expect at least one non-transparent
+  // pixel to have appeared (regression: the canvas element wasn't wired
+  // into `els`, so drawTreasureScene() silently no-opped every frame).
+  const hasContent = await page.evaluate(() => {
+    const c = document.getElementById('endScene');
+    const ctx = c.getContext('2d');
+    const data = ctx.getImageData(0, 0, c.width, c.height).data;
+    for (let i = 3; i < data.length; i += 4) if (data[i] > 0 && data[i - 1] > 40) return true;
+    return false;
+  });
+  expect(hasContent).toBe(true);
+
+  // Simulate the exact class combination loseGame() applies, and confirm
+  // the illustration (a win-only scene) is hidden on that screen.
+  await page.evaluate(() => document.getElementById('endOverlay').classList.add('mummy'));
+  await expect(page.locator('#endScene')).toBeHidden();
+});

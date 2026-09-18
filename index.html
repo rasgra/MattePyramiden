@@ -369,6 +369,12 @@
   .end-body h2{ font-size:1.7rem; color:var(--torch-bright); }
   .end-body p{ color:var(--papyrus-dim); max-width:42ch; line-height:1.5; }
   .overlay.mummy .end-body h2{ color:var(--ochre); }
+  .end-scene{
+    width:100%; max-width:440px; aspect-ratio:16/9; display:block; border-radius:8px;
+    background:#0c0906; box-shadow: inset 0 0 0 1px rgba(138,106,52,.3), 0 14px 30px rgba(0,0,0,.5);
+    margin-bottom:4px;
+  }
+  .overlay.mummy .end-scene{ display:none; }
 
   footer{ max-width:960px; text-align:center; color:var(--papyrus-dim); font-size:.78rem; line-height:1.6; }
   footer .glyphs{ color:var(--gilt); letter-spacing:.3em; font-size:.7rem; margin-bottom:6px; }
@@ -525,6 +531,7 @@
 
     <div class="overlay" id="endOverlay">
       <div class="end-body">
+        <canvas id="endScene" class="end-scene" width="640" height="360"></canvas>
         <h2 id="endTitle">You reach the treasure chamber</h2>
         <p id="endBody">Gold, faience and a very smug cat statue.</p>
         <button class="btn" id="restartBtn">Descend again</button>
@@ -1618,7 +1625,7 @@
    'setupPrimaryBtn','setupCancelBtn','introOverlay','introBeatText','introLetter','introLetterText','introLetterSig','introDots','introSkipBtn','introNextBtn',
    'endOverlay','endTitle','endBody','restartBtn','parchment','lblHint','lblMap','lblSave','lblLoad','lblSettings','lblRestart',
    'stage','roomClearBanner','roomClearText',
-   'devBar','devRoomSelect','devGameSelect','devJumpBtn'
+   'devBar','devRoomSelect','devGameSelect','devJumpBtn','endScene'
   ].forEach(function(id){ els[id] = document.getElementById(id); });
   els.answerRow = document.querySelector('.answer-row');
   // short aliases used throughout the game logic below
@@ -2638,6 +2645,116 @@
   }
   (function loop(){ drawScene(); requestAnimationFrame(loop); })();
 
+  // ---- Victory scene: the treasure chamber, a chest, and a shaft of
+  // sunlight through a breach in the wall — drawn once the pyramid is
+  // cleared. Self-terminating animation loop: it just stops rescheduling
+  // itself once the end overlay is no longer showing the win state. ----
+  function fillRoundRect(c,x,y,w,h,r){
+    if(c.roundRect){ c.beginPath(); c.roundRect(x,y,w,h,r); c.fill(); }
+    else { c.fillRect(x,y,w,h); }
+  }
+  var endSceneRunning = false;
+  function drawTreasureScene(){
+    var c = els.endScene;
+    if(!c) return;
+    var ectx = c.getContext('2d');
+    var w = c.width, h = c.height;
+    var ti = (performance.now() - animStart) / 1000;
+    ectx.clearRect(0,0,w,h);
+
+    var bg = ectx.createLinearGradient(0,0,0,h);
+    bg.addColorStop(0, '#241b13'); bg.addColorStop(1, '#0c0906');
+    ectx.fillStyle = bg; ectx.fillRect(0,0,w,h);
+    ectx.fillStyle = '#150f09';
+    ectx.fillRect(0, h*0.72, w, h*0.28);
+
+    // The breach in the wall and the beam it casts across the floor.
+    var openX = w*0.66, openY = h*0.10, openW = w*0.30, openH = h*0.5;
+    var beam = ectx.createLinearGradient(openX, openY, w*0.18, h);
+    beam.addColorStop(0, 'rgba(255,244,214,.85)');
+    beam.addColorStop(1, 'rgba(255,244,214,0)');
+    ectx.fillStyle = beam;
+    ectx.beginPath();
+    ectx.moveTo(openX, openY);
+    ectx.lineTo(openX+openW, openY);
+    ectx.lineTo(w*0.22, h);
+    ectx.lineTo(-w*0.1, h);
+    ectx.closePath();
+    ectx.fill();
+
+    var glow = ectx.createRadialGradient(openX+openW*0.5, openY+openH*0.32, 4, openX+openW*0.5, openY+openH*0.32, openW*0.95);
+    glow.addColorStop(0, 'rgba(255,250,230,1)');
+    glow.addColorStop(.5, 'rgba(255,225,155,.55)');
+    glow.addColorStop(1, 'rgba(255,225,155,0)');
+    ectx.fillStyle = glow;
+    ectx.beginPath();
+    ectx.ellipse(openX+openW*0.5, openY+openH*0.35, openW*0.6, openH*0.45, 0, 0, Math.PI*2);
+    ectx.fill();
+    ectx.fillStyle = '#fdf6e3';
+    ectx.beginPath();
+    ectx.moveTo(openX, openY+openH*0.5);
+    ectx.quadraticCurveTo(openX, openY, openX+openW*0.5, openY);
+    ectx.quadraticCurveTo(openX+openW, openY, openX+openW, openY+openH*0.5);
+    ectx.lineTo(openX+openW, openY+openH);
+    ectx.lineTo(openX, openY+openH);
+    ectx.closePath();
+    ectx.fill();
+
+    // Dust motes drifting down through the light.
+    ectx.fillStyle = '#fff';
+    for(var i=0;i<12;i++){
+      var seed = i*41.7;
+      var drift = (ti*0.12 + i/12) % 1;
+      var px = openX*0.35 + (w*0.15 - openX*0.35)*drift + Math.sin(ti+seed)*5;
+      var py = openY + (h*0.95-openY)*drift;
+      ectx.globalAlpha = 0.12 + 0.35*Math.abs(Math.sin(ti*1.4+seed));
+      ectx.beginPath(); ectx.arc(px, py, 1.3, 0, Math.PI*2); ectx.fill();
+    }
+    ectx.globalAlpha = 1;
+
+    // The treasure chest, sitting where the light lands.
+    var cx = w*0.34, cy = h*0.76, cw = w*0.24, ch = h*0.16;
+    ectx.fillStyle = 'rgba(0,0,0,.35)';
+    ectx.beginPath(); ectx.ellipse(cx, cy+ch*0.5, cw*0.62, ch*0.2, 0, 0, Math.PI*2); ectx.fill();
+
+    var bodyGrad = ectx.createLinearGradient(cx-cw/2, cy, cx+cw/2, cy+ch*0.6);
+    bodyGrad.addColorStop(0, '#8a5a24'); bodyGrad.addColorStop(1, '#4a2c10');
+    ectx.fillStyle = bodyGrad;
+    fillRoundRect(ectx, cx-cw/2, cy, cw, ch*0.6, Math.max(3,w*0.01));
+
+    ectx.fillStyle = '#7a4a1e';
+    ectx.beginPath();
+    ectx.moveTo(cx-cw/2, cy);
+    ectx.quadraticCurveTo(cx, cy-ch*0.65, cx+cw/2, cy);
+    ectx.closePath();
+    ectx.fill();
+
+    ectx.strokeStyle = '#f6c766'; ectx.lineWidth = Math.max(2, w*0.006);
+    ectx.beginPath(); ectx.moveTo(cx-cw/2, cy+ch*0.2); ectx.lineTo(cx+cw/2, cy+ch*0.2); ectx.stroke();
+    ectx.beginPath(); ectx.moveTo(cx, cy-ch*0.6); ectx.lineTo(cx, cy+ch*0.58); ectx.stroke();
+    ectx.fillStyle = '#f6c766';
+    fillRoundRect(ectx, cx-cw*0.05, cy+ch*0.04, cw*0.1, ch*0.24, 2);
+
+    var sparkle = 0.4 + 0.6*Math.abs(Math.sin(ti*3));
+    ectx.fillStyle = 'rgba(255,255,255,' + sparkle + ')';
+    ectx.beginPath(); ectx.arc(cx+cw*0.3, cy+ch*0.2, 2, 0, Math.PI*2); ectx.fill();
+
+    [[-0.4,0.62],[0.32,0.6],[0.46,0.44],[-0.18,0.68]].forEach(function(p){
+      ectx.fillStyle = '#e0a83a';
+      ectx.beginPath();
+      ectx.ellipse(cx+p[0]*cw, cy+p[1]*ch, cw*0.05, cw*0.024, 0, 0, Math.PI*2);
+      ectx.fill();
+    });
+
+    if(endSceneRunning) requestAnimationFrame(drawTreasureScene);
+  }
+  function startTreasureScene(){
+    if(endSceneRunning) return;
+    endSceneRunning = true;
+    drawTreasureScene();
+  }
+  function stopTreasureScene(){ endSceneRunning = false; }
+
   // ================= End states =================
   function winGame(){
     state.ended = true; clearInterval(state.timerId);
@@ -2646,6 +2763,7 @@
     els.endBody.textContent = t().winBody;
     els.endOverlay.classList.add('show');
     playVictory();
+    startTreasureScene();
     try{ localStorage.removeItem('pyramid-reckoning-save'); }catch(_e){}
   }
   function loseGame(){
@@ -2661,6 +2779,7 @@
     state.room = 0; state.torches = MAX_TORCHES; state.visited = []; state.ended = false;
     state.recentTopics = []; state.lastMinigameType = null; state.visitedMinigameTypes = {};
     els.endOverlay.classList.remove('show');
+    stopTreasureScene();
     renderTorches();
     loadRoom(0);
   }
@@ -2855,6 +2974,7 @@
       state.torches = data.torches; state.visited = data.visited || [];
       state.ended = false;
       els.endOverlay.classList.remove('show');
+      stopTreasureScene();
       applyStaticText();
       loadRoom(data.room||0);
       els.feedback.className='feedback good'; els.feedback.textContent = t().loadOk;
@@ -2917,6 +3037,7 @@
       els.setupOverlay.classList.remove('show');
       els.introOverlay.classList.remove('show');
       els.endOverlay.classList.remove('show');
+      stopTreasureScene();
       state.ended = false;
       state.torches = MAX_TORCHES;
       renderTorches();
