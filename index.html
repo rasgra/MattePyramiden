@@ -480,6 +480,21 @@
   // ================= Utilities =================
   function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
   function pick(arr){ return arr[randInt(0, arr.length-1)]; }
+  // Re-rolls build() until its sigFn signature hasn't been seen yet in this
+  // batch (tracked via the caller's `seen` map), so a worksheet never shows
+  // the same problem twice. Bounded by maxAttempts and falls back to
+  // whatever was last drawn, so a too-small value space (e.g. tiny number
+  // ranges at the easiest levels) can't spin forever or force a rarer draw.
+  function uniqueDraw(seen, build, sigFn, maxAttempts){
+    var value, sig, attempts = 0;
+    do{
+      value = build();
+      sig = sigFn(value);
+      attempts++;
+    } while(seen[sig] && attempts < maxAttempts);
+    seen[sig] = true;
+    return value;
+  }
   function normAnswer(s){
     return String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/,/g,'.').replace(/±/g,'+-');
   }
@@ -868,10 +883,14 @@
       name:{sv:'Den Triangulära Stämpeln', en:'The Triangular Seal'},
       buildSet:function(level, lang){
         var items = [];
+        var seen = {};
         for(var i=0;i<6;i++){
-          var a = randInt(30,85);
-          var bMax = Math.max(21, 150-a-10);
-          var b = randInt(20, bMax);
+          var pair = uniqueDraw(seen, function(){
+            var a = randInt(30,85);
+            var bMax = Math.max(21, 150-a-10);
+            return {a:a, b:randInt(20, bMax)};
+          }, function(p){ return p.a+'|'+p.b; }, 20);
+          var a = pair.a, b = pair.b;
           var ans = 180-a-b;
           items.push((function(a,b,ans){
             var self = { revealed:false, wasCorrect:false };
@@ -981,7 +1000,10 @@
       key:'pythagoras', minLevel:7,
       name:{sv:'Byggmästarens Gång', en:'The Mason’s Corridor'}, accent:'#9c3f2f',
       build:function(level){
-        var triples = [[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25],[12,16,20],[20,21,29]];
+        var triples = [
+          [3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25],[12,16,20],[20,21,29],
+          [9,40,41],[12,35,37],[10,24,26],[15,20,25],[16,30,34],[18,24,30],[21,28,35],[15,36,39]
+        ];
         var tri = pick(triples);
         var askLeg = tierOf(level) >= 4 && Math.random() < 0.5;
         if(askLeg){
@@ -1023,10 +1045,10 @@
       build:function(level){
         var college = level >= 10;
         if(college){
-          var k = randInt(3,12);
+          var k = randInt(3,20);
           return {college:true, k:k, roots:[0,k]};
         }
-        var r = randInt(2, tierOf(level)>=3 ? 12 : 9);
+        var r = randInt(2, tierOf(level)>=3 ? 16 : 9);
         return {college:false, r:r, n:r*r};
       },
       text:function(lang,v){
@@ -1110,8 +1132,12 @@
       buildSet:function(level, lang){
         var range = T(level, [3,4,5,6,7]);
         var items = [];
+        var seen = {};
         for(var i=0;i<6;i++){
-          var tx = randInt(-range, range), ty = randInt(-range, range);
+          var pt = uniqueDraw(seen, function(){
+            return {tx: randInt(-range, range), ty: randInt(-range, range)};
+          }, function(p){ return p.tx+','+p.ty; }, 20);
+          var tx = pt.tx, ty = pt.ty;
           items.push((function(tx,ty){
             return {
               prompt: lang==='sv' ? 'Markera punkten (' + tx + ', ' + ty + ')' : 'Mark the point (' + tx + ', ' + ty + ')',
@@ -1197,8 +1223,9 @@
     }
 
     var items = [];
+    var seen = {};
     for(var i=0;i<SET_SIZE;i++){
-      var vars = def.build(level);
+      var vars = uniqueDraw(seen, function(){ return def.build(level); }, function(v){ return def.short(lang, v); }, 20);
       var text = def.text(lang, vars);
       items.push({
         label: def.short(lang, vars), sub: text.sub, hint: text.hint,

@@ -154,3 +154,35 @@ test('drill topics never repeat within the last 4 chambers', async ({ page }) =>
     expect(new Set(window4).size).toBe(window4.length);
   }
 });
+
+test('a worksheet/trial chamber never shows the same problem twice at any difficulty', async ({ page }) => {
+  // Regression test: build()/buildSet() draw each item independently, so
+  // nothing stopped e.g. two identical "7 + 5 =" additions landing in the
+  // same 10-question chamber. buildDrillSet and the trial buildSet loops
+  // now re-roll (via uniqueDraw) until each item's visible text is new
+  // within that chamber.
+  await startWithDebug(page);
+
+  const failures = await page.evaluate(() => {
+    const dbg = window.__debug;
+    const drillSlots = [0, 1, 2, 3, 5, 6, 7, 8, 10];
+    const found = [];
+    for (let level = 1; level <= 10; level++) {
+      dbg.state.level = level;
+      for (let i = 0; i < 30; i++) {
+        dbg.loadRoom(drillSlots[i % drillSlots.length], { skipTimer: true });
+        const set = dbg.state.set;
+        if (!set || set.topicName === 'The Geometry Vault') continue; // shapes are shuffled distinct, not text-differentiated
+        const seen = new Set();
+        for (const item of set.items) {
+          const label = item.label || item.prompt;
+          if (seen.has(label)) found.push({ level, topic: set.topicName, label });
+          seen.add(label);
+        }
+      }
+    }
+    return found;
+  });
+
+  expect(failures).toEqual([]);
+});
