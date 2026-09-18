@@ -383,7 +383,37 @@
     .ws-num{ font-size:.86rem; }
   }
   @media (prefers-reduced-motion: reduce){ * { animation-duration:.001ms !important; } }
+  /* Local-only dev jump bar — see dev.config.js. Never shown in the
+     published Artifact, which has no such file to enable it. */
+  .dev-bar{
+    display:none; align-items:center; gap:10px; flex-wrap:wrap;
+    background:repeating-linear-gradient(135deg, #4a3f00, #4a3f00 10px, #3a3100 10px, #3a3100 20px);
+    color:#ffe680; padding:8px 16px; font-family:'IBM Plex Mono',monospace; font-size:.78rem;
+    border-bottom:2px solid #ffe680;
+  }
+  .dev-bar.show{ display:flex; }
+  .dev-bar strong{ letter-spacing:.08em; }
+  .dev-bar select, .dev-bar button{
+    font-family:inherit; font-size:.78rem; padding:3px 6px; border-radius:4px;
+    border:1px solid #ffe680; background:#1c1700; color:#ffe680;
+  }
+  .dev-bar button{ cursor:pointer; }
 </style>
+
+<div class="dev-bar" id="devBar">
+  <strong>DEV MODE</strong>
+  <label>Room <select id="devRoomSelect"></select></label>
+  <label>Force game
+    <select id="devGameSelect">
+      <option value="">Random</option>
+      <option value="nim">Nim</option>
+      <option value="mastermind">Mastermind</option>
+      <option value="guess">Guess</option>
+      <option value="minesweeper">Minesweeper</option>
+    </select>
+  </label>
+  <button type="button" id="devJumpBtn">Jump</button>
+</div>
 
 <div class="masthead">
   <div class="eyebrow" id="eyebrowText">A math expedition</div>
@@ -519,6 +549,7 @@
   <span id="footerText">Numbers regenerate on every descent, so the pyramid never solves the same way twice.</span>
 </footer>
 
+<script src="dev.config.js"></script>
 <script>
 (function(){
   "use strict";
@@ -781,22 +812,28 @@
     },
     {
       key:'subtraction', minLevel:1,
-      name:{sv:'Förrådskammaren', en:'The Storeroom'}, accent:'#6b4a2f',
+      name:{sv:'Subtraktionsrummet', en:'The Subtraction Room'}, accent:'#6b4a2f',
       build:function(level){
         var range = T(level, [[1,9],[5,40],[20,200],[100,5000],[1000,90000]]);
         var a = randInt(range[0], range[1]);
-        var b = randInt(range[0], a);
+        // Almost always b <= a (a non-negative result) — occasionally
+        // (under 5% of problems) b is drawn from the full range instead,
+        // which can land above a and give a negative answer.
+        var b = Math.random() < 0.05 ? randInt(range[0], range[1]) : randInt(range[0], a);
         return {a:a,b:b,ans:a-b};
       },
       text:function(lang,v){
+        var negHint = v.ans < 0
+          ? (lang==='sv' ? ' Den här gången är svaret negativt.' : ' This time the answer is negative.')
+          : '';
         return lang==='sv' ? {
           prompt:'Förrådet rymmer ' + v.a + ' säckar spannmål. Arbetarna bär bort ' + v.b + '. Hur många säckar blir kvar?',
-          sub:'Dra bort det som togs bort från det du började med.',
-          hint:'Räkna ut skillnaden: ' + v.a + ' − ' + v.b + '.'
+          sub:'Subtraktionsrummet! Hur mycket blir kvar när du är klar?',
+          hint:'Räkna ut skillnaden: ' + v.a + ' − ' + v.b + '.' + negHint
         } : {
           prompt:'The storeroom holds ' + v.a + ' sacks of grain. The workers carry away ' + v.b + '. How many sacks are left?',
-          sub:'Subtract what was taken from what you started with.',
-          hint:'Work out the difference: ' + v.a + ' − ' + v.b + '.'
+          sub:'The Subtraction Room! How much is left when you’re done?',
+          hint:'Work out the difference: ' + v.a + ' − ' + v.b + '.' + negHint
         };
       },
       short:function(lang,v){ return v.a + ' − ' + v.b + ' ='; },
@@ -1274,6 +1311,12 @@
   function isMinigameSlot(index){ return MINIGAME_SLOTS.indexOf(index) !== -1; }
 
   function pickMinigameType(){
+    if(state.forcedMinigameType){
+      var forced = state.forcedMinigameType;
+      state.forcedMinigameType = null; // one-shot — only applies to the very next pick
+      state.lastMinigameType = forced;
+      return forced;
+    }
     var pool = MINIGAME_TYPES.filter(function(k){ return k !== state.lastMinigameType; });
     var type = pick(pool.length ? pool : MINIGAME_TYPES);
     state.lastMinigameType = type;
@@ -1558,6 +1601,7 @@
     timerTotal: ROOM_SECONDS,
     recentTopics: [],           // drill-topic keys used recently, for variety
     lastMinigameType: null,     // avoids the same mini-game in both slots
+    forcedMinigameType: null,   // dev-bar override: the next mini-game slot uses exactly this type
     visitedMinigameTypes: {},   // index -> mini-game type, for the map labels
     soundOn: true,
     settingsMode: 'initial' // 'initial' | 'reopen'
@@ -1573,7 +1617,8 @@
    'setupOverlay','setupTitle','setupSub','langLabel','langSv','langEn','levelLabel','levelGrid',
    'setupPrimaryBtn','setupCancelBtn','introOverlay','introBeatText','introLetter','introLetterText','introLetterSig','introDots','introSkipBtn','introNextBtn',
    'endOverlay','endTitle','endBody','restartBtn','parchment','lblHint','lblMap','lblSave','lblLoad','lblSettings','lblRestart',
-   'stage','roomClearBanner','roomClearText'
+   'stage','roomClearBanner','roomClearText',
+   'devBar','devRoomSelect','devGameSelect','devJumpBtn'
   ].forEach(function(id){ els[id] = document.getElementById(id); });
   els.answerRow = document.querySelector('.answer-row');
   // short aliases used throughout the game logic below
@@ -2197,10 +2242,23 @@
       }
     }
   }
+  function msAllMinesFlagged(ms){
+    if(!ms.mines) return false;
+    for(var i=0;i<ms.total;i++) if(ms.mines[i] && !ms.flagged[i]) return false;
+    return true;
+  }
   function msToggleFlag(i){
     var ms = state.msState;
     if(!ms || ms.over || ms.revealed[i]) return;
     ms.flagged[i] = !ms.flagged[i];
+    // Flagging the very last unflagged mummy clears the field outright —
+    // no need to also hunt down and click every remaining safe tile.
+    if(ms.flagged[i] && msAllMinesFlagged(ms)){
+      for(var k=0;k<ms.total;k++) if(!ms.mines[k]) ms.revealed[k] = true;
+      renderMsBoard();
+      msFinish(true, state.lang==='sv' ? 'Alla mumier är märkta! En dörr öppnas.' : 'Every mummy is marked! A door opens.');
+      return;
+    }
     renderMsBoard();
   }
   function msCellClick(i){
@@ -2837,6 +2895,35 @@
     if(e.key==='l' || e.key==='L') els.loadBtn.click();
   });
 
+  // ================= Dev mode =================
+  // Local-only room/mini-game jump menu, gated by dev.config.js (git-tracked,
+  // defaults to disabled). That file doesn't exist for the published
+  // Artifact, so window.PYRAMID_DEV_CONFIG is simply undefined there and
+  // this whole feature quietly stays off.
+  var DEV_MODE = !!(window.PYRAMID_DEV_CONFIG && window.PYRAMID_DEV_CONFIG.enabled);
+  function initDevBar(){
+    if(!DEV_MODE || !els.devBar) return;
+    els.devBar.classList.add('show');
+    for(var i=0;i<TOTAL_ROOMS;i++){
+      var opt = document.createElement('option');
+      opt.value = i;
+      var tag = isMinigameSlot(i) ? ' (mini-game)' : (i===TOTAL_ROOMS-1 ? ' (finale)' : '');
+      opt.textContent = 'Chamber ' + (i+1) + tag;
+      els.devRoomSelect.appendChild(opt);
+    }
+    els.devJumpBtn.addEventListener('click', function(){
+      var idx = parseInt(els.devRoomSelect.value, 10);
+      if(els.devGameSelect.value) state.forcedMinigameType = els.devGameSelect.value;
+      els.setupOverlay.classList.remove('show');
+      els.introOverlay.classList.remove('show');
+      els.endOverlay.classList.remove('show');
+      state.ended = false;
+      state.torches = MAX_TORCHES;
+      renderTorches();
+      loadRoom(idx, {});
+    });
+  }
+
   function saveSettings(){
     try{ localStorage.setItem('pyramid-reckoning-settings', JSON.stringify({ lang: state.lang, level: state.level, sound: state.soundOn })); }catch(_e){}
   }
@@ -2880,6 +2967,8 @@
       nimPlayerMove: nimPlayerMove, nimBestMove: nimBestMove
     };
   }
+
+  initDevBar();
 
   if(window.claude && window.claude.hot){
     window.claude.hot.snapshot(function(){

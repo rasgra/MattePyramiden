@@ -14,6 +14,33 @@ test('loads with the setup screen', async ({ page }) => {
   await expect(page.locator('#levelGrid .level-pill')).toHaveCount(10);
 });
 
+test('the dev bar stays hidden by default (dev.config.js ships disabled)', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#devBar')).toBeHidden();
+});
+
+test('dev.config.js can enable a room/mini-game jump bar for local testing', async ({ page }) => {
+  // dev.config.js ships with enabled:false (see dev.config.js) — this
+  // intercepts it with an enabled copy rather than touching the real file,
+  // so the feature is verified without ever risking it landing enabled.
+  await page.route('**/dev.config.js', (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: 'window.PYRAMID_DEV_CONFIG = { enabled: true };' })
+  );
+  await page.goto('/');
+
+  await expect(page.locator('#devBar')).toBeVisible();
+  await expect(page.locator('#devRoomSelect option')).toHaveCount(12);
+
+  // Jumps straight into a forced mini-game from a cold boot, before ever
+  // touching the normal setup/intro flow.
+  await page.selectOption('#devRoomSelect', '4');
+  await page.selectOption('#devGameSelect', 'mastermind');
+  await page.click('#devJumpBtn');
+
+  await expect(page.locator('#roomIndexLabel')).toContainText('CHAMBER 5 / 12');
+  await expect(page.locator('#roomNameLabel')).toContainText('Master Mind');
+});
+
 test('choosing a language and difficulty starts the intro', async ({ page }) => {
   await page.goto('/');
   await page.click('#langEn');

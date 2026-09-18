@@ -388,3 +388,47 @@ test('grade 1 mixes addition and subtraction rooms instead of always addition', 
   expect(result.sawSubtraction).toBe(true);
   expect(result.topicCount).toBeGreaterThan(1);
 });
+
+test('the subtraction room rarely (under 5%) allows a negative answer', async ({ page }) => {
+  await startWithDebug(page);
+  const stats = await page.evaluate(() => {
+    const dbg = window.__debug;
+    dbg.state.level = 1;
+    let total = 0;
+    let negative = 0;
+    for (let i = 0; i < 400; i++) {
+      dbg.loadRoom(0, { skipTimer: true });
+      const set = dbg.state.set;
+      if (set.topicName !== 'The Subtraction Room') continue;
+      for (const item of set.items) {
+        total++;
+        if (item.hint.includes('negative')) negative++;
+      }
+    }
+    return { total, negative, ratio: total ? negative / total : null };
+  });
+
+  expect(stats.total).toBeGreaterThan(0);
+  expect(stats.ratio).toBeLessThan(0.05);
+});
+
+test('minesweeper auto-completes once every mummy has been flagged', async ({ page }) => {
+  await startWithDebug(page);
+  test.skip(!(await landOnMinigame(page, 'minesweeper')), 'minesweeper did not come up in the sample of attempts');
+
+  await page.locator('.ms-cell').first().click(); // seeds the mine layout, safely
+  const mineIndices = await page.evaluate(() =>
+    window.__debug.state.msState.mines.map((m, i) => (m ? i : -1)).filter((i) => i >= 0)
+  );
+
+  await page.click('.ms-flag-btn');
+  const cells = page.locator('.ms-cell');
+  for (const idx of mineIndices) {
+    await cells.nth(idx).click();
+  }
+
+  // Flagging the last mummy should clear the room outright — no need to
+  // also individually reveal every remaining safe tile.
+  await expect(page.locator('#feedbackText')).not.toHaveText('');
+  expect(await page.evaluate(() => window.__debug.state.msState.over)).toBe(true);
+});

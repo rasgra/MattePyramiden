@@ -22,11 +22,13 @@ _Pyramid Reckoning_:
   "sequential visual" topics — Geometry Vault and Coordinate Grid — sharing
   a canvas-driven engine), drawn as a two-column worksheet of 10 problems.
   The same topic never runs in back-to-back-ish chambers (no repeats within
-  the last 4). Chambers 5 and 10 are always one of four mini-games — Nim,
-  Mastermind, a Guess-the-Number game with too-high/too-low feedback, or a
-  10×10 Minesweeper field where the mines are sleeping mummies (the first
-  click is always safe) — picked at random and never the same type in both
-  slots. Chamber 12 is always the combinatorics riddle finale.
+  the last 4). Chambers 5 and 10 are always one of four mini-games —
+  the Counting Wall (visualized 3-pile misère Nim: click a brick to take it
+  and everything stacked above it), Mastermind, a Guess-the-Number game with
+  too-high/too-low feedback, or a 10×10 Minesweeper field where the mines
+  are sleeping mummies (the first click is always safe, and flagging every
+  mummy auto-clears the field) — picked at random and never the same type
+  in both slots. Chamber 12 is always the combinatorics riddle finale.
 - Difficulty selectable by Swedish school year (Åk 1–9) or College, which
   changes number ranges, which topics can appear, and the mini-games'
   opponent strength.
@@ -60,6 +62,15 @@ Run `make help` for the full list, or `make shell` to poke around inside the
 container. Every command runs via `docker compose run`, with `node_modules`
 kept in an anonymous volume — it's never written to the project directory
 on the host.
+
+### Dev mode
+
+[`dev.config.js`](dev.config.js) is a small git-tracked file (ships with
+`enabled: false`) that the published Artifact never loads. Flip it to
+`true` locally and reload to get a "DEV MODE" bar at the top of the page
+with a chamber picker (and an optional "force this mini-game" picker for
+chambers 5/10), so you can jump straight to any room to test it instead of
+playing through the whole pyramid each time.
 
 ## Status
 
