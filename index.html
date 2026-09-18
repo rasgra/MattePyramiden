@@ -764,6 +764,29 @@
       check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
     },
     {
+      key:'subtraction', minLevel:1,
+      name:{sv:'Förrådskammaren', en:'The Storeroom'}, accent:'#6b4a2f',
+      build:function(level){
+        var range = T(level, [[1,9],[5,40],[20,200],[100,5000],[1000,90000]]);
+        var a = randInt(range[0], range[1]);
+        var b = randInt(range[0], a);
+        return {a:a,b:b,ans:a-b};
+      },
+      text:function(lang,v){
+        return lang==='sv' ? {
+          prompt:'Förrådet rymmer ' + v.a + ' säckar spannmål. Arbetarna bär bort ' + v.b + '. Hur många säckar blir kvar?',
+          sub:'Dra bort det som togs bort från det du började med.',
+          hint:'Räkna ut skillnaden: ' + v.a + ' − ' + v.b + '.'
+        } : {
+          prompt:'The storeroom holds ' + v.a + ' sacks of grain. The workers carry away ' + v.b + '. How many sacks are left?',
+          sub:'Subtract what was taken from what you started with.',
+          hint:'Work out the difference: ' + v.a + ' − ' + v.b + '.'
+        };
+      },
+      short:function(lang,v){ return v.a + ' − ' + v.b + ' ='; },
+      check:function(v,s){ var n=parseFloat(normAnswer(s)); return numEq(n,v.ans,0); }
+    },
+    {
       key:'multiplication', minLevel:2,
       name:{sv:'Radernas Sal', en:'The Hall of Rows'}, accent:'#8a2f2f',
       build:function(level){

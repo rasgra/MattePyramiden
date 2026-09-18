@@ -260,3 +260,27 @@ test('a drill chamber shows a room-type icon before its topic name', async ({ pa
   // scroll for worksheets, or the trial room's own charge icon).
   expect(/^\p{Extended_Pictographic}/u.test(name)).toBe(true);
 });
+
+test('grade 1 mixes addition and subtraction rooms instead of always addition', async ({ page }) => {
+  // Regression test: grade 1's topic pool used to be "The Threshold" (a
+  // coinflip between + and -) and "The Coin Chest" (always addition), so a
+  // player could easily land on several addition-only chambers in a row
+  // with no dedicated subtraction room ever appearing.
+  await startWithDebug(page);
+  const result = await page.evaluate(() => {
+    const dbg = window.__debug;
+    dbg.state.level = 1;
+    let sawSubtraction = false;
+    const topics = new Set();
+    for (let i = 0; i < 40; i++) {
+      dbg.loadRoom(0, { skipTimer: true });
+      const set = dbg.state.set;
+      topics.add(set.topicName);
+      if (set.items.some((it) => it.label && it.label.includes('−'))) sawSubtraction = true;
+    }
+    return { sawSubtraction, topicCount: topics.size };
+  });
+
+  expect(result.sawSubtraction).toBe(true);
+  expect(result.topicCount).toBeGreaterThan(1);
+});
