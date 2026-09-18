@@ -1384,6 +1384,7 @@
     state.room = index;
     state.resolved = false;
     state.set = null;
+    state.current = null; // only special/mini-game rooms repopulate this, below
     els.hint.classList.remove('show');
     els.feedback.textContent = '';
     els.feedback.className = 'feedback';

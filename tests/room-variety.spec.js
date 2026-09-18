@@ -72,6 +72,32 @@ test('the guessing room gives too-high/too-low feedback', async ({ page }) => {
   await expect(page.locator('.mm-row').first()).toContainText(/too low|correct!/);
 });
 
+test('the worksheet still answers correctly right after a Nim/Tic-Tac-Toe chamber', async ({ page }) => {
+  // Regression test: Nim and Tic-Tac-Toe are the two mini-game types whose
+  // checkAnswer() short-circuits (they're played via their own on-screen
+  // controls, not the shared input). state.current used to only ever be
+  // *set* when entering one of those rooms, never cleared afterward — so
+  // the next room, even a plain worksheet, would inherit its stale
+  // minigameType and silently swallow every Enter press and Answer click.
+  await startWithDebug(page);
+  const landed = (await landOnMinigame(page, 'nim')) || (await landOnMinigame(page, 'tictactoe'));
+  test.skip(!landed, 'neither Nim nor tic-tac-toe came up in the sample of attempts');
+
+  const roomAfter = MINIGAME_SLOTS[0] + 1;
+  await page.evaluate((idx) => window.__debug.loadRoom(idx, { skipTimer: true }), roomAfter);
+
+  const currentAfter = await page.evaluate(() => window.__debug.state.current);
+  expect(currentAfter).toBeNull();
+
+  // And the answer control itself must actually still work, not just the
+  // internal state — if it's a worksheet room, answering should register.
+  if (await page.locator('#worksheet').isVisible()) {
+    await page.fill('#answerInput', '0');
+    await page.click('#submitBtn');
+    await expect(page.locator('#wsSlot-0')).not.toHaveClass(/placeholder/);
+  }
+});
+
 test('drill topics never repeat within the last 4 chambers', async ({ page }) => {
   await startWithDebug(page);
 
