@@ -10,12 +10,12 @@ excerpt of the entry dispatcher, and a few of the original `.PCX` screens
 converted to PNG.
 
 **Play it:** open [`index.html`](index.html) directly in a browser — no build
-step, no dependencies.
+step, no dependencies. That file is generated (see Development below), but
+it's checked into git specifically so this stays true for players.
 
 ## What's here
 
-A single-page game (`index.html`, vanilla HTML/CSS/JS, no build tooling) —
-_Pyramid Reckoning_:
+A vanilla HTML/CSS/JS game, no framework — _Pyramid Reckoning_:
 
 - 12 chambers: 9 are random maths topics (arithmetic, percent, geometry,
   algebra, sequences, number bases, Pythagoras, quadratics, and two
@@ -29,9 +29,9 @@ _Pyramid Reckoning_:
   are sleeping mummies (the first click is always safe, and flagging every
   mummy auto-clears the field) — picked at random and never the same type
   in both slots. Chamber 12 is always the combinatorics riddle finale.
-- Difficulty selectable by Swedish school year (Åk 1–9) or College, which
-  changes number ranges, which topics can appear, and the mini-games'
-  opponent strength.
+- Difficulty selectable across ten levels — Difficulty level 1 through 9, or
+  Master — which changes number ranges, which topics can appear, and the
+  mini-games' opponent strength.
 - Swedish/English language toggle, a skippable narrated intro, a torch/life
   system, save/load via `localStorage`, an in-game map, and separate
   Hint (F2-style) and Rules (F1-style) panels per the original's own
@@ -42,18 +42,24 @@ _Pyramid Reckoning_:
 
 ## Development
 
-The game itself has no build step or dependencies — `index.html` is
-self-contained on purpose (it's also published as a Claude Artifact, which
-requires a single inline file). All dev tooling (Node, npm packages,
-Playwright's browser) lives in a Docker image; nothing is installed on the
-host beyond Docker itself.
+The source lives in [`src/`](src/) as plain ES modules — one file per room,
+mini-game, and engine concern (see `src/rooms/`, `src/minigames/`,
+`src/engine/`, `src/ui/`, `src/styles/`). [`build.js`](build.js) (esbuild
+under the hood) bundles that into the single self-contained `index.html` at
+the repo root — the form the game is actually played from, since it's also
+published as a Claude Artifact, which requires one inline file. **`index.html`
+is generated — never hand-edit it; edit under `src/` and rebuild.** All dev
+tooling (Node, npm packages, Playwright's browser) lives in a Docker image;
+nothing is installed on the host beyond Docker itself.
 
 ```
 make install      # one-time: builds the tooling image (npm install runs inside it)
-make dev           # serve the game at http://localhost:8080 (PORT=... to override)
+make build         # bundle src/ into the root index.html once
+make dev           # build, then serve at http://localhost:8080, rebuilding on save (PORT=... to override)
+make dev-down      # stop a `make dev` left running (e.g. in another terminal, or after a crash)
 make format        # check formatting               make format-fix  # apply it
-make lint          # eslint (inline <script>) + stylelint (inline <style>)
-make test          # Playwright smoke tests, headless
+make lint          # eslint (src/**/*.js) + stylelint (src/styles/**/*.css)
+make test          # Playwright smoke tests, headless (builds first)
 make report        # view the last test run's HTML report at http://localhost:9223
 make check         # format + lint + test — what CI should run
 ```

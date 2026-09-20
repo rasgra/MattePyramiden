@@ -1,0 +1,117 @@
+// ================= Localized fixed strings =================
+export var STR = {
+  sv: {
+    eyebrow: 'Ett matteäventyr',
+    subtitle: 'Facklan försvinner runt hörnet. Tolv kamrar med olika utmaningar skiljer dig från Khufus skatt. Klarar du utmaningarna öppnas vägen till nästa kammare, annars faller du tillbaka en kammare. Luften här nere räcker inte hur länge som helst heller, håll klockan under uppsikt, är du kvar i pyramiden när den tar slut, blir du kvar för evigt!',
+    footer: 'Kamrarna och uppgifterna skapas på nytt varje spel, varje spel är unikt.',
+    chamber: function(n,total){ return 'KAMMARE ' + n + ' / ' + total; },
+    hint:'Ledtråd', map:'Karta', save:'Spara', load:'Hämta', settings:'Inställningar', restart:'Börja om',
+    restartCta:'Klättra igen',
+    soundOnLabel:'Ljud', soundOffLabel:'Ljud av',
+    answerBtn:'Svara', answerPlaceholder:'Ditt svar', continueBtn:'Fortsätt',
+    mapTitle:'Pyramiden',
+    mapSub:'Kammare 1 ligger vid basen, skattkammaren väntar högst upp.',
+    mapLegendHere:'Här nu', mapLegendCleared:'Klarad', mapLegendAhead:'Framför dig',
+    correct:'Rätt!',
+    wrongAnswer:'Fel.',
+    roomClearGame:'Du vann! 🎉',
+    roomClearMath:'Du klarade det!',
+    wordCorrect:'Rätt', wordWrong:'Fel',
+    rulesBtn:'Regler', rulesTitle:'Rumsregler',
+    rulesBodyDrill:'Lös alla 10 uppgifterna — för att klättra uppåt krävs alla rätt. Svarar du fel får du en ny chans senare: använd piltangenterna för att hoppa till en annan olöst uppgift, eller tillbaka till en du missade. Det finns ingen tidsgräns för själva kammaren — bara den tid det finns luft kvar.',
+    rulesBodyEstimation:'Lös alla 10 uppskattningarna — för att klättra uppåt krävs alla rätt. Till skillnad från andra kamrar har den här ett eget timglas: du har 4 minuter på dig. Rinner det ut innan allt är rätt skickas du tillbaka ett rum.',
+    rulesBodyNim:'Tre murar av tegelstenar. På din tur väljer du EN mur och tar valfritt antal stenar från den — klicka på en tegelsten för att ta den och alla ovanför. Den som tvingas ta den allra sista stenen förlorar. Besegra din motståndare för att komma vidare; förlorar du faller du tillbaka en kammare.',
+    rulesBodyCombo:'En gåta, en chans. Svara rätt för att öppna valvet. Ett felaktigt svar skickar dig tillbaka ett rum.',
+    rulesBodyMastermind:'Tre hemliga siffror (0–9, kan upprepas) väntar på att knäckas. Efter varje gissning får du veta hur många siffror som satt helt rätt, och hur många som fanns med men på fel plats. Du har 15 gissningar — tar de slut utan att du knäcker koden faller du tillbaka en kammare.',
+    rulesBodyGuess:'Ett hemligt tal väntar på att gissas. Efter varje gissning får du veta om talet du sökte är högre eller lägre. Du har 10 gissningar — halvera intervallet varje gång för att hitta det snabbast. Tar gissningarna slut faller du tillbaka en kammare.',
+    rulesBodyMinesweeper:'Ett 10×10-fält döljer sovande mumier. Klicka på en ruta för att avslöja den — siffran visar hur många mumier som gömmer sig i rutorna runt omkring. Klarar du hela fältet utan att väcka en mumie öppnas vägen; klickar du på en mumie faller du tillbaka en kammare. Högerklicka (eller slå på flaggläge) för att märka ut rutor du misstänker.',
+    setQuestion: function(n,total){ return 'Uppgift ' + n + ' / ' + total; },
+    setTally: function(n){ return 'Antal rätt: ' + n; },
+    setFail:function(n,total){ return 'Bara ' + n + '/' + total + ' rätt — det räcker inte. Du faller tillbaka en kammare.'; },
+    setFailSub:'Alla 10 rätt krävdes för att gå vidare.',
+    setTimeUp:'Timglaset rinner ut mitt i räkningen — du faller tillbaka en kammare.',
+    wrongGeneric:'Fel svar — du faller tillbaka en kammare.',
+    timeUp:'Timglaset rinner ut — du faller tillbaka en kammare.',
+    saveOk:'Sparat i väggen.', saveFail:'Kunde inte spara i den här webbläsaren.',
+    loadOk:'Du fortsätter där du var.', loadFail:'Det sparade märket gick inte att läsa.', loadEmpty:'Inget sparat märke hittades.',
+    winTitle:'Du når skattkammaren',
+    winBody: function(nextLevelName){
+      var base = 'Fantastiskt jobbat! Tolv kamrar, tolv fullständiga svar — du har besegrat pyramiden med lysande resultat. Guld, fajans och en hemresa att planera.';
+      return nextLevelName
+        ? base + ' Redo för en tuffare utmaning? Prova ' + nextLevelName + ' härnäst!'
+        : base + ' Du har klarat pyramiden på den svåraste nivån som finns — själva Cheops hade blivit imponerad!';
+    },
+    loseTitle:'Luften tar slut',
+    loseBody:'"Jag beklagar verkligen ditt öde," säger Cheops och skakar sorgset på huvudet, "men var inte orolig — jag ska personligen se till att du blir ordentligt balsamerad och inlindad, så att du kan vila i evighet här nere, i gott sällskap."',
+    settingsHeading:'Innan du kliver in', settingsSub:'Välj språk och svårighetsgrad.',
+    settingsHeadingReopen:'Ändra inställningar', settingsSubReopen:'Spelet startas om från kammare 1 med de nya inställningarna.',
+    langLabel:'Språk', levelLabel:'Svårighetsgrad',
+    begin:'Påbörja klättringen', apply:'Starta om med detta', cancel:'Avbryt',
+    levelNames:['Nivå 1','Nivå 2','Nivå 3','Nivå 4','Nivå 5','Nivå 6','Nivå 7','Nivå 8','Nivå 9','Mästare'],
+    introSkip:'Hoppa över', introNext:'Fortsätt', introEnter:'Kliv in i pyramiden',
+    introBeats:[
+      'En stund för länge vid hieroglyferna på väggen — och turen har redan svängt runt hörnet utan dig.',
+      'Du trevar dig fram genom en gång som blivit kolsvart, gruppens röster redan uppslukade av stenen.',
+      null,
+      'Långt ovanför har sanden börjat rinna in i ett schakt. Tolv kamrar står mellan dig och utgången.'
+    ],
+    introLetterText:'Den som läser detta sitter fången i min pyramid, precis som du. Varje kammare gömmer ett matematiskt problem — lös det, och du kan klättra till nästa kammare! Missa, och du faller tillbaka ett steg.'
+  },
+  en: {
+    eyebrow: 'A math expedition',
+    subtitle: 'The torchbearer turned a corner without you. Twelve sealed chambers stand between you and Khufu’s hoard. Each chamber sets ten problems of the same kind — a perfect ten opens the way; fall short and you slip back a chamber. The air down here won’t last forever, either — one shared clock ticks for the whole climb, so spend it wisely.',
+    footer: 'Numbers regenerate on every climb, so the pyramid never solves the same way twice.',
+    chamber: function(n,total){ return 'CHAMBER ' + n + ' / ' + total; },
+    hint:'Hint', map:'Map', save:'Save', load:'Load', settings:'Settings', restart:'Restart',
+    restartCta:'Climb again',
+    soundOnLabel:'Sound', soundOffLabel:'Muted',
+    answerBtn:'Answer', answerPlaceholder:'Your answer', continueBtn:'Continue',
+    mapTitle:'The Pyramid',
+    mapSub:'Chamber 1 sits at the base; the treasury waits at the top.',
+    mapLegendHere:'Here now', mapLegendCleared:'Cleared', mapLegendAhead:'Ahead',
+    correct:'Correct!',
+    wrongAnswer:'Not quite.',
+    roomClearGame:'You won! 🎉',
+    roomClearMath:'You did it!',
+    wordCorrect:'Correct', wordWrong:'Wrong',
+    rulesBtn:'Rules', rulesTitle:'Room rules',
+    rulesBodyDrill:'Solve all 10 problems — climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed. There’s no deadline on the chamber itself — only the air shown in the clock above, which keeps counting down through the whole climb.',
+    rulesBodyEstimation:'Solve all 10 estimates — climbing upward requires a perfect sheet. Unlike other chambers, this one keeps an hourglass of its own: you have 4 minutes. If it runs out before everything is correct, you’re sent back a chamber — meanwhile the air clock above keeps counting down through the whole climb regardless.',
+    rulesBodyNim:'Three walls of bricks. On your turn, choose ONE wall and take any number of bricks from it — click a brick to take it and every one above it. Whoever is forced to take the very last brick loses. Beat your rival to move on; lose, and you slip back a chamber.',
+    rulesBodyCombo:'One riddle, one chance. Answer correctly to open the vault. A wrong answer sends you back a chamber.',
+    rulesBodyMastermind:'Three secret digits (0–9, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses — run out without cracking it and you slip back a chamber.',
+    rulesBodyGuess:'A secret number is waiting to be guessed. After each guess you learn whether the number you want is higher or lower. You have 10 guesses — halve the remaining range each time to find it fastest. Run out of guesses and you slip back a chamber.',
+    rulesBodyMinesweeper:'A 10×10 field hides sleeping mummies. Click a tile to reveal it — the number shows how many mummies lurk in the tiles around it. Clear the whole field without waking a mummy and the way opens; click a mummy and you slip back a chamber. Right-click (or switch on flag mode) to mark tiles you suspect.',
+    setQuestion: function(n,total){ return 'Question ' + n + ' / ' + total; },
+    setTally: function(n){ return 'Correct: ' + n; },
+    setFail:function(n,total){ return 'Only ' + n + '/' + total + ' correct — not enough. You slip back a chamber.'; },
+    setFailSub:'All 10 out of 10 were needed to move on.',
+    setTimeUp:'The hourglass runs out mid-count — you slip back a chamber.',
+    wrongGeneric:'Not quite — you slip back a chamber.',
+    timeUp:'The hourglass runs out — you slip back a chamber.',
+    saveOk:'Progress etched into the wall.', saveFail:'Could not save in this browser.',
+    loadOk:'Picked up where you left off.', loadFail:'That save mark was unreadable.', loadEmpty:'No saved mark found on the wall.',
+    winTitle:'You reach the treasury',
+    winBody: function(nextLevelName){
+      var base = 'Magnificent work! Twelve chambers, twelve perfect reckonings — you\'ve conquered the pyramid in style. Gold, faience beads, and a trip home to plan.';
+      return nextLevelName
+        ? base + ' Ready for a tougher challenge? Try ' + nextLevelName + ' next!'
+        : base + ' You\'ve beaten the pyramid at the hardest setting there is — Cheops himself would be impressed!';
+    },
+    loseTitle:'The air runs out',
+    loseBody:'"I am truly sorry for your fate," says Cheops, shaking his head mournfully, "but do not worry — I shall personally see to it that you are properly mummified and wrapped, so that you may rest here in the dark for eternity, in fine company."',
+    settingsHeading:'Before you enter', settingsSub:'Choose a language and a difficulty.',
+    settingsHeadingReopen:'Change settings', settingsSubReopen:'The run restarts from chamber 1 with the new settings.',
+    langLabel:'Language', levelLabel:'Difficulty',
+    begin:'Begin the climb', apply:'Restart with this', cancel:'Cancel',
+    levelNames:['Difficulty level 1','Difficulty level 2','Difficulty level 3','Difficulty level 4','Difficulty level 5','Difficulty level 6','Difficulty level 7','Difficulty level 8','Difficulty level 9','Master'],
+    introSkip:'Skip intro', introNext:'Continue', introEnter:'Enter the pyramid',
+    introBeats:[
+      'A moment too long over the hieroglyphs on the wall — and the tour has already turned the corner without you.',
+      'You feel your way forward down a corridor gone pitch-black, the group’s voices already swallowed by the stone.',
+      null,
+      'Far above, sand has begun hissing into a shaft. Twelve chambers stand between you and the way out.'
+    ],
+    introLetterText:'Whoever finds this is trapped here, same as you. Every chamber hides a problem of mathematics — solve it, and you can climb to the next chamber! Miss it, and you fall back a step.'
+  }
+};

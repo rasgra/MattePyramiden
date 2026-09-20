@@ -1,0 +1,15 @@
+/* Local-only dev jump bar — see dev.config.js. Never shown in the
+   published Artifact, which has no such file to enable it. */
+.dev-bar{
+  display:none; align-items:center; gap:10px; flex-wrap:wrap;
+  background:repeating-linear-gradient(135deg, #4a3f00, #4a3f00 10px, #3a3100 10px, #3a3100 20px);
+  color:#ffe680; padding:8px 16px; font-family:'IBM Plex Mono',monospace; font-size:.78rem;
+  border-bottom:2px solid #ffe680;
+}
+.dev-bar.show{ display:flex; }
+.dev-bar strong{ letter-spacing:.08em; }
+.dev-bar select, .dev-bar button{
+  font-family:inherit; font-size:.78rem; padding:3px 6px; border-radius:4px;
+  border:1px solid #ffe680; background:#1c1700; color:#ffe680;
+}
+.dev-bar button{ cursor:pointer; }

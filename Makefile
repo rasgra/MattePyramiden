@@ -1,4 +1,4 @@
-.PHONY: help install dev serve format format-fix lint lint-js lint-css test report check shell clean
+.PHONY: help install build build-watch dev serve dev-down format format-fix lint lint-js lint-css test report check shell clean
 
 PORT ?= 8080
 REPORT_PORT ?= 9223
@@ -10,20 +10,26 @@ help: ## show this help
 install: ## build the tooling image (npm install runs inside it — nothing touches the host)
 	docker compose build
 
+build: ## bundle src/ into the single self-contained index.html at the repo root
+	$(DC_RUN) node build.js
+
 dev: serve ## alias for serve
-serve: ## run the game at http://localhost:$(PORT) (fully containerized, no host installs; override with PORT=...)
-	docker compose run --rm -p $(PORT):$(PORT) app npx http-server . -p $(PORT)
+serve: ## build, then serve the game at http://localhost:$(PORT), rebuilding on save (fully containerized; override with PORT=...)
+	docker compose run --rm -p $(PORT):$(PORT) app sh -c "node build.js && (node build.js --watch & npx http-server . -p $(PORT))"
+dev-down: ## stop a `make dev`/`make serve` left running (e.g. in another terminal, or after a crash)
+	docker compose kill
+	docker compose down --remove-orphans
 
 format: ## check formatting (no changes)
 	$(DC_RUN) npx prettier --check .
 format-fix: ## fix formatting
 	$(DC_RUN) npx prettier --write .
 
-lint: lint-js lint-css ## lint the inline <script> and <style> in index.html
+lint: lint-js lint-css ## lint src/ (JS via eslint, CSS via stylelint)
 lint-js:
 	$(DC_RUN) npx eslint .
 lint-css:
-	$(DC_RUN) npx stylelint index.html
+	$(DC_RUN) npx stylelint "src/styles/**/*.css"
 
 test: ## run the Playwright smoke-test suite headlessly
 	$(DC_RUN) npx playwright test

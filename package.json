@@ -5,21 +5,23 @@
   "type": "module",
   "description": "Pyramid Reckoning — a modern remake of Cheops Pyramid (1993)",
   "scripts": {
+    "build": "node build.js",
+    "build:watch": "node build.js --watch",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint:js": "eslint .",
-    "lint:css": "stylelint index.html",
+    "lint:css": "stylelint \"src/styles/**/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "test": "playwright test",
     "serve": "http-server . -p 8000"
   },
   "devDependencies": {
     "@playwright/test": "1.47.2",
+    "esbuild": "^0.24.0",
     "eslint": "^9.11.1",
     "eslint-plugin-html": "^8.1.1",
     "globals": "^15.9.0",
     "http-server": "^14.1.1",
-    "postcss-html": "^1.7.0",
     "prettier": "^3.3.3",
     "stylelint": "^16.9.0",
     "stylelint-config-recommended": "^14.0.1"

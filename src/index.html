@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- The original single-file version never had this tag, so mobile browsers
+     rendered it at a zoomed-out desktop width and the @media(max-width:480px)
+     rules never actually applied on a phone. Fixed as part of the module
+     split — see the "phone/tablet" section of the split write-up. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pyramid Reckoning</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/frame.css">
+<link rel="stylesheet" href="styles/minigames.css">
+<link rel="stylesheet" href="styles/overlays.css">
+<link rel="stylesheet" href="styles/dev-bar.css">
+</head>
+<body>
+
+<script src="../dev.config.js"></script>
+
+<div class="dev-bar" id="devBar">
+  <strong>DEV MODE</strong>
+  <label>Room <select id="devRoomSelect"></select></label>
+  <label>Force game
+    <select id="devGameSelect">
+      <option value="">Random</option>
+      <option value="nim">Nim</option>
+      <option value="mastermind">Mastermind</option>
+      <option value="guess">Guess</option>
+      <option value="minesweeper">Minesweeper</option>
+    </select>
+  </label>
+  <button type="button" id="devJumpBtn">Jump</button>
+</div>
+
+<div class="masthead">
+  <div class="eyebrow" id="eyebrowText">A math expedition</div>
+  <h1>Pyramid Reckoning</h1>
+  <p id="subtitleText">Loading…</p>
+</div>
+
+<div class="frame">
+  <div class="hud">
+    <div class="hud-block">
+      <span class="level-badge" id="levelBadge">ÅK 5</span>
+      <span class="room-label" id="roomIndexLabel">CHAMBER 1 / 12</span>
+      <span class="room-name" id="roomNameLabel">The Threshold</span>
+    </div>
+    <div class="hud-block">
+      <span class="air-clock" id="airClock" title="Air remaining in the pyramid">48:00</span>
+      <svg class="hourglass" id="hourglass" viewBox="0 0 40 64" role="img" aria-labelledby="hourglassTitle" style="display:none;">
+        <title id="hourglassTitle">01:00 remaining</title>
+        <clipPath id="hgTopClip"><path d="M6 6 H34 L20 30 Z" /></clipPath>
+        <clipPath id="hgBotClip"><path d="M20 34 L34 58 H6 Z" /></clipPath>
+        <rect class="hg-cap" x="3" y="1" width="34" height="4" rx="1.5"></rect>
+        <rect class="hg-cap" x="3" y="59" width="34" height="4" rx="1.5"></rect>
+        <rect id="hgTopSand" class="hg-sand" x="6" y="6" width="28" height="24" clip-path="url(#hgTopClip)"></rect>
+        <rect id="hgBotSand" class="hg-sand" x="6" y="58" width="28" height="0" clip-path="url(#hgBotClip)"></rect>
+        <circle class="hg-grain hg-grain-a" cx="20" cy="30" r="1"></circle>
+        <circle class="hg-grain hg-grain-b" cx="20" cy="30" r="1"></circle>
+        <path class="hg-glass" d="M6 6 H34 L20 30 L34 58 H6 L20 30 Z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="scene" width="960" height="540"></canvas>
+
+    <div class="parchment" id="parchment">
+      <p class="ws-tip" id="wsTip" style="display:none;"></p>
+      <div class="worksheet" id="worksheet" style="display:none;">
+        <div class="ws-col" id="wsColLeft"></div>
+        <div class="ws-col" id="wsColRight"></div>
+      </div>
+      <div class="tally-row" id="tallyRow" style="display:none;">
+        <span class="tally-plaque" id="setTallyLabel">Correct: 0</span>
+      </div>
+      <div class="trial-charges" id="trialCharges" style="display:none;"></div>
+
+      <p class="prompt" id="promptText">Loading the first chamber…</p>
+      <p class="subprompt" id="subPromptText"></p>
+      <div class="answer-row" id="answerRow">
+        <input id="answerInput" type="text" inputmode="text" enterkeyhint="done" autocomplete="off" placeholder="Your answer" aria-label="Your answer">
+        <button class="btn" id="submitBtn">Answer</button>
+        <button class="btn" id="setContinueBtn" style="display:none;">Continue</button>
+      </div>
+      <div class="feedback" id="feedbackText"></div>
+      <div class="mm-history" id="mmHistory"></div>
+      <div class="hint" id="hintText"></div>
+    </div>
+
+    <div class="room-clear-banner" id="roomClearBanner" aria-live="polite"><span id="roomClearText"></span></div>
+
+    <div class="overlay" id="rulesOverlay">
+      <button class="overlay-x" id="rulesXBtn" aria-label="Close" type="button">×</button>
+      <h3 id="rulesTitle">Room rules</h3>
+      <div class="overlay-body">
+        <p class="overlay-sub" id="rulesBody" style="margin-bottom:0;">Solve all 10 problems…</p>
+      </div>
+    </div>
+
+    <div class="overlay" id="mapOverlay">
+      <button class="overlay-x" id="mapXBtn" aria-label="Close" type="button">×</button>
+      <h3 id="mapTitle">The pyramid</h3>
+      <p class="overlay-sub" id="mapSub">Chamber 1 is at the top; the treasury waits at the base.</p>
+      <div class="overlay-body">
+        <div class="pyramid-map" id="mapTrack"></div>
+        <div class="map-legend" id="mapLegend">
+          <span><i class="map-swatch current"></i><span id="mapLegendHere">Here now</span></span>
+          <span><i class="map-swatch done"></i><span id="mapLegendCleared">Cleared</span></span>
+          <span><i class="map-swatch"></i><span id="mapLegendAhead">Ahead</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="setupOverlay">
+      <h3 id="setupTitle">Before you enter</h3>
+      <p class="overlay-sub" id="setupSub">Choose a language and a difficulty.</p>
+
+      <div class="field-label" id="langLabel">Language</div>
+      <div class="lang-row">
+        <button class="pill" id="langSv" type="button">Svenska</button>
+        <button class="pill" id="langEn" type="button">English</button>
+      </div>
+
+      <div class="field-label" id="levelLabel">Difficulty</div>
+      <div class="level-grid" id="levelGrid"></div>
+
+      <div class="setup-actions">
+        <button class="btn" id="setupPrimaryBtn">Begin the climb</button>
+        <button class="btn ghost" id="setupCancelBtn" style="display:none;">Cancel</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="introOverlay">
+      <div class="intro-body">
+        <canvas id="introScene" class="intro-scene" width="640" height="360"></canvas>
+        <p class="intro-beat" id="introBeatText"></p>
+        <div class="intro-letter" id="introLetter" style="display:none;">
+          <div class="intro-letter-scrap">
+            <p class="intro-letter-text" id="introLetterText"></p>
+            <span class="intro-letter-sig" id="introLetterSig">— Cheops</span>
+          </div>
+          <div class="intro-candle"><span class="flame">🕯️</span></div>
+        </div>
+      </div>
+      <div class="intro-dots" id="introDots"></div>
+      <div class="intro-actions">
+        <button class="btn ghost" id="introSkipBtn">Skip intro</button>
+        <button class="btn" id="introNextBtn">Continue</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="endOverlay">
+      <div class="end-body">
+        <div class="end-scroll">
+          <canvas id="endScene" class="end-scene" width="640" height="360"></canvas>
+          <h2 id="endTitle">You reach the treasure chamber</h2>
+          <p id="endBody">Gold, faience and a very smug cat statue.</p>
+        </div>
+        <button class="btn" id="restartBtn">Climb again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="rail-btn" id="rulesBtn">📖 <span id="lblRules">Rules</span> <kbd>R</kbd></button>
+    <button class="rail-btn" id="hintBtn">💡 <span id="lblHint">Hint</span> <kbd>H</kbd></button>
+    <button class="rail-btn" id="mapBtn">🗺 <span id="lblMap">Map</span> <kbd>M</kbd></button>
+    <button class="rail-btn" id="saveBtn">⛏ <span id="lblSave">Save</span> <kbd>S</kbd></button>
+    <button class="rail-btn" id="loadBtn">📜 <span id="lblLoad">Load</span> <kbd>L</kbd></button>
+    <button class="rail-btn" id="soundBtn"><span id="soundIcon">🔊</span> <span id="lblSound">Sound</span></button>
+    <button class="rail-btn" id="settingsBtn">⚙ <span id="lblSettings">Settings</span></button>
+    <button class="rail-btn" id="resetBtn">↺ <span id="lblRestart">Restart</span></button>
+  </div>
+</div>
+
+<footer>
+  <div class="glyphs">▲ ▲ ▲ ▲ ▲</div>
+  <span id="footerText">Numbers regenerate on every climb, so the pyramid never solves the same way twice.</span>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

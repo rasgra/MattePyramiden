@@ -67,7 +67,9 @@ test('the answer blank sits inline at the end of the current worksheet row', asy
     await expect(page.locator('#answerRow')).toBeHidden();
 
     await page.fill('#answerInput', '0');
-    await page.click('#submitBtn');
+    // No submit button lives in the worksheet slot (too little room for it) —
+    // Enter is the only way to submit here.
+    await page.locator('#answerInput').press('Enter');
     // The answer itself may be right or wrong (problems are randomized) — only
     // assert that the row left its unanswered "placeholder" state either way,
     // and that the blank moved on to the next row rather than vanishing.
@@ -106,7 +108,7 @@ test('arrow keys navigate between not-yet-correct worksheet rows, and a wrong ro
   // A wrong answer no longer locks the row out for the rest of the sheet —
   // it hands off to another row, but row 0 stays revisitable afterward.
   await page.fill('#answerInput', '999999999');
-  await page.click('#submitBtn');
+  await page.locator('#answerInput').press('Enter');
   await expect(page.locator('#wsSlot-0')).toHaveClass(/wrong/);
   await page.waitForTimeout(800); // clears the 700ms hand-off delay
   await expect(page.locator('#wsSlot-0 #answerInput')).toHaveCount(0);
@@ -114,6 +116,44 @@ test('arrow keys navigate between not-yet-correct worksheet rows, and a wrong ro
   await page.keyboard.press('ArrowUp'); // back up to row 0 from wherever the hand-off landed
   await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
   await expect(page.locator('#wsSlot-0')).not.toHaveClass(/wrong/);
+});
+
+test('a worksheet row can be selected with a click/tap, not just the arrow keys', async ({ page }) => {
+  await startGame(page);
+  const worksheet = page.locator('#worksheet');
+  if (!(await worksheet.isVisible())) return; // chamber 1 landed on a non-worksheet room this run
+
+  await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible();
+
+  await page.click('#wsRow-6');
+  await expect(page.locator('#wsSlot-6 #answerInput')).toBeVisible();
+  await expect(page.locator('#wsSlot-0')).toHaveClass(/placeholder/);
+
+  // Clicking the already-active row, or one already answered correctly, is a no-op.
+  await page.click('#wsRow-6');
+  await expect(page.locator('#wsSlot-6 #answerInput')).toBeVisible();
+});
+
+test('no submit button crowds the worksheet slot, and arrow-key navigation ignores caret position', async ({
+  page
+}) => {
+  await startGame(page);
+  const worksheet = page.locator('#worksheet');
+  if (!(await worksheet.isVisible())) return; // chamber 1 landed on a non-worksheet room this run
+
+  // Regression test: #submitBtn used to be squeezed into the slot alongside
+  // the answer input, leaving little room to type — it's dropped now that
+  // Enter already submits.
+  await expect(page.locator('.ws-slot #submitBtn')).toHaveCount(0);
+
+  // Regression test: Left/Right used to only navigate once the caret sat at
+  // the exact start/end of the field, which real typing rarely leaves it at
+  // — in practice the arrows just seemed dead (only Up/Down, within a single
+  // column, ever visibly worked). They now always navigate regardless.
+  await page.click('#wsRow-5'); // right-hand column, row 0
+  await page.fill('#answerInput', '17'); // fill() leaves the caret at the end, the old failure case
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.locator('#wsSlot-0 #answerInput')).toBeVisible(); // hopped back to the left column
 });
 
 test('the hint, rules and map panels open and close', async ({ page }) => {
@@ -124,13 +164,13 @@ test('the hint, rules and map panels open and close', async ({ page }) => {
 
   await page.click('#rulesBtn');
   await expect(page.locator('#rulesOverlay')).toBeVisible();
-  await page.click('#rulesCloseBtn');
+  await page.click('#rulesXBtn');
   await expect(page.locator('#rulesOverlay')).toBeHidden();
 
   await page.click('#mapBtn');
   await expect(page.locator('#mapOverlay')).toBeVisible();
   await expect(page.locator('#mapTrack .map-node')).toHaveCount(12);
-  await page.click('#mapCloseBtn');
+  await page.click('#mapXBtn');
   await expect(page.locator('#mapOverlay')).toBeHidden();
 });
 
@@ -164,8 +204,8 @@ test('the map opens/closes via the corner X, Escape, and the M-key toggle — an
 test('switching to Swedish updates on-screen text', async ({ page }) => {
   await page.goto('/');
   await page.click('#langSv');
-  await expect(page.locator('#setupPrimaryBtn')).toHaveText('Kliv ner i pyramiden');
-  await expect(page.locator('#levelGrid .level-pill').first()).toHaveText('Åk 1');
+  await expect(page.locator('#setupPrimaryBtn')).toHaveText('Påbörja klättringen');
+  await expect(page.locator('#levelGrid .level-pill').first()).toHaveText('Nivå 1');
 });
 
 test('a sequential visual chamber (Geometry Vault / Coordinate Grid / Triangular Seal) plays through one step', async ({
@@ -188,7 +228,12 @@ test('a sequential visual chamber (Geometry Vault / Coordinate Grid / Triangular
   await expect(page.locator('.trial-charge').first()).toBeVisible();
   await expect(page.locator('#promptText')).not.toHaveText('');
 
-  await page.fill('#answerInput', '0');
+  // The Coordinate Grid marks its answer via arrow keys/clicks rather than
+  // typing (see room-variety.spec.js for that room's own dedicated tests),
+  // so its #answerInput is read-only — skip filling it and just confirm
+  // whatever it's already showing.
+  const isReadOnly = await page.locator('#answerInput').evaluate((el) => el.readOnly);
+  if (!isReadOnly) await page.fill('#answerInput', '0');
   await page.click('#submitBtn');
   // Right or wrong (content is randomized), answering should register — either
   // the tally moved, or (Nim/Mastermind-style rooms aside) the room's own
@@ -218,7 +263,7 @@ test('answering questions triggers no console errors (audio cues included)', asy
   await startGame(page);
   if (await page.locator('#worksheet').isVisible()) {
     await page.fill('#answerInput', '0');
-    await page.click('#submitBtn'); // plays the positive or negative cue
+    await page.locator('#answerInput').press('Enter'); // plays the positive or negative cue
     await page.waitForTimeout(200);
   }
 
@@ -235,7 +280,17 @@ test('opening settings mid-run can be cancelled without restarting', async ({ pa
   await expect(page.locator('#roomIndexLabel')).toContainText('CHAMBER 1 / 12');
 });
 
-test('clearing the finale shows the treasure-chamber illustration; losing does not', async ({ page }) => {
+async function endSceneHasContent(page) {
+  return page.evaluate(() => {
+    const c = document.getElementById('endScene');
+    const ctx = c.getContext('2d');
+    const data = ctx.getImageData(0, 0, c.width, c.height).data;
+    for (let i = 3; i < data.length; i += 4) if (data[i] > 0 && data[i - 1] > 40) return true;
+    return false;
+  });
+}
+
+test('clearing the finale shows the treasure-chamber illustration', async ({ page }) => {
   await page.goto('/?debug=1');
   await page.click('#langEn');
   await page.click('#setupPrimaryBtn');
@@ -248,22 +303,31 @@ test('clearing the finale shows the treasure-chamber illustration; losing does n
   await expect(page.locator('#endOverlay')).toHaveClass(/show/);
   await expect(page.locator('#endOverlay')).not.toHaveClass(/mummy/);
   await expect(page.locator('#endScene')).toBeVisible();
+  await expect(page.locator('#endBody')).toContainText('Difficulty level 6'); // level 5 -> "try level 6 next"
 
   // The scene should actually be drawing something, not sitting blank —
-  // sample a pixel a moment apart and expect at least one non-transparent
-  // pixel to have appeared (regression: the canvas element wasn't wired
-  // into `els`, so drawTreasureScene() silently no-opped every frame).
-  const hasContent = await page.evaluate(() => {
-    const c = document.getElementById('endScene');
-    const ctx = c.getContext('2d');
-    const data = ctx.getImageData(0, 0, c.width, c.height).data;
-    for (let i = 3; i < data.length; i += 4) if (data[i] > 0 && data[i - 1] > 40) return true;
-    return false;
-  });
-  expect(hasContent).toBe(true);
+  // regression: the canvas element wasn't wired into `els`, so
+  // drawTreasureScene() silently no-opped every frame.
+  expect(await endSceneHasContent(page)).toBe(true);
+});
 
-  // Simulate the exact class combination loseGame() applies, and confirm
-  // the illustration (a win-only scene) is hidden on that screen.
-  await page.evaluate(() => document.getElementById('endOverlay').classList.add('mummy'));
-  await expect(page.locator('#endScene')).toBeHidden();
+test("losing shows the mummy illustration and Cheops's mummification message", async ({ page }) => {
+  await page.goto('/?debug=1');
+  await page.click('#langEn');
+  await page.click('#setupPrimaryBtn');
+  await page.click('#introSkipBtn');
+
+  // Running out of air is the only way to lose — drain it directly rather
+  // than playing the whole climb out.
+  await page.evaluate(() => {
+    window.__debug.state.airLeft = 1; // about to run out on the next tick
+  });
+  await page.waitForTimeout(1300);
+
+  await expect(page.locator('#endOverlay')).toHaveClass(/show/);
+  await expect(page.locator('#endOverlay')).toHaveClass(/mummy/);
+  await expect(page.locator('#endScene')).toBeVisible();
+  await expect(page.locator('#endBody')).toContainText('mummified');
+
+  expect(await endSceneHasContent(page)).toBe(true);
 });

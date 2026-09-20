@@ -1,0 +1,132 @@
+/* ---------- Generic full-stage overlays ---------- */
+.overlay{
+  display:none; position:absolute; inset:16px; background:rgba(10,7,4,.96);
+  border-radius:10px; border:1px solid rgba(138,106,52,.5); padding:20px; z-index:8;
+  overflow:auto;
+}
+/* Overlays with an .overlay-body wrapper (rules, map) scroll only that
+   inner region, so the header and the corner × button never scroll out
+   of reach. Overlays without one (setup, intro, end) fall back to
+   scrolling the whole box via the overflow:auto above. */
+.overlay.show{ display:flex; flex-direction:column; }
+.overlay h3{ color:var(--torch-bright); margin-bottom:4px; font-size:1.15rem; flex:none; }
+.overlay .overlay-sub{ color:var(--papyrus-dim); font-size:.85rem; margin-bottom:16px; flex:none; }
+.overlay-body{ flex:1 1 auto; min-height:0; overflow:auto; }
+.overlay-x{
+  position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%;
+  border:1px solid rgba(138,106,52,.5); background:var(--wall-2); color:var(--papyrus);
+  font-size:1.1rem; line-height:1; cursor:pointer;
+}
+.overlay-x:hover{ border-color:var(--torch); color:var(--torch-bright); }
+
+/* Map */
+.pyramid-map{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px 0 14px; }
+.pyramid-row{ display:flex; gap:6px; }
+.map-node{
+  position:relative; width:44px; height:38px; flex:none; display:flex; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:700;
+  background:linear-gradient(180deg, var(--wall-2), var(--wall)); color:var(--papyrus-dim);
+  border:1px solid rgba(138,106,52,.4); border-radius:4px;
+}
+.map-node.current{
+  background:linear-gradient(180deg, var(--torch-bright), var(--torch)); color:var(--basalt);
+  border-color:transparent; box-shadow:0 0 10px rgba(217,154,61,.6);
+}
+.map-node.done{ background:linear-gradient(180deg, #4a92b6, #3a6f8a); color:#eaf4f9; border-color:transparent; }
+.map-node .badge{ position:absolute; top:-8px; right:-8px; font-size:.8rem; }
+.map-legend{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:.76rem; color:var(--papyrus-dim); }
+.map-swatch{
+  display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px;
+  background:linear-gradient(180deg, var(--wall-2), var(--wall)); border:1px solid rgba(138,106,52,.4);
+}
+.map-swatch.current{ background:linear-gradient(180deg, var(--torch-bright), var(--torch)); border-color:transparent; }
+.map-swatch.done{ background:linear-gradient(180deg, #4a92b6, #3a6f8a); border-color:transparent; }
+
+/* Setup */
+.field-label{ font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gilt); margin:14px 0 8px; }
+.field-label:first-of-type{ margin-top:0; }
+.lang-row{ display:flex; gap:8px; }
+.pill{
+  font-family:'Manrope',sans-serif; font-weight:600; font-size:.85rem; padding:8px 14px;
+  border-radius:20px; border:1px solid rgba(138,106,52,.5); background:var(--wall-2); color:var(--papyrus);
+  cursor:pointer;
+}
+.pill.active{ background:linear-gradient(180deg, var(--torch-bright), var(--torch)); color:var(--basalt); border-color:transparent; }
+.level-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(84px,1fr)); gap:8px; }
+.level-pill{
+  font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:9px 6px; text-align:center;
+  border-radius:7px; border:1px solid rgba(138,106,52,.5); background:var(--wall-2); color:var(--papyrus); cursor:pointer;
+}
+.level-pill.active{ background:linear-gradient(180deg, var(--torch-bright), var(--torch)); color:var(--basalt); border-color:transparent; }
+.level-pill.master{ grid-column: 1 / -1; }
+.setup-actions{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+
+/* Intro */
+/* Only intro-body (the illustration + beat text/letter, whose combined
+   height varies by beat and by translated text length) scrolls on a short
+   viewport — introDots/introActions stay flex:none siblings below it, so
+   Skip/Continue are always reachable without scrolling. See
+   docs/DESIGN_RULES.md. */
+.intro-body{
+  flex:1 1 auto; min-height:0; overflow:auto;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+}
+.intro-scene{
+  width:100%; max-width:440px; max-height:24vh; aspect-ratio:16/9; display:block; border-radius:8px;
+  background:#0c0906; box-shadow: inset 0 0 0 1px rgba(138,106,52,.3), 0 14px 30px rgba(0,0,0,.5);
+  flex:none;
+}
+.intro-beat{ font-size:1.15rem; line-height:1.6; text-align:center; max-width:48ch; color:var(--papyrus); }
+.intro-actions{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:18px; flex:none; }
+.intro-dots{ display:flex; gap:6px; justify-content:center; margin-top:14px; flex:none; }
+.intro-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(230,200,140,.25); }
+.intro-dots span.on{ background:var(--torch); }
+
+.intro-letter{
+  display:flex; align-items:center; gap:22px; max-width:520px;
+}
+.intro-letter-scrap{
+  position:relative; background:linear-gradient(155deg, #d9cba3, #c3b280);
+  color:#2b2013; padding:22px 26px; flex:1;
+  clip-path: polygon(3% 6%, 22% 0%, 45% 4%, 68% 0%, 92% 5%, 100% 18%, 97% 40%,
+    100% 63%, 95% 82%, 100% 96%, 78% 100%, 55% 97%, 30% 100%, 6% 95%, 0% 74%, 5% 48%, 0% 24%);
+  box-shadow: 0 16px 30px rgba(0,0,0,.5);
+}
+.intro-letter-sig{
+  font-family:'Cinzel',serif; font-size:.8rem; letter-spacing:.15em; text-transform:uppercase;
+  color:#6b5327; display:block; margin-top:10px; text-align:right;
+}
+.intro-letter-text{ font-family:'Caveat',cursive; font-size:1.45rem; line-height:1.35; }
+.intro-candle{ flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.intro-candle .flame{
+  font-size:1.9rem; filter:drop-shadow(0 0 10px rgba(246,199,102,.8));
+  animation: flicker 1.6s ease-in-out infinite;
+}
+@keyframes flicker{ 0%,100%{ transform:scale(1) translateY(0); } 50%{ transform:scale(1.08) translateY(-1px); } }
+@media (max-width:560px){ .intro-letter{ flex-direction:column; } }
+
+/* End */
+/* The restart button lives outside .end-scroll and stays flex:none, so it's
+   always visible without scrolling — only the illustration/title/body (the
+   part that can genuinely vary in height, and isn't essential to act on)
+   scrolls internally if a short viewport can't fit all of it at once. See
+   docs/DESIGN_RULES.md: avoid layouts that need scrolling to reach the
+   thing the user's actually here to do. */
+.end-body{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; }
+.end-scroll{
+  flex:1 1 auto; min-height:0; width:100%; overflow:auto;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+}
+.end-body h2{ font-size:1.7rem; color:var(--torch-bright); }
+.end-body p{ color:var(--papyrus-dim); max-width:60ch; line-height:1.5; }
+.overlay.mummy .end-body h2{ color:var(--ochre); }
+#restartBtn{ flex:none; }
+.end-scene{
+  width:100%; max-width:440px; max-height:30vh; aspect-ratio:16/9; display:block; border-radius:8px;
+  background:#0c0906; box-shadow: inset 0 0 0 1px rgba(138,106,52,.3), 0 14px 30px rgba(0,0,0,.5);
+  margin-bottom:4px;
+}
+
+@media (max-width:480px){
+  .intro-actions{ flex-direction:column-reverse; }
+}

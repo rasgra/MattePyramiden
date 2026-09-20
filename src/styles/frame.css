@@ -1,0 +1,186 @@
+/* ---------- Game frame ---------- */
+.frame{
+  width:100%; max-width:960px;
+  background: linear-gradient(180deg, var(--wall-3), var(--wall) 40%, var(--wall) 100%);
+  border:1px solid #4a3720; border-radius:14px; padding:16px;
+  box-shadow: 0 30px 60px -25px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.04);
+  position:relative;
+}
+.frame::before{
+  content:""; position:absolute; inset:6px;
+  border:1px solid rgba(138,106,52,.35); border-radius:9px; pointer-events:none;
+}
+
+.hud{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:2px 6px 12px; flex-wrap:wrap; }
+.hud-block{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.room-label{ font-family:'IBM Plex Mono',monospace; font-size:.78rem; color:var(--papyrus-dim); letter-spacing:.06em; }
+.level-badge{
+  font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.05em;
+  color:var(--basalt); background:var(--gilt); border-radius:4px; padding:2px 6px;
+}
+.room-name{ font-family:'Cinzel',serif; font-size:1.05rem; color:var(--torch-bright); }
+
+.air-clock{
+  font-family:'IBM Plex Mono',monospace; font-variant-numeric: tabular-nums; font-size:.85rem;
+  padding:4px 10px; border-radius:7px; background:rgba(0,0,0,.35);
+  border:1px solid rgba(138,106,52,.4); min-width:56px; text-align:center;
+}
+.air-clock.low{ color:var(--ochre); border-color:rgba(193,79,49,.5); }
+.hourglass{ width:26px; height:42px; flex:none; overflow:visible; }
+.hg-cap{ fill:var(--gilt); }
+.hg-glass{ fill:none; stroke:rgba(230,210,180,.55); stroke-width:1.6; stroke-linejoin:round; }
+.hg-sand{ fill:var(--torch); transition:y 1s linear, height 1s linear; }
+.hourglass.low .hg-sand{ fill:var(--ochre); }
+.hg-grain{ fill:var(--torch-bright); animation:hgFall 0.9s linear infinite; }
+.hg-grain-b{ animation-delay:0.45s; }
+.hourglass.empty .hg-grain{ opacity:0; }
+@keyframes hgFall{
+  0%{ cy:29; opacity:0; }
+  15%{ opacity:1; }
+  85%{ opacity:1; }
+  100%{ cy:35; opacity:0; }
+}
+
+canvas#scene{
+  width:100%; aspect-ratio: 16/9; display:block; border-radius:8px; background:#0c0906;
+  box-shadow: inset 0 0 0 1px rgba(138,106,52,.3), inset 0 30px 60px rgba(0,0,0,.6);
+}
+
+.stage{ position:relative; }
+.stage.leaving{ animation: stageLeave .35s ease forwards; }
+.stage.entering{ animation: stageEnter .4s ease; }
+@keyframes stageLeave{ to{ opacity:0; transform:translateY(14px) scale(.98); } }
+@keyframes stageEnter{ from{ opacity:0; transform:translateY(-14px) scale(.98); } to{ opacity:1; transform:none; } }
+
+.room-clear-banner{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  pointer-events:none; opacity:0; z-index:7;
+}
+.room-clear-banner.show{ opacity:1; animation: roomClearPop .9s ease forwards; }
+.room-clear-banner span{
+  font-family:'Cinzel',serif; font-weight:700; font-size:1.6rem; color:var(--torch-bright);
+  background:rgba(10,7,4,.88); border:1px solid rgba(217,154,61,.6); border-radius:12px;
+  padding:14px 30px; box-shadow:0 10px 40px rgba(0,0,0,.5), 0 0 30px rgba(217,154,61,.45);
+  text-shadow:0 0 14px rgba(217,154,61,.7);
+}
+@keyframes roomClearPop{
+  0%{ opacity:0; transform:scale(.7); }
+  18%{ opacity:1; transform:scale(1.08); }
+  30%{ transform:scale(1); }
+  82%{ opacity:1; transform:scale(1); }
+  100%{ opacity:0; transform:scale(1.03); }
+}
+@media (prefers-reduced-motion: reduce){
+  .stage.leaving, .stage.entering, .room-clear-banner.show{ animation:none; }
+}
+
+.parchment{
+  position:absolute; left:5%; right:5%; bottom:6%; box-sizing:border-box;
+  background: linear-gradient(180deg, #e9dcc0, #ddcda6);
+  color:#2b2013; border-radius:6px; padding:16px 18px;
+  border-top:4px solid var(--room-accent);
+  box-shadow: 0 18px 34px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.15);
+  transition: border-color .25s ease;
+  --room-accent: #4a92b6;
+}
+.parchment .prompt{ font-size:1.02rem; line-height:1.5; font-weight:600; margin:0 0 10px; }
+.parchment .subprompt{ font-family:'IBM Plex Mono',monospace; font-size:.85rem; color:#5c4a2c; margin:-4px 0 12px; }
+.ws-tip{
+  font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:#5c4a2c;
+  margin:0 0 10px; line-height:1.4;
+}
+.worksheet{
+  display:grid; grid-template-columns:1fr 1fr; gap:1px 22px; margin-bottom:6px;
+  border-top:3px solid var(--room-accent); padding-top:9px;
+}
+.ws-col{ display:flex; flex-direction:column; gap:1px; }
+.ws-row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  font-family:'IBM Plex Mono',monospace; font-size:.92rem; padding:4px 6px; border-radius:4px;
+  cursor:pointer;
+}
+.ws-row.current, .ws-row.ws-row-done{ cursor:default; }
+.ws-row.current{ background:rgba(43,32,19,.08); box-shadow:inset 3px 0 0 var(--room-accent); }
+.ws-num{ white-space:nowrap; }
+.ws-slot{
+  font-weight:700; min-width:30px; text-align:right; font-variant-numeric:tabular-nums;
+  display:inline-flex; align-items:center; gap:4px; justify-content:flex-end;
+}
+.ws-slot.placeholder{ color:var(--lapis-dim); opacity:.7; }
+.ws-slot.correct{ color:#2e6b3e; }
+.ws-slot.wrong{ color:#8a2f1c; }
+.ws-word{
+  font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:700;
+  letter-spacing:.03em; text-transform:uppercase; opacity:.85;
+}
+.tally-row{ display:flex; justify-content:center; margin:2px 0 12px; }
+.tally-plaque{
+  font-family:'IBM Plex Mono',monospace; font-size:.85rem; font-weight:700; padding:5px 14px;
+  border-radius:5px; background:rgba(177,71,46,.1); border:1px solid rgba(177,71,46,.4); color:#8a2f1c;
+}
+.trial-charges{ display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+.trial-charge{ font-size:1.3rem; opacity:.25; filter:grayscale(1); transition:opacity .2s, filter .2s; }
+.trial-charge.lit{ opacity:1; filter:none; }
+.trial-charge.spent{ opacity:.5; filter:grayscale(1) brightness(.6); }
+.answer-row{ display:flex; gap:8px; flex-wrap:wrap; }
+/* #answerInput's base look holds regardless of which container it's currently
+   living in — it relocates into the worksheet's blank at the end of each line
+   (like a fill-in-the-blank), and back into .answer-row for non-worksheet rooms. */
+#answerInput{
+  font-family:'IBM Plex Mono',monospace; font-size:1rem;
+  padding:9px 10px; border-radius:6px; border:1px solid #a68c5c; background:#f7efdc; color:#2b2013;
+}
+#answerInput:focus{ outline:2px solid var(--lapis); outline-offset:1px; }
+.answer-row #answerInput{ flex:1 1 160px; min-width:0; }
+/* No submit button rides along in here anymore (Enter already submits, and
+   this slot is too narrow to spare the room) — just the input, sized for
+   the longest realistic answer (hex digits, a "3,-2"-style coordinate, …). */
+.ws-slot #answerInput{ width:7.5em; min-width:0; padding:3px 5px; font-size:.92rem; border-radius:4px; }
+.btn{
+  font-family:'Manrope',sans-serif; font-weight:700; font-size:.88rem; border:none; border-radius:6px;
+  padding:9px 16px; cursor:pointer; color:var(--basalt);
+  background: linear-gradient(180deg, var(--torch-bright), var(--torch));
+  box-shadow: 0 2px 0 #8a611c, 0 6px 14px -6px rgba(0,0,0,.5);
+}
+.btn:active{ transform:translateY(1px); box-shadow:0 1px 0 #8a611c; }
+.btn.secondary{
+  background: linear-gradient(180deg, #3f5c6d, var(--lapis-dim)); color:#eaf4f9;
+  box-shadow: 0 2px 0 #274654, 0 6px 14px -6px rgba(0,0,0,.5);
+}
+.btn.ghost{
+  background:transparent; color:var(--papyrus-dim); border:1px solid rgba(138,106,52,.5);
+  box-shadow:none;
+}
+.feedback{ margin-top:10px; font-size:.88rem; font-weight:600; min-height:1.2em; }
+.feedback.good{ color:#2e6b3e; }
+.feedback.bad{ color:#8a2f1c; }
+
+.hint{
+  display:none; margin-top:10px; padding:10px 12px; border-radius:6px;
+  background:rgba(74,146,182,.14); border:1px dashed var(--lapis-dim); color:#20323b;
+  font-size:.85rem; line-height:1.5;
+}
+.hint.show{ display:block; }
+
+.controls{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding-top:14px; }
+.frame:has(#setupOverlay.show) .controls,
+.frame:has(#introOverlay.show) .controls{ visibility:hidden; }
+.rail-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:.76rem; letter-spacing:.04em; color:var(--papyrus);
+  background:linear-gradient(180deg, var(--wall-2), var(--wall)); border:1px solid rgba(138,106,52,.45);
+  border-radius:6px; padding:8px 12px; cursor:pointer; display:flex; align-items:center; gap:6px;
+}
+.rail-btn:hover{ border-color:var(--torch); color:var(--torch-bright); }
+.rail-btn kbd{
+  font-family:'IBM Plex Mono',monospace; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.12);
+  border-radius:3px; padding:0 4px; font-size:.68rem;
+}
+
+@media (max-width:480px){
+  .hud{ justify-content:flex-start; }
+  .parchment{ left:3%; right:3%; padding:12px 14px; }
+  .answer-row{ flex-direction:column; }
+  .answer-row .btn{ width:100%; }
+  .worksheet{ grid-template-columns:1fr; gap:1px; }
+  .ws-num{ font-size:.86rem; }
+}

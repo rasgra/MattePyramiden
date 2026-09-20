@@ -9,7 +9,7 @@ export default defineConfig({
     trace: 'on-first-retry'
   },
   webServer: {
-    command: 'npx http-server . -p 4173 -s',
+    command: 'node build.js && npx http-server . -p 4173 -s',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI
   },

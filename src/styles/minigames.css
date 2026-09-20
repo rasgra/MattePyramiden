@@ -1,0 +1,59 @@
+/* ---------- Mastermind / Guess-the-number history ---------- */
+.mm-history{
+  display:none; margin-top:10px; padding-top:8px; border-top:1px solid rgba(43,32,19,.25);
+  font-family:'IBM Plex Mono',monospace; font-size:.82rem; max-height:200px; overflow-y:auto;
+}
+.mm-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:2px 0; }
+.mm-row .mm-code{ font-weight:700; letter-spacing:.15em; }
+.mm-row .mm-score{ color:#5c4a2c; white-space:nowrap; }
+.mm-row.win .mm-score{ color:#2e6b3e; font-weight:700; }
+
+/* ---------- Minesweeper ---------- */
+.ms-wrap{ margin-top:6px; }
+.ms-toolbar{ display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+.ms-counter{
+  font-family:'IBM Plex Mono',monospace; font-size:.85rem; font-weight:700;
+  background:rgba(43,32,19,.08); border-radius:6px; padding:3px 8px;
+}
+.ms-flag-btn.active{ background:var(--torch); color:#2b2013; border-color:transparent; }
+.ms-grid{
+  display:grid; grid-template-columns:repeat(10, 1fr); gap:2px;
+  width:100%; max-width:320px;
+}
+.ms-cell{
+  aspect-ratio:1; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:.72rem;
+  line-height:1; border-radius:3px; border:1px solid rgba(43,32,19,.3);
+  background:linear-gradient(180deg, rgba(255,255,255,.5), rgba(43,32,19,.1));
+  color:#2b2013; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;
+}
+.ms-cell:not(:disabled):hover{ background:rgba(74,146,182,.18); }
+.ms-cell:disabled{ cursor:default; }
+.ms-cell.revealed{ background:rgba(43,32,19,.06); border-color:rgba(43,32,19,.18); }
+.ms-cell.mine{ background:rgba(138,40,20,.25); border-color:rgba(138,40,20,.4); }
+.ms-cell.flagged{ font-size:.85rem; }
+.ms-cell.n1{ color:var(--lapis-dim); }
+.ms-cell.n2{ color:#2e6b3e; }
+.ms-cell.n3{ color:#8a2f1c; }
+.ms-cell.n4{ color:#5c2f8a; }
+.ms-cell.n5{ color:#8a5c1c; }
+.ms-cell.n6{ color:#1c8a7c; }
+.ms-cell.n7{ color:#2b2013; }
+.ms-cell.n8{ color:#5c4a2c; }
+
+/* ---------- Nim (The Counting Wall) ---------- */
+.nim-piles{ display:flex; gap:22px; margin-top:10px; align-items:flex-end; justify-content:center; flex-wrap:wrap; }
+.nim-pile{ display:flex; flex-direction:column; align-items:center; }
+.nim-bricks{ display:flex; flex-direction:column; gap:3px; }
+.nim-pile-count{
+  margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:.85rem; font-weight:700; color:#5c4a2c;
+}
+.nim-brick{
+  width:64px; height:16px; border-radius:3px; cursor:pointer;
+  background:linear-gradient(180deg, #b5502f, #8a3620);
+  border:1px solid rgba(43,32,19,.4);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.15), inset 0 2px 0 rgba(255,255,255,.2);
+  transition: transform .3s ease, opacity .3s ease, background .15s ease;
+}
+.nim-brick:not(.disabled):hover, .nim-brick.preview{ background:linear-gradient(180deg, #e08a54, #b5502f); }
+.nim-brick.removing{ transform:scale(.3) rotate(14deg); opacity:0; }
+.nim-brick.disabled{ cursor:default; }
