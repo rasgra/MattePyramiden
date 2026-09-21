@@ -5,19 +5,24 @@ export default {
   name:{sv:'Subtraktionsrummet', en:'The Subtraction Room'}, accent:'#6b4a2f',
   build:function(level){
     var range = T(level, [[1,9],[5,40],[20,200],[100,5000],[1000,90000]]);
-    var a = randInt(range[0], range[1]);
-    // Almost always b < a (a meaningfully positive result) — a plain
-    // uniform draw of b up to a used to land on b===a roughly 1-in-a
-    // times, which at the easiest tier's tiny [1,9] range meant a large
-    // share of a 10-problem sheet was the trivial "anything minus itself
-    // is zero", so that's now kept rare (~10% of the non-negative case)
-    // rather than left to chance. Occasionally (under 5% of problems) b
-    // is drawn from the full range instead, which can land above a and
+    // Occasionally (under 5% of problems) both operands are drawn
+    // independently from the full range, which can land b above a and
     // give a negative answer.
-    var b;
-    if(Math.random() < 0.05) b = randInt(range[0], range[1]);
-    else if(a > range[0] && Math.random() < 0.9) b = randInt(range[0], a-1);
-    else b = randInt(range[0], a);
+    if(Math.random() < 0.05){
+      var a2 = randInt(range[0], range[1]), b2 = randInt(range[0], range[1]);
+      return {a:a2, b:b2, ans:a2-b2};
+    }
+    // Otherwise, the *difference* is drawn first and spread fairly evenly
+    // across the whole span the level allows (rarely landing on exactly
+    // 0), then a and b are built around it. Drawing a and b independently
+    // instead (a uniform, b uniform up to a) used to badly skew the
+    // answers toward small differences — a small minuend only ever leaves
+    // room for a small gap, so 0s and 1s could dominate a 10-problem
+    // sheet even though every (a,b) pair was individually "random".
+    var span = range[1]-range[0];
+    var diff = Math.random() < 0.1 ? 0 : randInt(1, span);
+    var b = randInt(range[0], range[1]-diff);
+    var a = b+diff;
     return {a:a,b:b,ans:a-b};
   },
   text:function(lang,v){

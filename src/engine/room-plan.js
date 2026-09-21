@@ -41,14 +41,21 @@ export function planRooms(level){
 }
 
 // Room keys can outlive a save (e.g. a room file gets renamed/removed in a
-// later version) — validate before trusting a restored plan, and only ever
-// touch the drill slots, since MINIGAME_TYPES is a small fixed set that
-// isn't expected to change the same way.
+// later version) — validate before trusting a restored plan. The mini-game
+// slots get their own check: planRooms() guarantees they're never the same
+// type as each other, but that guarantee lives only in planRooms() itself
+// — a save from an older/corrupted format could restore a plan with a
+// duplicate (or no-longer-valid) mini-game type in one of those slots
+// without ever going through planRooms() again, so it has to be checked
+// here too, not just assumed from where the plan came from.
 export function isValidPlan(plan){
   if(!Array.isArray(plan) || plan.length !== TOTAL_ROOMS) return false;
   for(var i=0;i<TOTAL_ROOMS;i++){
     if(isSpecialRoom(i)) continue;
     if(!ROOMS.some(function(r){ return r.key === plan[i]; })) return false;
   }
+  var mg0 = plan[MINIGAME_SLOTS[0]], mg1 = plan[MINIGAME_SLOTS[1]];
+  if(MINIGAME_TYPES.indexOf(mg0) === -1 || MINIGAME_TYPES.indexOf(mg1) === -1) return false;
+  if(mg0 === mg1) return false;
   return true;
 }

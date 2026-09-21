@@ -38,6 +38,40 @@ test('chambers 5 and 10 are always a mini-game, and never the same one twice in 
   expect(typeB).not.toBe(typeA);
 });
 
+test('isValidPlan rejects a restored plan with a duplicate or invalid mini-game type', async ({ page }) => {
+  // planRooms() itself guarantees the two mini-game slots never match, but
+  // that guarantee only holds for plans it just generated — a restored
+  // plan (a save, or the Claude-Artifact hot-reload snapshot) skips
+  // planRooms() entirely and goes straight through isValidPlan() instead,
+  // so isValidPlan() has to enforce the same invariant itself rather than
+  // just checking the drill topics and assuming the rest is fine.
+  await startWithDebug(page);
+  const results = await page.evaluate(
+    ({ slots }) => {
+      const dbg = window.__debug;
+      const base = dbg.state.roomPlan.slice();
+
+      const duplicate = base.slice();
+      duplicate[slots[0]] = 'nim';
+      duplicate[slots[1]] = 'nim';
+
+      const invalidType = base.slice();
+      invalidType[slots[0]] = 'not-a-real-minigame';
+
+      return {
+        original: dbg.isValidPlan(base),
+        duplicate: dbg.isValidPlan(duplicate),
+        invalidType: dbg.isValidPlan(invalidType)
+      };
+    },
+    { slots: MINIGAME_SLOTS }
+  );
+
+  expect(results.original).toBe(true);
+  expect(results.duplicate).toBe(false);
+  expect(results.invalidType).toBe(false);
+});
+
 test('re-planning the map eventually surfaces all four mini-game types in chamber 5', async ({ page }) => {
   // Which mini-game each slot gets is now fixed once per run (planRooms()),
   // not re-rolled on every visit — so variety is sampled across many fresh
@@ -494,33 +528,37 @@ test('the subtraction room rarely (under 5%) allows a negative answer', async ({
   expect(stats.ratio).toBeLessThan(0.05);
 });
 
-test('the subtraction room rarely produces the trivial "a minus itself" zero-answer problem', async ({ page }) => {
-  // Regression test: at the easiest tier's tiny [1,9] range, drawing b
-  // uniformly up to a used to land on b===a often enough that a 10-problem
-  // sheet could be 40% "anything minus itself is zero" — see the level-2
-  // screenshot that reported this. Now b is deliberately kept below a most
-  // of the time, so the zero-answer case stays rare instead of dominant.
+test('the subtraction room spreads its answers across the whole range instead of clumping at 0/1', async ({ page }) => {
+  // Regression test: at the easiest tier's tiny [1,9] range, drawing a and
+  // b as two independent uniform values (b up to a) badly skewed the
+  // answers toward small differences — a small minuend can only ever
+  // produce a small gap — so a reported 10-problem sheet was 40% "a minus
+  // itself is zero" and another 30% "a minus one" answers. The difference
+  // is now drawn first and spread evenly across the level's whole span, so
+  // no single small-answer bucket should dominate a large sample this way.
   await startWithDebug(page);
   const stats = await page.evaluate(() => {
     const dbg = window.__debug;
     dbg.state.level = 2;
+    const counts = {};
     let total = 0;
-    let zero = 0;
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 80; i++) {
       dbg.state.roomPlan[0] = 'subtraction';
       dbg.loadRoom(0, { skipTimer: true });
       for (const item of dbg.state.set.items) {
         const m = item.label.match(/^(-?\d+) − (-?\d+) =$/);
         if (!m) continue;
+        const diff = parseInt(m[1], 10) - parseInt(m[2], 10);
+        counts[diff] = (counts[diff] || 0) + 1;
         total++;
-        if (m[1] === m[2]) zero++;
       }
     }
-    return { total, zero, ratio: total ? zero / total : null };
+    return { counts, total };
   });
 
   expect(stats.total).toBeGreaterThan(0);
-  expect(stats.ratio).toBeLessThan(0.2);
+  expect((stats.counts[0] || 0) / stats.total).toBeLessThan(0.2);
+  expect((stats.counts[1] || 0) / stats.total).toBeLessThan(0.2);
 });
 
 test('minesweeper auto-completes once every mummy has been flagged', async ({ page }) => {

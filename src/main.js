@@ -167,7 +167,7 @@ if(/(?:^|[?&])debug=1(?:&|$)/.test(location.search)){
   window.__debug = {
     state: state, loadRoom: loadRoom, isMinigameSlot: isMinigameSlot, minigameName: minigameName,
     onSuccess: onSuccess, onFail: onFail, advanceRoom: advanceRoom, finalizeSet: finalizeSet,
-    planRooms: planRooms, pauseTick: pauseTick, nimPlayerMove: nimPlayerMove, nimBestMove: nimBestMove
+    planRooms: planRooms, isValidPlan: isValidPlan, pauseTick: pauseTick, nimPlayerMove: nimPlayerMove, nimBestMove: nimBestMove
   };
 }
 
