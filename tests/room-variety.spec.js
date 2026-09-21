@@ -449,6 +449,47 @@ test('a click during the "You did it!" banner skips the linger and advances righ
   });
 });
 
+test('3 wrong answers ends a worksheet chamber early and falls back a chamber', async ({ page }) => {
+  // Worksheet rows can be retried indefinitely via the arrow keys, but that
+  // used to mean a player could brute-force a row by guessing until they
+  // stumbled on the right answer. A 3rd wrong submission (across any rows,
+  // not just distinct ones) now ends the attempt early instead.
+  await startWithDebug(page);
+  await page.evaluate((i) => {
+    window.__debug.state.roomPlan[i] = 'subtraction';
+    window.__debug.loadRoom(i, { skipTimer: true });
+  }, DRILL_SLOTS[1]);
+
+  for (let i = 0; i < 3; i++) {
+    await page.fill('#answerInput', 'not-a-number');
+    await page.locator('#answerInput').press('Enter');
+    await page.waitForTimeout(750);
+  }
+
+  await expect(page.locator('#subPromptText')).toHaveText('Three wrong answers is the limit for this chamber.');
+  await expect(page.locator('#setContinueBtn')).toBeVisible();
+  await page.click('#setContinueBtn');
+  await expect(page.locator('#roomIndexLabel')).toContainText(`CHAMBER ${DRILL_SLOTS[1]} / 12`);
+});
+
+test('3 wrong answers ends a trial chamber early too, even with items left unanswered', async ({ page }) => {
+  await startWithDebug(page);
+  await page.evaluate((i) => {
+    window.__debug.state.roomPlan[i] = 'pythagoras';
+    window.__debug.loadRoom(i, { skipTimer: true });
+  }, DRILL_SLOTS[1]);
+
+  for (let i = 0; i < 3; i++) {
+    await page.fill('#answerInput', 'nope');
+    await page.locator('#answerInput').press('Enter');
+    await page.waitForTimeout(750);
+  }
+
+  await expect(page.locator('#setContinueBtn')).toBeVisible();
+  await page.click('#setContinueBtn');
+  await expect(page.locator('#roomIndexLabel')).toContainText(`CHAMBER ${DRILL_SLOTS[1]} / 12`);
+});
+
 test('each mini-game chamber gets its own icon and accent color', async ({ page }) => {
   await startWithDebug(page);
   for (const type of MINIGAME_TYPES) {

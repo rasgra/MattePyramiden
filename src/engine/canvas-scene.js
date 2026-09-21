@@ -689,6 +689,69 @@ function drawIntroCorridorScene(ctx, w, h, ti){
   ctx.fillStyle = vg; ctx.fillRect(0,0,w,h);
 }
 
+function drawIntroLampScene(ctx, w, h, ti){
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#050403';
+  ctx.fillRect(0,0,w,h);
+
+  // The same dim corridor walls as the pitch-black beat, but now lit by a
+  // real light source instead of just ambient gloom.
+  var cx = w/2, cy = h*0.5, stages = 5;
+  for(var i=stages;i>=1;i--){
+    var f = i/stages;
+    var hw = (w*0.42)*f, hh = (h*0.38)*f;
+    ctx.strokeStyle = 'rgba(150,115,70,' + (0.06 + (stages-i)*0.035) + ')';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx-hw, cy-hh, hw*2, hh*2);
+  }
+
+  var lampX = w*0.47, lampY = h*0.68;
+  var flick = 0.85 + 0.15*Math.sin(ti*7);
+
+  // The lamp's glow, spilling out into the dark around it.
+  var glow = ctx.createRadialGradient(lampX, lampY-h*0.05, 4, lampX, lampY-h*0.05, w*0.32*flick);
+  glow.addColorStop(0, 'rgba(255,214,140,0.6)');
+  glow.addColorStop(0.5, 'rgba(255,180,90,0.2)');
+  glow.addColorStop(1, 'rgba(255,180,90,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath(); ctx.arc(lampX, lampY-h*0.05, w*0.32*flick, 0, Math.PI*2); ctx.fill();
+
+  // The folded note, lying flat beside the lamp.
+  ctx.save();
+  ctx.translate(lampX+w*0.11, lampY+h*0.025);
+  ctx.rotate(-0.14);
+  ctx.fillStyle = '#d9cba3';
+  ctx.fillRect(-w*0.045, -h*0.02, w*0.09, h*0.04);
+  ctx.strokeStyle = 'rgba(90,70,40,0.45)'; ctx.lineWidth = 1;
+  ctx.strokeRect(-w*0.045, -h*0.02, w*0.09, h*0.04);
+  ctx.restore();
+
+  // The oil lamp itself: a rounded vessel with a spout, resting on the floor.
+  ctx.fillStyle = '#3a2f22';
+  ctx.beginPath(); ctx.ellipse(lampX, lampY, w*0.055, h*0.028, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(lampX+w*0.048, lampY-h*0.006);
+  ctx.quadraticCurveTo(lampX+w*0.09, lampY-h*0.014, lampX+w*0.1, lampY-h*0.026);
+  ctx.quadraticCurveTo(lampX+w*0.085, lampY, lampX+w*0.04, lampY+h*0.012);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#241c14';
+  ctx.beginPath(); ctx.ellipse(lampX, lampY-h*0.012, w*0.018, h*0.01, 0, 0, Math.PI*2); ctx.fill();
+
+  // The flame, rising from the spout.
+  var fx = lampX+w*0.1, fy = lampY-h*0.03;
+  ctx.beginPath();
+  ctx.moveTo(fx, fy-2*flick);
+  ctx.quadraticCurveTo(fx-6*flick, fy-16*flick, fx, fy-28*flick);
+  ctx.quadraticCurveTo(fx+6*flick, fy-16*flick, fx, fy-2*flick);
+  ctx.fillStyle = '#f6c766';
+  ctx.fill();
+
+  var vg = ctx.createRadialGradient(cx,cy,h*0.1, cx,cy,h*0.7);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.55)');
+  ctx.fillStyle = vg; ctx.fillRect(0,0,w,h);
+}
+
 function drawIntroShaftScene(ctx, w, h, ti){
   ctx.clearRect(0,0,w,h);
   var bg = ctx.createLinearGradient(0,0,0,h);
@@ -733,8 +796,8 @@ function drawIntroShaftScene(ctx, w, h, ti){
 }
 
 // One entry per intro beat index — null for the letter beat, which already
-// has its own visual (the candle + parchment markup, not a canvas scene).
-var INTRO_SCENES = [drawIntroWallScene, drawIntroCorridorScene, null, drawIntroShaftScene];
+// has its own visual (the lamp + parchment markup, not a canvas scene).
+var INTRO_SCENES = [drawIntroWallScene, drawIntroCorridorScene, drawIntroLampScene, null, drawIntroShaftScene];
 var introSceneRunning = false;
 var activeIntroDraw = null;
 function runIntroSceneLoop(){

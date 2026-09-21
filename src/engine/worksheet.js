@@ -1,6 +1,6 @@
 // ---------------- Drill-set (10-exercise worksheet) flow ----------------
 import { state, els, t } from './state.js';
-import { SET_SIZE } from './constants.js';
+import { SET_SIZE, MAX_WRONG_ANSWERS } from './constants.js';
 import { playPositive, playNegative } from '../core/audio.js';
 import { advanceRoom, failRoom } from './room-lifecycle.js';
 
@@ -170,6 +170,7 @@ export function checkAnswerForSet(val){
   set.results[idx] = correct ? 'correct' : 'wrong';
   item.answered = val.trim();
   item.answeredCorrect = correct;
+  if(!correct) set.wrongCount = (set.wrongCount||0) + 1;
   correct ? playPositive() : playNegative();
 
   if(set.isTrial){
@@ -199,16 +200,19 @@ export function checkAnswerForSet(val){
   els.submitBtn.disabled = true;
   setTimeout(function(){
     if(set.finalized) return;
+    // A wrong row can be retried via the arrow keys rather than ending the
+    // attempt outright — but retrying is still guessing, so the 3rd wrong
+    // submission overall (whether 3 distinct rows or 3 attempts at the
+    // same one) ends the attempt early, same as running out of rows with
+    // too few correct.
+    if(set.wrongCount >= MAX_WRONG_ANSWERS){ finalizeSet('tooManyWrong'); return; }
     if(set.isTrial){
-      if(idx+1 >= set.items.length) finalizeSet(false);
+      if(idx+1 >= set.items.length) finalizeSet();
       else { set.idx = idx+1; focusCurrentRow(); }
       return;
     }
-    // Worksheet rooms: a wrong answer no longer ends the attempt — the row
-    // stays open to retry via the arrow keys. Move on to whichever other
-    // row still isn't correct yet; once none remain, the sheet is done.
     var next = findNextPending(set, idx);
-    if(next === null) finalizeSet(false);
+    if(next === null) finalizeSet();
     else { set.idx = next; focusCurrentRow(); }
   }, 700);
 }
@@ -225,12 +229,17 @@ export function findNextPending(set, fromIdx){
   return null;
 }
 
-export function finalizeSet(timedOut){
+// `reason` is undefined for a normal completion (every row attempted),
+// or one of 'timeUp' (the estimation room's hourglass ran out) /
+// 'tooManyWrong' (MAX_WRONG_ANSWERS reached) for the two ways a set can
+// end early — only affects which sub-line showSetResult() shows.
+export function finalizeSet(reason){
   var set = state.set;
   if(!set || set.finalized) return;
-  // If the timer ran out mid-edit, the current row's slot still holds the
-  // shared input rather than a graded result — restore its placeholder so
-  // it doesn't just look like an empty gap in the result recap.
+  // If the timer (or the wrong-answer cap) ended things mid-edit, the
+  // current row's slot still holds the shared input rather than a graded
+  // result — restore its placeholder so it doesn't just look like an
+  // empty gap in the result recap.
   if(!set.isTrial) resetRowPlaceholder(set.idx);
   set.finalized = true;
   var correctCount = countCorrect(set);
@@ -241,14 +250,14 @@ export function finalizeSet(timedOut){
     advanceRoom();
   } else {
     // Falling short still gets its own screen — worth pausing on, since it
-    // explains why a torch is about to burn out — with a manual Continue
-    // (failRoom() doesn't have a "linger, but skippable" celebration to
-    // fold this into the way a pass does).
-    showSetResult(correctCount, timedOut);
+    // explains why the player is about to fall back a chamber — with a
+    // manual Continue (failRoom() doesn't have a "linger, but skippable"
+    // celebration to fold this into the way a pass does).
+    showSetResult(correctCount, reason);
   }
 }
 
-export function showSetResult(correctCount, timedOut){
+export function showSetResult(correctCount, reason){
   var s = t();
   var set = state.set;
   if(set && set.isTrial) renderTrialCharges(); else updateRowHighlight();
@@ -263,7 +272,7 @@ export function showSetResult(correctCount, timedOut){
   els.sub.style.display = '';
 
   els.prompt.textContent = s.setFail(correctCount, set ? set.items.length : SET_SIZE);
-  els.sub.textContent = timedOut ? s.setTimeUp : s.setFailSub;
+  els.sub.textContent = reason==='timeUp' ? s.setTimeUp : reason==='tooManyWrong' ? s.setTooManyWrong : s.setFailSub;
   playNegative();
 
   els.setContinueBtn.textContent = s.continueBtn;

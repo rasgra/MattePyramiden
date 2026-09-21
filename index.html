@@ -413,8 +413,8 @@ canvas#scene{
   color:#6b5327; display:block; margin-top:10px; text-align:right;
 }
 .intro-letter-text{ font-family:'Caveat',cursive; font-size:1.45rem; line-height:1.35; }
-.intro-candle{ flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.intro-candle .flame{
+.intro-lamp{ flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.intro-lamp .flame{
   font-size:1.9rem; filter:drop-shadow(0 0 10px rgba(246,199,102,.8));
   animation: flicker 1.6s ease-in-out infinite;
 }
@@ -592,7 +592,7 @@ canvas#scene{
             <p class="intro-letter-text" id="introLetterText"></p>
             <span class="intro-letter-sig" id="introLetterSig">— Cheops</span>
           </div>
-          <div class="intro-candle"><span class="flame">🕯️</span></div>
+          <div class="intro-lamp"><span class="flame">🪔</span></div>
         </div>
       </div>
       <div class="intro-dots" id="introDots"></div>
@@ -667,8 +667,8 @@ canvas#scene{
       wordWrong: "Fel",
       rulesBtn: "Regler",
       rulesTitle: "Rumsregler",
-      rulesBodyDrill: "L\xF6s alla 10 uppgifterna \u2014 f\xF6r att kl\xE4ttra upp\xE5t kr\xE4vs alla r\xE4tt. Svarar du fel f\xE5r du en ny chans senare: anv\xE4nd piltangenterna f\xF6r att hoppa till en annan ol\xF6st uppgift, eller tillbaka till en du missade. Det finns ingen tidsgr\xE4ns f\xF6r sj\xE4lva kammaren \u2014 bara den tid det finns luft kvar.",
-      rulesBodyEstimation: "L\xF6s alla 10 uppskattningarna \u2014 f\xF6r att kl\xE4ttra upp\xE5t kr\xE4vs alla r\xE4tt. Till skillnad fr\xE5n andra kamrar har den h\xE4r ett eget timglas: du har 4 minuter p\xE5 dig. Rinner det ut innan allt \xE4r r\xE4tt skickas du tillbaka ett rum.",
+      rulesBodyDrill: "L\xF6s alla 10 uppgifterna \u2014 f\xF6r att kl\xE4ttra upp\xE5t kr\xE4vs alla r\xE4tt. Svarar du fel f\xE5r du en ny chans senare: anv\xE4nd piltangenterna f\xF6r att hoppa till en annan ol\xF6st uppgift, eller tillbaka till en du missade \u2014 men tre fel svar totalt r\xE4cker f\xF6r att skicka dig tillbaka en kammare, s\xE5 gissa inte i blindo. Det finns ingen tidsgr\xE4ns f\xF6r sj\xE4lva kammaren \u2014 bara den tid det finns luft kvar.",
+      rulesBodyEstimation: "L\xF6s alla 10 uppskattningarna \u2014 f\xF6r att kl\xE4ttra upp\xE5t kr\xE4vs alla r\xE4tt (och precis som i alla kamrar skickas du tillbaka efter tre fel svar). Till skillnad fr\xE5n andra kamrar har den h\xE4r ett eget timglas: du har 4 minuter p\xE5 dig. Rinner det ut innan allt \xE4r r\xE4tt skickas du tillbaka ett rum.",
       rulesBodyNim: "Tre murar av tegelstenar. P\xE5 din tur v\xE4ljer du EN mur och tar valfritt antal stenar fr\xE5n den \u2014 klicka p\xE5 en tegelsten f\xF6r att ta den och alla ovanf\xF6r. Den som tvingas ta den allra sista stenen f\xF6rlorar. Besegra din motst\xE5ndare f\xF6r att komma vidare; f\xF6rlorar du faller du tillbaka en kammare.",
       rulesBodyCombo: "En g\xE5ta, en chans. Svara r\xE4tt f\xF6r att \xF6ppna valvet. Ett felaktigt svar skickar dig tillbaka ett rum.",
       rulesBodyMastermind: "Tre hemliga siffror (0\u20139, kan upprepas) v\xE4ntar p\xE5 att kn\xE4ckas. Efter varje gissning f\xE5r du veta hur m\xE5nga siffror som satt helt r\xE4tt, och hur m\xE5nga som fanns med men p\xE5 fel plats. Du har 15 gissningar \u2014 tar de slut utan att du kn\xE4cker koden faller du tillbaka en kammare.",
@@ -684,6 +684,7 @@ canvas#scene{
         return "Bara " + n + "/" + total + " r\xE4tt \u2014 det r\xE4cker inte. Du faller tillbaka en kammare.";
       },
       setFailSub: "Alla 10 r\xE4tt kr\xE4vdes f\xF6r att g\xE5 vidare.",
+      setTooManyWrong: "Tre fel svar \xE4r gr\xE4nsen f\xF6r den h\xE4r kammaren.",
       setTimeUp: "Timglaset rinner ut mitt i r\xE4kningen \u2014 du faller tillbaka en kammare.",
       wrongGeneric: "Fel svar \u2014 du faller tillbaka en kammare.",
       timeUp: "Timglaset rinner ut \u2014 du faller tillbaka en kammare.",
@@ -715,6 +716,7 @@ canvas#scene{
       introBeats: [
         "En stund f\xF6r l\xE4nge vid hieroglyferna p\xE5 v\xE4ggen \u2014 och turen har redan sv\xE4ngt runt h\xF6rnet utan dig.",
         "Du trevar dig fram genom en g\xE5ng som blivit kolsvart, gruppens r\xF6ster redan uppslukade av stenen.",
+        "Ett svagt sken flimrar n\xE5gonstans framf\xF6r dig. Du k\xE4nner dig fram mot det \u2014 och hittar en gammal oljelampa, fortfarande t\xE4nd, med en hopvikt lapp bredvid.",
         null,
         "L\xE5ngt ovanf\xF6r har sanden b\xF6rjat rinna in i ett schakt. Tolv kamrar st\xE5r mellan dig och utg\xE5ngen."
       ],
@@ -752,8 +754,8 @@ canvas#scene{
       wordWrong: "Wrong",
       rulesBtn: "Rules",
       rulesTitle: "Room rules",
-      rulesBodyDrill: "Solve all 10 problems \u2014 climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed. There\u2019s no deadline on the chamber itself \u2014 only the air shown in the clock above, which keeps counting down through the whole climb.",
-      rulesBodyEstimation: "Solve all 10 estimates \u2014 climbing upward requires a perfect sheet. Unlike other chambers, this one keeps an hourglass of its own: you have 4 minutes. If it runs out before everything is correct, you\u2019re sent back a chamber \u2014 meanwhile the air clock above keeps counting down through the whole climb regardless.",
+      rulesBodyDrill: "Solve all 10 problems \u2014 climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed \u2014 but three wrong answers in total ends the attempt, so don\u2019t just guess blindly. There\u2019s no deadline on the chamber itself \u2014 only the air shown in the clock above, which keeps counting down through the whole climb.",
+      rulesBodyEstimation: "Solve all 10 estimates \u2014 climbing upward requires a perfect sheet (and, as in every chamber, three wrong answers sends you back). Unlike other chambers, this one keeps an hourglass of its own: you have 4 minutes. If it runs out before everything is correct, you\u2019re sent back a chamber \u2014 meanwhile the air clock above keeps counting down through the whole climb regardless.",
       rulesBodyNim: "Three walls of bricks. On your turn, choose ONE wall and take any number of bricks from it \u2014 click a brick to take it and every one above it. Whoever is forced to take the very last brick loses. Beat your rival to move on; lose, and you slip back a chamber.",
       rulesBodyCombo: "One riddle, one chance. Answer correctly to open the vault. A wrong answer sends you back a chamber.",
       rulesBodyMastermind: "Three secret digits (0\u20139, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses \u2014 run out without cracking it and you slip back a chamber.",
@@ -769,6 +771,7 @@ canvas#scene{
         return "Only " + n + "/" + total + " correct \u2014 not enough. You slip back a chamber.";
       },
       setFailSub: "All 10 out of 10 were needed to move on.",
+      setTooManyWrong: "Three wrong answers is the limit for this chamber.",
       setTimeUp: "The hourglass runs out mid-count \u2014 you slip back a chamber.",
       wrongGeneric: "Not quite \u2014 you slip back a chamber.",
       timeUp: "The hourglass runs out \u2014 you slip back a chamber.",
@@ -800,6 +803,7 @@ canvas#scene{
       introBeats: [
         "A moment too long over the hieroglyphs on the wall \u2014 and the tour has already turned the corner without you.",
         "You feel your way forward down a corridor gone pitch-black, the group\u2019s voices already swallowed by the stone.",
+        "A faint light flickers somewhere ahead. Feeling your way toward it, you find an old oil lamp, still burning \u2014 and beside it, a folded note.",
         null,
         "Far above, sand has begun hissing into a shaft. Twelve chambers stand between you and the way out."
       ],
@@ -818,6 +822,7 @@ canvas#scene{
   var TOTAL_ROOMS = 12;
   var SET_SIZE = 10;
   var TOPIC_MEMORY = 4;
+  var MAX_WRONG_ANSWERS = 3;
   var AIR_SECONDS_PER_ROOM = 240;
   var ESTIMATION_ROOM_SECONDS = 240;
   var NIM_PILE_COUNT = 3;
@@ -2036,6 +2041,64 @@ canvas#scene{
     ctx2.fillStyle = vg;
     ctx2.fillRect(0, 0, w, h);
   }
+  function drawIntroLampScene(ctx2, w, h, ti) {
+    ctx2.clearRect(0, 0, w, h);
+    ctx2.fillStyle = "#050403";
+    ctx2.fillRect(0, 0, w, h);
+    var cx = w / 2, cy = h * 0.5, stages = 5;
+    for (var i = stages; i >= 1; i--) {
+      var f = i / stages;
+      var hw = w * 0.42 * f, hh = h * 0.38 * f;
+      ctx2.strokeStyle = "rgba(150,115,70," + (0.06 + (stages - i) * 0.035) + ")";
+      ctx2.lineWidth = 1.5;
+      ctx2.strokeRect(cx - hw, cy - hh, hw * 2, hh * 2);
+    }
+    var lampX = w * 0.47, lampY = h * 0.68;
+    var flick = 0.85 + 0.15 * Math.sin(ti * 7);
+    var glow = ctx2.createRadialGradient(lampX, lampY - h * 0.05, 4, lampX, lampY - h * 0.05, w * 0.32 * flick);
+    glow.addColorStop(0, "rgba(255,214,140,0.6)");
+    glow.addColorStop(0.5, "rgba(255,180,90,0.2)");
+    glow.addColorStop(1, "rgba(255,180,90,0)");
+    ctx2.fillStyle = glow;
+    ctx2.beginPath();
+    ctx2.arc(lampX, lampY - h * 0.05, w * 0.32 * flick, 0, Math.PI * 2);
+    ctx2.fill();
+    ctx2.save();
+    ctx2.translate(lampX + w * 0.11, lampY + h * 0.025);
+    ctx2.rotate(-0.14);
+    ctx2.fillStyle = "#d9cba3";
+    ctx2.fillRect(-w * 0.045, -h * 0.02, w * 0.09, h * 0.04);
+    ctx2.strokeStyle = "rgba(90,70,40,0.45)";
+    ctx2.lineWidth = 1;
+    ctx2.strokeRect(-w * 0.045, -h * 0.02, w * 0.09, h * 0.04);
+    ctx2.restore();
+    ctx2.fillStyle = "#3a2f22";
+    ctx2.beginPath();
+    ctx2.ellipse(lampX, lampY, w * 0.055, h * 0.028, 0, 0, Math.PI * 2);
+    ctx2.fill();
+    ctx2.beginPath();
+    ctx2.moveTo(lampX + w * 0.048, lampY - h * 6e-3);
+    ctx2.quadraticCurveTo(lampX + w * 0.09, lampY - h * 0.014, lampX + w * 0.1, lampY - h * 0.026);
+    ctx2.quadraticCurveTo(lampX + w * 0.085, lampY, lampX + w * 0.04, lampY + h * 0.012);
+    ctx2.closePath();
+    ctx2.fill();
+    ctx2.fillStyle = "#241c14";
+    ctx2.beginPath();
+    ctx2.ellipse(lampX, lampY - h * 0.012, w * 0.018, h * 0.01, 0, 0, Math.PI * 2);
+    ctx2.fill();
+    var fx = lampX + w * 0.1, fy = lampY - h * 0.03;
+    ctx2.beginPath();
+    ctx2.moveTo(fx, fy - 2 * flick);
+    ctx2.quadraticCurveTo(fx - 6 * flick, fy - 16 * flick, fx, fy - 28 * flick);
+    ctx2.quadraticCurveTo(fx + 6 * flick, fy - 16 * flick, fx, fy - 2 * flick);
+    ctx2.fillStyle = "#f6c766";
+    ctx2.fill();
+    var vg = ctx2.createRadialGradient(cx, cy, h * 0.1, cx, cy, h * 0.7);
+    vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(1, "rgba(0,0,0,0.55)");
+    ctx2.fillStyle = vg;
+    ctx2.fillRect(0, 0, w, h);
+  }
   function drawIntroShaftScene(ctx2, w, h, ti) {
     ctx2.clearRect(0, 0, w, h);
     var bg = ctx2.createLinearGradient(0, 0, 0, h);
@@ -2088,7 +2151,7 @@ canvas#scene{
     ctx2.fillStyle = vg;
     ctx2.fillRect(0, 0, w, h);
   }
-  var INTRO_SCENES = [drawIntroWallScene, drawIntroCorridorScene, null, drawIntroShaftScene];
+  var INTRO_SCENES = [drawIntroWallScene, drawIntroCorridorScene, drawIntroLampScene, null, drawIntroShaftScene];
   var introSceneRunning = false;
   var activeIntroDraw = null;
   function runIntroSceneLoop() {
@@ -2554,7 +2617,8 @@ canvas#scene{
         items: trial.items,
         idx: 0,
         results: [],
-        finalized: false
+        finalized: false,
+        wrongCount: 0
       };
     }
     var items = [];
@@ -2586,7 +2650,8 @@ canvas#scene{
       items,
       idx: 0,
       results: [],
-      finalized: false
+      finalized: false,
+      wrongCount: 0
     };
   }
 
@@ -3366,6 +3431,7 @@ canvas#scene{
     set.results[idx] = correct ? "correct" : "wrong";
     item.answered = val.trim();
     item.answeredCorrect = correct;
+    if (!correct) set.wrongCount = (set.wrongCount || 0) + 1;
     correct ? playPositive() : playNegative();
     if (set.isTrial) {
       renderTrialCharges();
@@ -3391,8 +3457,12 @@ canvas#scene{
     els.submitBtn.disabled = true;
     setTimeout(function() {
       if (set.finalized) return;
+      if (set.wrongCount >= MAX_WRONG_ANSWERS) {
+        finalizeSet("tooManyWrong");
+        return;
+      }
       if (set.isTrial) {
-        if (idx + 1 >= set.items.length) finalizeSet(false);
+        if (idx + 1 >= set.items.length) finalizeSet();
         else {
           set.idx = idx + 1;
           focusCurrentRow();
@@ -3400,7 +3470,7 @@ canvas#scene{
         return;
       }
       var next = findNextPending(set, idx);
-      if (next === null) finalizeSet(false);
+      if (next === null) finalizeSet();
       else {
         set.idx = next;
         focusCurrentRow();
@@ -3415,7 +3485,7 @@ canvas#scene{
     }
     return null;
   }
-  function finalizeSet(timedOut) {
+  function finalizeSet(reason) {
     var set = state.set;
     if (!set || set.finalized) return;
     if (!set.isTrial) resetRowPlaceholder(set.idx);
@@ -3424,10 +3494,10 @@ canvas#scene{
     if (correctCount === set.items.length) {
       advanceRoom();
     } else {
-      showSetResult(correctCount, timedOut);
+      showSetResult(correctCount, reason);
     }
   }
-  function showSetResult(correctCount, timedOut) {
+  function showSetResult(correctCount, reason) {
     var s = t();
     var set = state.set;
     if (set && set.isTrial) renderTrialCharges();
@@ -3442,7 +3512,7 @@ canvas#scene{
     els.prompt.style.display = "";
     els.sub.style.display = "";
     els.prompt.textContent = s.setFail(correctCount, set ? set.items.length : SET_SIZE);
-    els.sub.textContent = timedOut ? s.setTimeUp : s.setFailSub;
+    els.sub.textContent = reason === "timeUp" ? s.setTimeUp : reason === "tooManyWrong" ? s.setTooManyWrong : s.setFailSub;
     playNegative();
     els.setContinueBtn.textContent = s.continueBtn;
     els.setContinueBtn.onclick = failRoom;
@@ -3550,7 +3620,7 @@ canvas#scene{
         updateHourglass();
         if (state.roomTimeLeft <= 0) {
           state.roomTimeTotal = 0;
-          if (state.set && !state.set.finalized) finalizeSet(true);
+          if (state.set && !state.set.finalized) finalizeSet("timeUp");
           else onFail(t().timeUp);
         }
       }

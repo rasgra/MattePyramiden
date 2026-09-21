@@ -49,6 +49,24 @@ test('choosing a language and difficulty starts the intro', async ({ page }) => 
   await expect(page.locator('#introBeatText')).not.toHaveText('');
 });
 
+test('the intro finds an oil lamp before the letter, and the letter is lit by it', async ({ page }) => {
+  await page.goto('/');
+  await page.click('#langEn');
+  await page.click('#setupPrimaryBtn');
+
+  // 5 beats now: wall, corridor, the lamp discovery, the letter, the shaft.
+  await expect(page.locator('#introDots span')).toHaveCount(5);
+
+  await page.click('#introNextBtn'); // corridor
+  await page.click('#introNextBtn'); // the lamp discovery
+  await expect(page.locator('#introBeatText')).toContainText('oil lamp');
+  await expect(page.locator('#introScene')).toBeVisible();
+
+  await page.click('#introNextBtn'); // the letter
+  await expect(page.locator('#introLetter')).toBeVisible();
+  await expect(page.locator('.intro-lamp .flame')).toHaveText('🪔');
+});
+
 test('skipping the intro drops you into chamber 1', async ({ page }) => {
   await startGame(page);
   await expect(page.locator('#introOverlay')).toBeHidden();

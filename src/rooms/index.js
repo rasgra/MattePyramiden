@@ -54,7 +54,7 @@ export function buildDrillSet(topicKey, level, lang){
     return {
       key: def.key, topicName: trial.name, topicSub: trial.sub || '', accent: def.accent, isTrial:true,
       chargeIcon: def.chargeIcon, items: trial.items,
-      idx:0, results:[], finalized:false
+      idx:0, results:[], finalized:false, wrongCount:0
     };
   }
 
@@ -70,6 +70,6 @@ export function buildDrillSet(topicKey, level, lang){
   }
   return {
     key: def.key, topicName: def.name[lang], topicSub: items[0].sub, accent: def.accent, isTrial:false,
-    items: items, idx:0, results:[], finalized:false
+    items: items, idx:0, results:[], finalized:false, wrongCount:0
   };
 }

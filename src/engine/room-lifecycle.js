@@ -44,7 +44,7 @@ export function runGlobalTick(){
         // keeps draining through the fail screen and the fall-back to the
         // previous chamber, same as it would for any other wrong answer.
         state.roomTimeTotal = 0;
-        if(state.set && !state.set.finalized) finalizeSet(true);
+        if(state.set && !state.set.finalized) finalizeSet('timeUp');
         else onFail(t().timeUp);
       }
     }

@@ -27,6 +27,23 @@ match whatever's decided here.
 > shipped game. The letter's "the stone lifts you higher" line was also
 > reworded to "you can climb to the next chamber!" — same climbing
 > metaphor, less poetic indirection.
+>
+> **Second follow-up, resolved and implemented:** the intro used to cut
+> straight from "pitch-black corridor" to "here's a letter" with no
+> explanation of how the player could suddenly read it in the dark. A new
+> beat now sits between them: a faint light ahead turns out to be an old,
+> still-burning oil lamp sitting next to the note — which is also what
+> lights the letter beat now (the candle emoji next to the parchment was
+> swapped for an oil lamp to match). Each of the intro's non-letter beats
+> also got its own small canvas illustration this pass (the hieroglyph
+> wall, the pitch-black corridor, the lamp discovery, the sand-filled
+> shaft) — see `showIntroScene()`/`INTRO_SCENES` in
+> `src/engine/canvas-scene.js`.
+>
+> Also implemented, unrelated to the fiction: a worksheet/trial chamber
+> now ends the attempt (and sends the player back a chamber) after 3
+> wrong answers total, rather than allowing a row to be retried
+> indefinitely — see `MAX_WRONG_ANSWERS` in `src/engine/constants.js`.
 
 ## 1. The story as currently told (as of when this doc was written)
 

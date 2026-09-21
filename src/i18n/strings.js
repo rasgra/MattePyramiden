@@ -18,8 +18,8 @@ export var STR = {
     roomClearMath:'Du klarade det!',
     wordCorrect:'Rätt', wordWrong:'Fel',
     rulesBtn:'Regler', rulesTitle:'Rumsregler',
-    rulesBodyDrill:'Lös alla 10 uppgifterna — för att klättra uppåt krävs alla rätt. Svarar du fel får du en ny chans senare: använd piltangenterna för att hoppa till en annan olöst uppgift, eller tillbaka till en du missade. Det finns ingen tidsgräns för själva kammaren — bara den tid det finns luft kvar.',
-    rulesBodyEstimation:'Lös alla 10 uppskattningarna — för att klättra uppåt krävs alla rätt. Till skillnad från andra kamrar har den här ett eget timglas: du har 4 minuter på dig. Rinner det ut innan allt är rätt skickas du tillbaka ett rum.',
+    rulesBodyDrill:'Lös alla 10 uppgifterna — för att klättra uppåt krävs alla rätt. Svarar du fel får du en ny chans senare: använd piltangenterna för att hoppa till en annan olöst uppgift, eller tillbaka till en du missade — men tre fel svar totalt räcker för att skicka dig tillbaka en kammare, så gissa inte i blindo. Det finns ingen tidsgräns för själva kammaren — bara den tid det finns luft kvar.',
+    rulesBodyEstimation:'Lös alla 10 uppskattningarna — för att klättra uppåt krävs alla rätt (och precis som i alla kamrar skickas du tillbaka efter tre fel svar). Till skillnad från andra kamrar har den här ett eget timglas: du har 4 minuter på dig. Rinner det ut innan allt är rätt skickas du tillbaka ett rum.',
     rulesBodyNim:'Tre murar av tegelstenar. På din tur väljer du EN mur och tar valfritt antal stenar från den — klicka på en tegelsten för att ta den och alla ovanför. Den som tvingas ta den allra sista stenen förlorar. Besegra din motståndare för att komma vidare; förlorar du faller du tillbaka en kammare.',
     rulesBodyCombo:'En gåta, en chans. Svara rätt för att öppna valvet. Ett felaktigt svar skickar dig tillbaka ett rum.',
     rulesBodyMastermind:'Tre hemliga siffror (0–9, kan upprepas) väntar på att knäckas. Efter varje gissning får du veta hur många siffror som satt helt rätt, och hur många som fanns med men på fel plats. Du har 15 gissningar — tar de slut utan att du knäcker koden faller du tillbaka en kammare.',
@@ -29,6 +29,7 @@ export var STR = {
     setTally: function(n){ return 'Antal rätt: ' + n; },
     setFail:function(n,total){ return 'Bara ' + n + '/' + total + ' rätt — det räcker inte. Du faller tillbaka en kammare.'; },
     setFailSub:'Alla 10 rätt krävdes för att gå vidare.',
+    setTooManyWrong:'Tre fel svar är gränsen för den här kammaren.',
     setTimeUp:'Timglaset rinner ut mitt i räkningen — du faller tillbaka en kammare.',
     wrongGeneric:'Fel svar — du faller tillbaka en kammare.',
     timeUp:'Timglaset rinner ut — du faller tillbaka en kammare.',
@@ -52,6 +53,7 @@ export var STR = {
     introBeats:[
       'En stund för länge vid hieroglyferna på väggen — och turen har redan svängt runt hörnet utan dig.',
       'Du trevar dig fram genom en gång som blivit kolsvart, gruppens röster redan uppslukade av stenen.',
+      'Ett svagt sken flimrar någonstans framför dig. Du känner dig fram mot det — och hittar en gammal oljelampa, fortfarande tänd, med en hopvikt lapp bredvid.',
       null,
       'Långt ovanför har sanden börjat rinna in i ett schakt. Tolv kamrar står mellan dig och utgången.'
     ],
@@ -75,8 +77,8 @@ export var STR = {
     roomClearMath:'You did it!',
     wordCorrect:'Correct', wordWrong:'Wrong',
     rulesBtn:'Rules', rulesTitle:'Room rules',
-    rulesBodyDrill:'Solve all 10 problems — climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed. There’s no deadline on the chamber itself — only the air shown in the clock above, which keeps counting down through the whole climb.',
-    rulesBodyEstimation:'Solve all 10 estimates — climbing upward requires a perfect sheet. Unlike other chambers, this one keeps an hourglass of its own: you have 4 minutes. If it runs out before everything is correct, you’re sent back a chamber — meanwhile the air clock above keeps counting down through the whole climb regardless.',
+    rulesBodyDrill:'Solve all 10 problems — climbing upward requires a perfect sheet. Get one wrong and you can try it again later: use the arrow keys to jump to any other unsolved problem, or back to one you missed — but three wrong answers in total ends the attempt, so don’t just guess blindly. There’s no deadline on the chamber itself — only the air shown in the clock above, which keeps counting down through the whole climb.',
+    rulesBodyEstimation:'Solve all 10 estimates — climbing upward requires a perfect sheet (and, as in every chamber, three wrong answers sends you back). Unlike other chambers, this one keeps an hourglass of its own: you have 4 minutes. If it runs out before everything is correct, you’re sent back a chamber — meanwhile the air clock above keeps counting down through the whole climb regardless.',
     rulesBodyNim:'Three walls of bricks. On your turn, choose ONE wall and take any number of bricks from it — click a brick to take it and every one above it. Whoever is forced to take the very last brick loses. Beat your rival to move on; lose, and you slip back a chamber.',
     rulesBodyCombo:'One riddle, one chance. Answer correctly to open the vault. A wrong answer sends you back a chamber.',
     rulesBodyMastermind:'Three secret digits (0–9, repeats allowed) are waiting to be cracked. After each guess you learn how many digits are in the exact right spot, and how many exist but are in the wrong spot. You have 15 guesses — run out without cracking it and you slip back a chamber.',
@@ -86,6 +88,7 @@ export var STR = {
     setTally: function(n){ return 'Correct: ' + n; },
     setFail:function(n,total){ return 'Only ' + n + '/' + total + ' correct — not enough. You slip back a chamber.'; },
     setFailSub:'All 10 out of 10 were needed to move on.',
+    setTooManyWrong:'Three wrong answers is the limit for this chamber.',
     setTimeUp:'The hourglass runs out mid-count — you slip back a chamber.',
     wrongGeneric:'Not quite — you slip back a chamber.',
     timeUp:'The hourglass runs out — you slip back a chamber.',
@@ -109,6 +112,7 @@ export var STR = {
     introBeats:[
       'A moment too long over the hieroglyphs on the wall — and the tour has already turned the corner without you.',
       'You feel your way forward down a corridor gone pitch-black, the group’s voices already swallowed by the stone.',
+      'A faint light flickers somewhere ahead. Feeling your way toward it, you find an old oil lamp, still burning — and beside it, a folded note.',
       null,
       'Far above, sand has begun hissing into a shaft. Twelve chambers stand between you and the way out.'
     ],

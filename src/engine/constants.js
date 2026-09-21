@@ -16,6 +16,12 @@ export var DRILL_ICON = '📜';
 export var TOTAL_ROOMS = 12;
 export var SET_SIZE = 10;        // exercises per drill chamber
 export var TOPIC_MEMORY = 4;     // a topic can't repeat within this many drill chambers
+// A worksheet/trial chamber used to allow retrying a row indefinitely — no
+// limit stopped a player from brute-force-guessing their way to a correct
+// answer. The 3rd wrong submission in a chamber (across any rows, not just
+// distinct ones) now ends the attempt early and sends the player back a
+// chamber, same as running out of rows with too few correct.
+export var MAX_WRONG_ANSWERS = 3;
 
 // The hourglass no longer times individual chambers — it times the whole
 // climb's breathable air, a fixed budget of AIR_SECONDS_PER_ROOM for each

@@ -97,8 +97,8 @@
   color:#6b5327; display:block; margin-top:10px; text-align:right;
 }
 .intro-letter-text{ font-family:'Caveat',cursive; font-size:1.45rem; line-height:1.35; }
-.intro-candle{ flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.intro-candle .flame{
+.intro-lamp{ flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.intro-lamp .flame{
   font-size:1.9rem; filter:drop-shadow(0 0 10px rgba(246,199,102,.8));
   animation: flicker 1.6s ease-in-out infinite;
 }
