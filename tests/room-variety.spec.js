@@ -494,6 +494,35 @@ test('the subtraction room rarely (under 5%) allows a negative answer', async ({
   expect(stats.ratio).toBeLessThan(0.05);
 });
 
+test('the subtraction room rarely produces the trivial "a minus itself" zero-answer problem', async ({ page }) => {
+  // Regression test: at the easiest tier's tiny [1,9] range, drawing b
+  // uniformly up to a used to land on b===a often enough that a 10-problem
+  // sheet could be 40% "anything minus itself is zero" — see the level-2
+  // screenshot that reported this. Now b is deliberately kept below a most
+  // of the time, so the zero-answer case stays rare instead of dominant.
+  await startWithDebug(page);
+  const stats = await page.evaluate(() => {
+    const dbg = window.__debug;
+    dbg.state.level = 2;
+    let total = 0;
+    let zero = 0;
+    for (let i = 0; i < 60; i++) {
+      dbg.state.roomPlan[0] = 'subtraction';
+      dbg.loadRoom(0, { skipTimer: true });
+      for (const item of dbg.state.set.items) {
+        const m = item.label.match(/^(-?\d+) − (-?\d+) =$/);
+        if (!m) continue;
+        total++;
+        if (m[1] === m[2]) zero++;
+      }
+    }
+    return { total, zero, ratio: total ? zero / total : null };
+  });
+
+  expect(stats.total).toBeGreaterThan(0);
+  expect(stats.ratio).toBeLessThan(0.2);
+});
+
 test('minesweeper auto-completes once every mummy has been flagged', async ({ page }) => {
   await startWithDebug(page);
   test.skip(!(await landOnMinigame(page, 'minesweeper')), 'minesweeper did not come up in the sample of attempts');

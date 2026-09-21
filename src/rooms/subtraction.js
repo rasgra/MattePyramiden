@@ -6,10 +6,18 @@ export default {
   build:function(level){
     var range = T(level, [[1,9],[5,40],[20,200],[100,5000],[1000,90000]]);
     var a = randInt(range[0], range[1]);
-    // Almost always b <= a (a non-negative result) — occasionally
-    // (under 5% of problems) b is drawn from the full range instead,
-    // which can land above a and give a negative answer.
-    var b = Math.random() < 0.05 ? randInt(range[0], range[1]) : randInt(range[0], a);
+    // Almost always b < a (a meaningfully positive result) — a plain
+    // uniform draw of b up to a used to land on b===a roughly 1-in-a
+    // times, which at the easiest tier's tiny [1,9] range meant a large
+    // share of a 10-problem sheet was the trivial "anything minus itself
+    // is zero", so that's now kept rare (~10% of the non-negative case)
+    // rather than left to chance. Occasionally (under 5% of problems) b
+    // is drawn from the full range instead, which can land above a and
+    // give a negative answer.
+    var b;
+    if(Math.random() < 0.05) b = randInt(range[0], range[1]);
+    else if(a > range[0] && Math.random() < 0.9) b = randInt(range[0], a-1);
+    else b = randInt(range[0], a);
     return {a:a,b:b,ans:a-b};
   },
   text:function(lang,v){
